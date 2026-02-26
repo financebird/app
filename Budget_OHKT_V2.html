@@ -213,11 +213,11 @@ input:focus,select:focus{outline:none;border-color:var(--accent2);box-shadow:0 0
       <div class="card-label" style="margin-bottom:12px">Notion Integration Token</div>
       <div class="alert info" style="margin-bottom:14px">
         <span>ℹ️</span>
-        <span>Gib deinen <code>secret_...</code> Token ein. Er wird nur lokal in deinem Browser gespeichert und nie übertragen.</span>
+        <span>Gib deinen <code>ntn_...</code> Token ein. Er wird nur lokal in deinem Browser gespeichert und nie übertragen.</span>
       </div>
       <div class="form-group">
         <label>Token</label>
-        <input type="password" id="tokenInput" class="token-input" placeholder="secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+        <input type="password" id="tokenInput" class="token-input" placeholder="ntn_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
       </div>
       <button class="btn btn-green btn-full" onclick="saveToken()">✓ Verbinden</button>
       <div id="tokenError" style="margin-top:10px;color:var(--red);font-size:13px;text-align:center"></div>
@@ -562,7 +562,7 @@ function hideLoading(){ document.getElementById('loadingOverlay').classList.remo
 // ═══════════════════════════════════════════
 async function saveToken(){
   const t = document.getElementById('tokenInput').value.trim();
-  if(!t.startsWith('secret_')){ document.getElementById('tokenError').textContent='Token muss mit secret_ beginnen'; return; }
+  if(!t || t.length < 10){ document.getElementById('tokenError').textContent='Bitte Token eingeben'; return; }
   showLoading('Verbinde mit Notion…');
   // Test token
   try{
