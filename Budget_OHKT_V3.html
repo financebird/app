@@ -773,7 +773,6 @@ textarea.form-input{resize:vertical;min-height:72px}
     </div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-outline btn-sm" onclick="syncClockify()">🔄 Sync</button>
-      <button class="btn btn-outline btn-sm" onclick="debugProjekte()" style="color:var(--amber)">🔍 Debug</button>
       <button class="btn btn-primary btn-sm" onclick="openProjModal()">+ Projekt</button>
     </div>
   </div>
@@ -1361,10 +1360,7 @@ textarea.form-input{resize:vertical;min-height:72px}
         </select>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Clockify Projekt ID <span style="color:var(--muted);font-weight:400">(optional — für Sync)</span></label>
-      <input type="text" id="pClockifyId" class="form-input" placeholder="wird beim Sync automatisch zugewiesen">
-    </div>
+    <input type="hidden" id="pClockifyId">
     <div class="form-group">
       <label class="form-label">Ziel-Stundensatz (CHF/h)</label>
       <input type="number" id="pTargetRate" class="form-input" placeholder="z.B. 180">
@@ -2147,6 +2143,13 @@ function openProjModal(proj=null){
   document.getElementById('pStatus').value=proj?.status||'active';
   document.getElementById('pKategorie').value=proj?.kategorie||'';
   document.getElementById('pClockifyId').value=proj?.clockifyId||'';
+  const cfDisp=document.getElementById('pClockifyIdDisplay');
+  if(cfDisp) cfDisp.textContent=proj?.clockifyId||'(wird beim Sync gesetzt)';
+  // Reset unlock state
+  const cfInput=document.getElementById('pClockifyId');
+  const cfHint=document.getElementById('cfIdUnlockHint');
+  if(cfInput) cfInput.style.display='none';
+  if(cfHint) cfHint.style.display='none';
   document.getElementById('pTargetRate').value=proj?.targetRate||'';
   document.getElementById('pNote').value=proj?.note||'';
   document.getElementById('projModal').classList.add('open');
@@ -2231,6 +2234,13 @@ async function syncClockify(){
     clockifyProjects=cfProjs;
     saveLocal('clockifyProjects',cfProjs);
 
+    // Load clients to resolve clientId → name
+    let cfClients=[];
+    try{ cfClients=await clockifyFetch(`/workspaces/${wsId}/clients?page-size=100`,key); }catch(e){}
+    const clientMap={};
+    cfClients.forEach(c=>{ clientMap[c.id]=c.name; });
+    saveLocal('clockifyClientMap',clientMap);
+
     // For each project: get time entries for current year
     const start=`${YEAR}-01-01T00:00:00Z`;
     const end=`${YEAR}-12-31T23:59:59Z`;
@@ -2283,7 +2293,7 @@ async function syncClockify(){
         name: dispName,
         clockifyId: cp.id,
         // Preserve user overrides, fall back to Clockify data
-        client: existing?.client||(cp.clientId?cp.clientId:''),
+        client: existing?.client||(cp.clientId?(clientMap[cp.clientId]||cp.clientId):''),
         type: existing?.type||(cfType==='heart'?'Herzensarbeit':'Honorar'),
         status: cp.archived?'inactive':'active',
         kategorie: existing?.kategorie||(cfType==='heart'?'heartwork':''),
@@ -2390,7 +2400,22 @@ function renderProjekte(){
       ${!cfKey?'<p style="font-size:12px;color:var(--muted)">API Key in ⚙️ Keys hinterlegen, dann Sync</p>':''}
     </div>`;
   } else {
-    document.getElementById('projGrid').innerHTML=localProjs.map(p=>{
+    // Sort: active first, then by most recent Clockify month, then alphabetically
+    const cfMonthlyData=loadLocal('clockifyMonthly',{});
+    const projLastMonth=p=>{
+      if(p.status!=='active') return 0;
+      const mo=p.clockifyId?cfMonthlyData[p.clockifyId]||{}:{};
+      return Math.max(0,...Object.keys(mo).map(Number));
+    };
+    const sortedProjs=[...localProjs].sort((a,b)=>{
+      if(a.status==='active'&&b.status!=='active') return -1;
+      if(a.status!=='active'&&b.status==='active') return 1;
+      const rd=projLastMonth(b)-projLastMonth(a);
+      return rd!==0?rd:a.name.localeCompare(b.name,'de');
+    });
+    const activeProjs=sortedProjs.filter(p=>p.status==='active');
+    const archivedProjs=sortedProjs.filter(p=>p.status!=='active');
+    const renderProjCard=(p)=>{
       const pInc=ytx.filter(t=>t.type==='Einnahme'&&t.projekt===p.name).reduce((s,t)=>s+t.amount,0);
       const pExp=ytx.filter(t=>t.type==='Ausgabe'&&t.projekt===p.name).reduce((s,t)=>s+t.amount,0);
       const cfp=p.clockifyId?cfProjs.find(c=>c.id===p.clockifyId):null;
@@ -2438,7 +2463,19 @@ function renderProjekte(){
         </div>`:''}
         ${!cfp&&cfKey?`<div style="font-size:10px;color:var(--muted);margin-top:6px;opacity:.6">⏱ Kein Clockify-Projekt verknüpft</div>`:''}
       </div>`;
-    }).join('');
+    };
+    const activeHtml=activeProjs.map(renderProjCard).join('');
+    const archivedHtml=archivedProjs.length?`
+      <div style="grid-column:1/-1;margin-top:8px">
+        <button onclick="toggleArchived()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;padding:4px 0;font-family:inherit" id="archivedToggleBtn">
+          <span id="archivedToggleIcon">▶</span>
+          ${archivedProjs.length} archivierte Projekte
+        </button>
+      </div>
+      <div id="archivedGrid" class="grid-2" style="display:none;grid-column:1/-1;opacity:.6">
+        ${archivedProjs.map(renderProjCard).join('')}
+      </div>`:'';
+    document.getElementById('projGrid').innerHTML=activeHtml+archivedHtml;
   }
 
   // ── Overhead Grid (from Clockify non-billable) ──
@@ -3878,6 +3915,26 @@ function applyCfQuick(cfId,cfName,clientId){
   showToast('success','⏱','Clockify Projekt gesetzt',lp?lp.name:cfName);
 }
 
+
+function unlockCfId(){
+  const input=document.getElementById('pClockifyId');
+  const hint=document.getElementById('cfIdUnlockHint');
+  const btn=document.getElementById('cfIdUnlockBtn');
+  if(!input||!hint) return;
+  input.style.display='';
+  hint.style.display='';
+  if(btn) btn.style.display='none';
+  input.focus();
+}
+
+function toggleArchived(){
+  const grid=document.getElementById('archivedGrid');
+  const icon=document.getElementById('archivedToggleIcon');
+  if(!grid||!icon) return;
+  const open=grid.style.display==='none';
+  grid.style.display=open?'':'none';
+  icon.textContent=open?'▼':'▶';
+}
 
 function debugProjekte(){
   const lp=loadLocal('projekte',[]);
