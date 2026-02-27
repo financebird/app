@@ -1883,9 +1883,26 @@ function buildCounterpartList(){
 // Projekt dropdowns
 function buildProjektDropdowns(){
   const projs=loadLocal('projekte',[]);
-  const opts='<option value="">— kein Projekt</option>'+projs.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
-  document.getElementById('eProjekt').innerHTML=opts;
-  document.getElementById('iProjekt').innerHTML=opts;
+  // For Erfassen: all active projects (Aufträge + Herzensarbeit, not overhead)
+  const active=projs.filter(p=>p.status==='active');
+  const auftraege=active.filter(p=>p.kategorie!=='overhead');
+  const archived=projs.filter(p=>p.status==='inactive'||p.cfArchived);
+
+  const makeOpts=(list,includeArchived=false)=>{
+    let html='<option value="">— kein Projekt</option>';
+    const active=list.filter(p=>p.status==='active');
+    if(active.length) html+=active.map(p=>`<option value="${p.name}">${p.type==='Herzensarbeit'?'❤️ ':''} ${p.name}</option>`).join('');
+    if(includeArchived){
+      const arch=list.filter(p=>p.status==='inactive');
+      if(arch.length) html+='<optgroup label="Archiviert">'+arch.map(p=>`<option value="${p.name}">${p.name}</option>`).join('')+'</optgroup>';
+    }
+    return html;
+  };
+
+  const eProjEl=document.getElementById('eProjekt');
+  if(eProjEl) eProjEl.innerHTML=makeOpts(auftraege, false);
+  const iProjEl=document.getElementById('iProjekt');
+  if(iProjEl) iProjEl.innerHTML=makeOpts(auftraege, false);
 }
 
 // ═══════════════════════════════════════════
@@ -2117,57 +2134,8 @@ function renderInv(){
 // ═══════════════════════════════════════════
 // PROJEKTE
 // ═══════════════════════════════════════════
-function renderProjekte(){
-  const projs=loadLocal('projekte',[]);
-  const cfKey=loadLocal('clockifyApiKey','');
-  document.getElementById('clockifyStatus').textContent=cfKey?'✅ Verbunden — zuletzt sync: '+loadLocal('lastClockifySync','nie'):'Nicht verbunden — API Key in Einstellungen hinterlegen';
+// renderProjekte() → see Clockify section below
 
-  if(!projs.length){
-    document.getElementById('projGrid').innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ico">🗂</div><p>Noch keine Projekte — füge dein erstes hinzu</p></div>';
-    document.getElementById('projCount').textContent='0';
-    document.getElementById('projAvgRate').textContent='—';
-    document.getElementById('projTotalHours').textContent='—';
-    return;
-  }
-
-  const ytx=txCache.filter(t=>getYear(t.date)===String(YEAR));
-  const cfHours=loadLocal('clockifyHours',{}); // {projectId: hours}
-
-  let totalHours=0,totalInc=0,projWithRate=0;
-  document.getElementById('projGrid').innerHTML=projs.map(p=>{
-    const pInc=ytx.filter(t=>t.type==='Einnahme'&&t.projekt===p.name).reduce((s,t)=>s+t.amount,0);
-    const pExp=ytx.filter(t=>t.type==='Ausgabe'&&t.projekt===p.name).reduce((s,t)=>s+t.amount,0);
-    const hours=cfHours[p.id]||0;
-    const rate=hours>0?Math.round(pInc/hours):null;
-    if(hours>0){ totalHours+=hours; totalInc+=pInc; projWithRate++; }
-    const pnl=pInc-pExp;
-    return `<div class="proj-card" onclick="openProjModal(loadLocal('projekte',[]).find(x=>x.id==='${p.id}'))">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-        <div>
-          <span class="proj-status-dot ${p.status==='active'?'active':'inactive'}"></span>
-          <span style="font-weight:600;font-size:15px">${p.name}</span>
-        </div>
-        <span style="font-size:11px;color:var(--muted)">${p.type||''}</span>
-      </div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">${p.client||''}</div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap">
-        <div><div style="font-size:10px;color:var(--muted);margin-bottom:2px">Einnahmen</div><div class="amt pos" style="font-family:'Fraunces',serif;font-size:17px">+${fmt(pInc)}</div></div>
-        <div><div style="font-size:10px;color:var(--muted);margin-bottom:2px">Ausgaben</div><div class="amt neg" style="font-family:'Fraunces',serif;font-size:17px">−${fmt(pExp)}</div></div>
-        <div><div style="font-size:10px;color:var(--muted);margin-bottom:2px">P&L</div><div class="amt ${pnl>=0?'pos':'neg'}" style="font-family:'Fraunces',serif;font-size:17px">${pnl>=0?'+':''}${fmt(pnl)}</div></div>
-      </div>
-      ${hours>0?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-        <div class="cf-badge">⏱ ${hours.toFixed(1)}h (Clockify)</div>
-        <div class="proj-hourly">${rate?'CHF '+rate+'/h':'—'}</div>
-      </div>`:''}
-      ${p.targetRate?`<div style="margin-top:6px;font-size:11px;color:var(--muted)">Ziel: CHF ${p.targetRate}/h${rate?' · Differenz: '+((rate-p.targetRate)>=0?'+':'')+(rate-p.targetRate)+' CHF/h':''}</div>`:''}
-    </div>`;
-  }).join('');
-
-  const active=projs.filter(p=>p.status==='active').length;
-  document.getElementById('projCount').textContent=active+' / '+projs.length;
-  document.getElementById('projAvgRate').textContent=totalHours>0?'CHF '+(Math.round(totalInc/totalHours))+'/h':'—';
-  document.getElementById('projTotalHours').textContent=totalHours>0?totalHours.toFixed(1)+'h':'—';
-}
 
 function openProjModal(proj=null){
   document.getElementById('pEditId').value=proj?.id||'';
@@ -2198,7 +2166,7 @@ function saveProj(){
     targetRate:parseFloat(document.getElementById('pTargetRate').value)||null,
     note:document.getElementById('pNote').value.trim()
   };
-  if(!proj.name){ alert('Bitte Projektname eingeben'); return; }
+  if(!proj.name){ showToast('error','⚠️','Bitte Projektname eingeben',''); return; }
   if(editId){
     const idx=projs.findIndex(p=>p.id===editId);
     if(idx>=0) projs[idx]=proj; else projs.push(proj);
@@ -2291,30 +2259,59 @@ async function syncClockify(){
     saveLocal('clockifyHours',cfHours);
     saveLocal('clockifyMonthly',cfMonthly);
 
-    // Auto-match local projects by name similarity
-    const localProjs=loadLocal('projekte',[]);
-    let matched=0;
-    localProjs.forEach(lp=>{
-      if(!lp.clockifyId){
-        const lpLow=lp.name.toLowerCase();
-        const match=cfProjs.find(cp=>{
-          const cpLow=cp.name.toLowerCase();
-          return cpLow===lpLow||cpLow.includes(lpLow.slice(0,10))||lpLow.includes(cpLow.slice(0,10));
-        });
-        if(match){lp.clockifyId=match.id; matched++;}
-      }
-    });
-    saveLocal('projekte',localProjs);
+    // ── CLOCKIFY IS MASTER: merge cfProjs → localProjs ──
+    const existingLocal=loadLocal('projekte',[]);
+    const mergedProjs=[];
+    let newCount=0, updatedCount=0;
+
+    for(const cp of cfProjs){
+      const cfType=cfProjType(cp,[]);
+      // Skip overhead from main projekt list — they live in Overhead tab only
+      if(cfType==='overhead') continue;
+
+      // Find existing local entry by clockifyId or name
+      const existing=existingLocal.find(lp=>lp.clockifyId===cp.id)||
+                     existingLocal.find(lp=>lp.name.toLowerCase()===cp.name.replace(HEART_PREFIX,'').trim().toLowerCase());
+
+      // Display name: strip prefixes
+      let dispName=cp.name;
+      if(dispName.startsWith(HEART_PREFIX)) dispName=dispName.slice(HEART_PREFIX.length).trim();
+
+      const proj={
+        id: existing?.id||'cf_'+cp.id,
+        name: dispName,
+        clockifyId: cp.id,
+        // Preserve user overrides, fall back to Clockify data
+        client: existing?.client||(cp.clientId?cp.clientId:''),
+        type: existing?.type||(cfType==='heart'?'Herzensarbeit':'Honorar'),
+        status: cp.archived?'inactive':'active',
+        kategorie: existing?.kategorie||(cfType==='heart'?'heartwork':''),
+        targetRate: existing?.targetRate||null,
+        note: existing?.note||'',
+        // Track if archived in Clockify (keep for history)
+        cfArchived: !!cp.archived,
+        cfColor: cp.color||null,
+      };
+
+      if(!existing) newCount++;
+      else if(existing.status!==proj.status) updatedCount++;
+      mergedProjs.push(proj);
+    }
+
+    // Keep any local-only projects (no clockifyId) that user created manually
+    existingLocal.filter(lp=>!lp.clockifyId).forEach(lp=>mergedProjs.push(lp));
+
+    saveLocal('projekte',mergedProjs);
     saveLocal('lastClockifySync',new Date().toLocaleString('de-CH',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
 
     hideLoading();
     renderProjekte();
     buildProjektDropdowns();
-    const billableProjs=cfProjs.filter(p=>cfProjType(p,loadLocal('projekte',[]))==='auftrag');
-    const heartProjs=cfProjs.filter(p=>cfProjType(p,loadLocal('projekte',[]))==='heart');
-    const overheadProjs=cfProjs.filter(p=>cfProjType(p,loadLocal('projekte',[]))==='overhead');
+
+    const billableProjs=cfProjs.filter(p=>cfProjType(p,mergedProjs)==='auftrag');
+    const heartProjs=cfProjs.filter(p=>cfProjType(p,mergedProjs)==='heart');
     showToast('success','🔄','Clockify sync OK',
-      `${cfProjs.length} Projekte · ${billableProjs.length} Aufträge · ${heartProjs.length} ❤ · ${matched} auto-zugeordnet`);
+      `${mergedProjs.length} Projekte · ${billableProjs.length} Aufträge · ${heartProjs.length} ❤ · ${newCount} neu`);
   }catch(e){
     hideLoading();
     console.error(e);
@@ -2384,20 +2381,25 @@ function renderProjekte(){
   document.getElementById('projAvgRate').textContent=echterH?'Ø CHF '+echterH+'/h (total)':'Ø — CHF/h';
 
   // ── Aufträge Grid (local projects) ──
+  const cfSynced=!!loadLocal('lastClockifySync','');
   if(!localProjs.length){
-    document.getElementById('projGrid').innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ico">🗂</div><p>Noch keine Projekte — füge dein erstes hinzu</p></div>';
+    document.getElementById('projGrid').innerHTML=`<div class="empty" style="grid-column:1/-1">
+      <div class="ico">${cfKey?'🔄':'🗂'}</div>
+      <p>${cfKey&&!cfSynced?'Clockify verbunden — klicke 🔄 Sync um Projekte zu laden':'Noch keine Projekte'}</p>
+      ${!cfKey?'<p style="font-size:12px;color:var(--muted)">API Key in ⚙️ Keys hinterlegen, dann Sync</p>':''}
+    </div>`;
   } else {
     document.getElementById('projGrid').innerHTML=localProjs.map(p=>{
       const pInc=ytx.filter(t=>t.type==='Einnahme'&&t.projekt===p.name).reduce((s,t)=>s+t.amount,0);
       const pExp=ytx.filter(t=>t.type==='Ausgabe'&&t.projekt===p.name).reduce((s,t)=>s+t.amount,0);
-      const cfp=cfProjs.find(c=>c.id===p.clockifyId);
-      const hours=p.clockifyId?( cfHours[p.clockifyId]||0):0;
+      const cfp=p.clockifyId?cfProjs.find(c=>c.id===p.clockifyId):null;
+      const hours=p.clockifyId?(cfHours[p.clockifyId]||0):0;
       const rate=hours>0?Math.round(pInc/hours):null;
       const targetRate=p.targetRate||0;
       const rateClass=!rate?'':rate>=targetRate&&targetRate>0?'rate-good':rate>=targetRate*0.8&&targetRate>0?'rate-warn':'rate-bad';
       const pnl=pInc-pExp;
       const hasBuchung=pInc>0||pExp>0;
-      const monthlyData=p.clockifyId?loadLocal('clockifyMonthly',{})[p.clockifyId]||{}:{};
+      const monthlyData=p.clockifyId?(loadLocal('clockifyMonthly',{})[p.clockifyId]||{}):{}; 
       const monthBars=Object.entries(monthlyData).sort((a,b)=>a[0]-b[0]).map(([m,h])=>{
         const max=Math.max(...Object.values(monthlyData),1);
         const pct=Math.round(h/max*100);
@@ -2412,6 +2414,7 @@ function renderProjekte(){
           <div>
             <span class="proj-status-dot ${p.status==='active'?'active':'inactive'}"></span>
             <span style="font-weight:700;font-size:15px">${p.name}</span>
+            ${p.cfArchived?'<span style="font-size:10px;background:var(--surface);color:var(--muted);padding:2px 6px;border-radius:4px;margin-left:4px">archiviert</span>':''}
           </div>
           <div style="text-align:right">
             <div style="font-size:10px;color:var(--muted)">${p.type==='Herzensarbeit'?'❤️ Herzensarbeit':p.type||''}</div>
