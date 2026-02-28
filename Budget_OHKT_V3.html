@@ -914,17 +914,13 @@ textarea.form-input{resize:vertical;min-height:72px}
 <!-- ═══════════════════════════════════════ -->
 <div id="page-leben" class="page">
 
-  <!-- BABY COUNTDOWN -->
-  <div class="baby-card" style="margin-bottom:16px">
-    <div style="font-size:12px;color:#9d174d;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">Baby kommt im September 🍼</div>
-    <div class="baby-days" id="babyDays">—</div>
-    <div style="font-size:13px;color:#be185d">Tage noch</div>
-  </div>
-
   <!-- SCHULDEN TRACKER -->
   <div class="section-head">
     <h3>💳 Schulden</h3>
-    <div style="font-family:'Fraunces',serif;font-size:16px;color:var(--red)" id="debtTotal">—</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-family:'Fraunces',serif;font-size:16px;color:var(--red)" id="debtTotal">—</div>
+      <button class="btn btn-outline btn-sm" onclick="openDebtEditModal(null)">+ Schuld</button>
+    </div>
   </div>
   <div id="debtList"></div>
 
@@ -1175,6 +1171,13 @@ textarea.form-input{resize:vertical;min-height:72px}
     <div class="card-title">Gefahrenzone</div>
     <div class="settings-row">
       <div>
+        <div style="font-weight:600;font-size:14px">Ausstehende Queue leeren</div>
+        <div style="font-size:12px;color:var(--muted)">Fehlgeschlagene Einträge aus der Warteschlange entfernen (z.B. nach Formatfehlern).</div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="clearQueue()" style="border-color:var(--amber);color:var(--amber)">⚠️ Queue leeren</button>
+    </div>
+    <div class="settings-row" style="margin-top:8px">
+      <div>
         <div style="font-weight:600;font-size:14px">Alle lokalen Daten löschen</div>
         <div style="font-size:12px;color:var(--muted)">Löscht alle Keys, Kontostände, Recurring, Goals, Projekte aus dem Browser. Notion-Daten bleiben unberührt.</div>
       </div>
@@ -1417,6 +1420,34 @@ textarea.form-input{resize:vertical;min-height:72px}
     </div>
     <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="payDebt()">✓ Ausführen</button>
     <div id="debtPayFeedback" style="font-size:13px;color:var(--red);margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- DEBT EDIT MODAL -->
+<div class="modal-overlay" id="debtEditModal">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeDebtEditModal()">✕</button>
+    <div class="modal-title" id="debtEditTitle">Schuld bearbeiten</div>
+    <input type="hidden" id="debtEditId">
+    <div class="form-group">
+      <label class="form-label">Name / Gläubiger</label>
+      <input type="text" id="debtEditName" class="form-input" placeholder="z.B. Philipp Mortier">
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Originalbetrag (CHF)</label>
+        <input type="number" id="debtEditOriginal" class="form-input" placeholder="5000" step="0.05">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Noch ausstehend (CHF)</label>
+        <input type="number" id="debtEditRemaining" class="form-input" placeholder="5000" step="0.05">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveDebtEdit()">✓ Speichern</button>
+      <button class="btn btn-outline" onclick="closeDebtEditModal()">Abbrechen</button>
+    </div>
+    <div id="debtEditFeedback" style="font-size:13px;color:var(--red);margin-top:8px"></div>
   </div>
 </div>
 
@@ -2703,15 +2734,63 @@ async function deleteTxNotion(id){
 // ═══════════════════════════════════════════
 // LEBEN TAB
 // ═══════════════════════════════════════════
+
+// ─── DEBT EDIT ───
+function openDebtEditModal(id){
+  const debts=loadLocal('debts',DEBT_INITIAL);
+  document.getElementById('debtEditId').value=id||'';
+  if(id){
+    const d=debts.find(x=>x.id===id);
+    if(!d) return;
+    document.getElementById('debtEditTitle').textContent='Schuld bearbeiten';
+    document.getElementById('debtEditName').value=d.name;
+    document.getElementById('debtEditOriginal').value=d.original;
+    document.getElementById('debtEditRemaining').value=d.remaining;
+  } else {
+    document.getElementById('debtEditTitle').textContent='Neue Schuld';
+    document.getElementById('debtEditName').value='';
+    document.getElementById('debtEditOriginal').value='';
+    document.getElementById('debtEditRemaining').value='';
+  }
+  document.getElementById('debtEditFeedback').textContent='';
+  document.getElementById('debtEditModal').classList.add('active');
+}
+function closeDebtEditModal(){
+  document.getElementById('debtEditModal').classList.remove('active');
+}
+function saveDebtEdit(){
+  const id=document.getElementById('debtEditId').value;
+  const name=document.getElementById('debtEditName').value.trim();
+  const original=parseFloat(document.getElementById('debtEditOriginal').value);
+  const remaining=parseFloat(document.getElementById('debtEditRemaining').value);
+  if(!name||isNaN(original)||isNaN(remaining)){
+    document.getElementById('debtEditFeedback').textContent='Bitte alle Felder ausfüllen';
+    return;
+  }
+  const debts=loadLocal('debts',DEBT_INITIAL);
+  if(id){
+    const idx=debts.findIndex(x=>x.id===id);
+    if(idx>=0){ debts[idx]={...debts[idx],name,original,remaining}; }
+  } else {
+    debts.push({id:'d'+Date.now(),name,original,remaining});
+  }
+  saveLocal('debts',debts);
+  closeDebtEditModal();
+  renderLeben();
+  showToast('success','✓','Schuld gespeichert',name);
+}
+function deleteDebt(id){
+  const debts=loadLocal('debts',DEBT_INITIAL);
+  const d=debts.find(x=>x.id===id);
+  if(!d) return;
+  if(!confirm('Schuld "'+d.name+'" wirklich löschen?')) return;
+  saveLocal('debts',debts.filter(x=>x.id!==id));
+  renderLeben();
+  showToast('info','🗑','Schuld entfernt',d.name);
+}
 function renderLeben(){
   renderAccountBalances();
   renderRecurring();
-  // Baby countdown
-  const babyDate=new Date('2026-09-15'); // estimated mid-September
-  const now=new Date();
-  const days=Math.max(0,Math.round((babyDate-now)/(1000*60*60*24)));
-  document.getElementById('babyDays').textContent=days>0?days:'🎉';
-
   // Debt tracker
   const debts=loadLocal('debts',DEBT_INITIAL);
   const debtTotal=debts.reduce((s,d)=>s+d.remaining,0);
@@ -2734,8 +2813,10 @@ function renderLeben(){
       <div class="prog-bar" style="margin:6px 0 10px">
         <div class="prog-fill" style="width:${pct}%;background:var(--accent)"></div>
       </div>
-      <div style="display:flex;gap:6px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm" style="background:var(--accent-light);color:var(--accent);border:none;font-size:12px;cursor:pointer" onclick="openDebtModal('${d.id}')">💸 Zahlung buchen</button>
+        <button class="btn btn-sm btn-outline" style="font-size:12px" onclick="openDebtEditModal('${d.id}')">✏️ Bearbeiten</button>
+        <button class="btn btn-sm" style="background:#fef2f2;color:var(--red);border:none;font-size:12px;cursor:pointer" onclick="deleteDebt('${d.id}')">✕</button>
         ${d.remaining<=0?'<span style="font-size:12px;color:var(--accent);font-weight:600">✓ Bezahlt!</span>':''}
       </div>
     </div>`;
@@ -4026,7 +4107,14 @@ function changeClaudeKey(){
   saveLocal('claudeApiKey',k.trim()); renderSettings();
 }
 function clearClaudeKey(){ localStorage.removeItem('claudeApiKey'); renderSettings(); }
-function clearGDrive(){ gdriveToken=null; renderSettings(); alert('Google Drive Session zurückgesetzt.'); }
+function clearGDrive(){ gdriveToken=null; renderSettings(); showToast('info','✓','GDrive Session zurückgesetzt',''); }
+function clearQueue(){
+  const q=loadLocal('pendingQueue',[]);
+  if(q.length===0){ showToast('info','ℹ️','Keine ausstehenden Einträge','Queue ist leer'); return; }
+  saveLocal('pendingQueue',[]);
+  document.getElementById('queueBanner').style.display='none';
+  showToast('success','🗑','Queue geleert',q.length+' Einträge entfernt');
+}
 function clearAllLocal(){
   if(!confirm('Wirklich ALLE lokalen Daten löschen? (Keys, Kontostände, Recurring, Goals, Projekte) Notion-Daten bleiben erhalten.')) return;
   const keep=['notionToken'];
