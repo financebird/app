@@ -1799,20 +1799,26 @@ async function loadAll(){
   setSyncStatus('syncing','Synchronisiert…');
   try{
     showLoading('Lade Buchungen…');
-    const txPages=await notionQueryAll(DB_BUCHUNGEN);
-    txCache=txPages.map(parseTx).sort((a,b)=>b.date.localeCompare(a.date));
-    const thumbMap=loadLocal('thumbs',{});
-    txCache.forEach(t=>{ if(thumbMap[t.id]) t.receipt=thumbMap[t.id]; });
+    try{
+      const txPages=await notionQueryAll(DB_BUCHUNGEN);
+      txCache=txPages.map(parseTx).sort((a,b)=>b.date.localeCompare(a.date));
+      const thumbMap=loadLocal('thumbs',{});
+      txCache.forEach(t=>{ if(thumbMap[t.id]) t.receipt=thumbMap[t.id]; });
+    }catch(e){ console.warn('Buchungen laden fehlgeschlagen, nutze Cache:',e); txCache=loadLocal('txCache_backup',[]); }
 
     document.getElementById('loadingText').textContent='Lade Rechnungen…';
-    const invPages=await notionQueryAll(DB_RECHNUNGEN);
-    invCache=invPages.map(parseInv).sort((a,b)=>b.date.localeCompare(a.date));
+    try{
+      const invPages=await notionQueryAll(DB_RECHNUNGEN);
+      invCache=invPages.map(parseInv).sort((a,b)=>b.date.localeCompare(a.date));
+    }catch(e){ console.warn('Rechnungen laden fehlgeschlagen, nutze Cache:',e); invCache=loadLocal('invCache_backup',[]); }
 
     document.getElementById('loadingText').textContent='Lade Projekte…';
-    await syncProjekteFromNotion();
+    try{ await syncProjekteFromNotion(); }
+    catch(e){ console.warn('syncProjekteFromNotion fehlgeschlagen, nutze Cache:',e); projektCache=loadLocal('projektCache',[]); }
 
     document.getElementById('loadingText').textContent='Lade Konten…';
-    await syncAccountsFromNotion();
+    try{ await syncAccountsFromNotion(); }
+    catch(e){ console.warn('syncAccountsFromNotion fehlgeschlagen, nutze Cache:',e); }
 
     saveLocal('txCache_backup',txCache);
     saveLocal('invCache_backup',invCache);
@@ -4124,10 +4130,17 @@ async function uploadToGDrive(dataURL,filename,isPDF){
   if(notionToken){
     document.getElementById('setupScreen').style.display='none';
     document.getElementById('mainApp').style.display='block';
+    go('uebersicht');
     loadAll();
   }else{
     document.getElementById('setupScreen').style.display='block';
     document.getElementById('mainApp').style.display='none';
+    // Kein Token: trotzdem aus Cache rendern falls vorhanden
+    txCache=loadLocal('txCache_backup',[]);
+    invCache=loadLocal('invCache_backup',[]);
+    projektCache=loadLocal('projektCache',[]);
+    renderAll();
+    go('uebersicht');
   }
 })();
 
