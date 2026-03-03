@@ -1645,7 +1645,7 @@ const NOTION_API    = 'https://notion-proxy.holy-forest-0174.workers.dev/v1';
 const NOTION_VER    = '2022-06-28';
 const GDRIVE_CLIENT_ID = '525241680265-ecrm63sckhdllc59gv8j7k19tecl7ulu.apps.googleusercontent.com';
 const GDRIVE_SCOPE  = 'https://www.googleapis.com/auth/drive.file';
-const GDRIVE_PARENT = '1NCSz86nG3Q0QRNu7Ltw-ZTYqhin0yNSS';
+const GDRIVE_PARENT = '1FPM0-YqwcsoJEYlZDdDirPE-RBOamEJL'; // Financebird root folder
 const CLOCKIFY_API  = 'https://api.clockify.me/api/v1';
 const YEAR = new Date().getFullYear();
 
@@ -3856,11 +3856,12 @@ function showReceiptUI(thumb,filename,isPDF){
 }
 function removeReceipt(){ currentReceipt=null; document.getElementById('receiptPreview').innerHTML=''; document.getElementById('scanZone').style.display=''; }
 function buildFilename(ext){
-  const ym=(document.getElementById('eDate').value||toDay()).slice(0,7);
+  // Format: YYYY-MM-DD_Kategorie_CHF-Betrag_Beschreibung.ext
+  const date=(document.getElementById('eDate').value||toDay()).slice(0,10);
   const amt=(document.getElementById('eAmt').value||'0').replace(/[^0-9.]/g,'');
   const san=(s,max)=>(s||'').replace(/[^a-zA-Z0-9äöüÄÖÜ\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,max)||'beleg';
   const desc=san(document.getElementById('eDesc').value||document.getElementById('eCounterpart').value,30);
-  return `${ym}_${san(entryCategory,20)||'Beleg'}_CHF-${amt}_${desc}.${ext}`;
+  return `${date}_${san(entryCategory,20)||'Beleg'}_CHF-${amt}_${desc}.${ext}`;
 }
 function getFileExt(dataURL,originalFilename,isPDF){
   if(isPDF) return 'pdf';
@@ -4171,41 +4172,62 @@ async function getGDriveToken(){
     client.requestAccessToken();
   });
 }
-async function getOrCreateFolder(token,year){
-  const folderName=`${year}`;
-  const q=encodeURIComponent(`name='${folderName}' and mimeType='application/vnd.google-apps.folder' and '${GDRIVE_PARENT}' in parents and trashed=false`);
-  const search=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}`,{headers:{Authorization:'Bearer '+token}});
+// Drive folder structure:
+// Financebird/ (root)
+//   Geschaeftlich/ oder Privat/
+//     IN/ oder OUT/
+//       2026/
+async function getOrCreateFolderInParent(token, name, parentId){
+  const q=encodeURIComponent(
+    `name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`
+  );
+  const search=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}`,
+    {headers:{Authorization:'Bearer '+token}});
   const sd=await search.json();
   if(sd.files&&sd.files.length>0) return sd.files[0].id;
   const create=await fetch('https://www.googleapis.com/drive/v3/files',{
-    method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
-    body:JSON.stringify({name:folderName,mimeType:'application/vnd.google-apps.folder',parents:[GDRIVE_PARENT]})
+    method:'POST',
+    headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+    body:JSON.stringify({name,mimeType:'application/vnd.google-apps.folder',parents:[parentId]})
   });
-  const folder=await create.json(); return folder.id;
+  const folder=await create.json();
+  return folder.id;
 }
-async function uploadToGDrive(dataURL,filename,isPDF){
+async function getDeepFolder(token, bereich, direction, year){
+  // bereich: 'business'|'private'   direction: 'IN'|'OUT'
+  const bereichName=bereich==='business'?'Geschaeftlich':'Privat';
+  const bereichId=await getOrCreateFolderInParent(token, bereichName, GDRIVE_PARENT);
+  const dirId    =await getOrCreateFolderInParent(token, direction,   bereichId);
+  const yearId   =await getOrCreateFolderInParent(token, String(year), dirId);
+  return yearId;
+}
+async function uploadToGDrive(dataURL, filename, isPDF){
   const token=await getGDriveToken();
   const year=(document.getElementById('eDate').value||toDay()).slice(0,4);
-  const folderId=await getOrCreateFolder(token,year);
+  const direction=entryType==='income'?'IN':'OUT';
+  const folderId=await getDeepFolder(token, entryBereich, direction, year);
   const res=await fetch(dataURL); const blob=await res.blob();
   let mimeType='image/jpeg';
   if(isPDF) mimeType='application/pdf';
-  else if(dataURL.startsWith('data:image/png')) mimeType='image/png';
+  else if(dataURL.startsWith('data:image/png'))  mimeType='image/png';
   else if(dataURL.startsWith('data:image/heic')) mimeType='image/heic';
-  else if(dataURL.startsWith('data:image/')) mimeType=dataURL.split(';')[0].replace('data:','');
-  const metadata={name:filename,parents:[folderId]};
+  else if(dataURL.startsWith('data:image/'))     mimeType=dataURL.split(';')[0].replace('data:','');
+  const metadata={name:filename, parents:[folderId]};
   const form=new FormData();
   form.append('metadata',new Blob([JSON.stringify(metadata)],{type:'application/json'}));
   form.append('file',blob,filename);
-  const upload=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',
-    {method:'POST',headers:{Authorization:'Bearer '+token},body:form});
+  const upload=await fetch(
+    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',
+    {method:'POST',headers:{Authorization:'Bearer '+token},body:form}
+  );
   const file=await upload.json();
   if(file.error) throw new Error(file.error.message);
   await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}/permissions`,{
-    method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+    method:'POST',
+    headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
     body:JSON.stringify({role:'reader',type:'anyone'})
   });
-  return {filename:file.name,link:file.webViewLink,id:file.id};
+  return {filename:file.name, link:file.webViewLink, id:file.id};
 }
 
 // ═══════════════════════════════════════════
