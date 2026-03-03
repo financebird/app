@@ -20,7 +20,7 @@
   --shadow:0 1px 4px rgba(22,20,18,.06),0 4px 16px rgba(22,20,18,.06);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{font-family:'Instrument Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 
 /* HEADER */
 .app-header{background:var(--ink);color:white;padding:0 20px;padding-top:env(safe-area-inset-top);display:flex;align-items:center;justify-content:space-between;height:calc(56px + env(safe-area-inset-top));position:sticky;top:0;z-index:100}
@@ -118,12 +118,17 @@ textarea.form-input{resize:vertical;min-height:72px}
 .sec-btn.active.priv{background:var(--purple);border-color:var(--purple)}
 
 /* TABLES */
-.data-table{width:100%;border-collapse:collapse;font-size:13.5px}
-.data-table th{text-align:left;padding:9px 10px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
-.data-table td{padding:10px 10px;border-bottom:1px solid #f3f2f0;vertical-align:middle}
+.data-table{width:100%;border-collapse:collapse;font-size:13.5px;table-layout:fixed}
+.data-table th{text-align:left;padding:9px 10px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.data-table td{padding:10px 10px;border-bottom:1px solid #f3f2f0;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Buchungen table column widths */
+#txBody~* .data-table th:nth-child(1),#txBody~* .data-table td:nth-child(1){width:90px} /* Datum */
+/* Column width hints via col groups are set inline on the tables */
 .data-table tr:last-child td{border-bottom:none}
 .data-table tr:hover td{background:#faf9f7}
 .data-table .totals-row td{background:#faf9f7;font-weight:700;border-top:2px solid var(--border)}
+/* BUG-11: mobile horizontal scroll fix */
+.table-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
 .amt{font-family:'Fraunces',serif;font-weight:500;white-space:nowrap}
 .amt.pos{color:var(--accent)}
 .amt.neg{color:var(--red)}
@@ -571,7 +576,7 @@ textarea.form-input{resize:vertical;min-height:72px}
     <h3>Letzte Buchungen</h3>
     <button class="btn btn-outline btn-sm" onclick="go('buchungen')">Alle →</button>
   </div>
-  <div class="card" style="overflow-x:auto">
+  <div class="card table-scroll-wrap">
     <div id="recentTx"></div>
   </div>
 </div>
@@ -820,7 +825,7 @@ textarea.form-input{resize:vertical;min-height:72px}
     <button class="btn btn-primary btn-sm" onclick="openInvModal()">+ Neue Rechnung</button>
   </div>
 
-  <div class="card" style="overflow-x:auto">
+  <div class="card table-scroll-wrap">
     <table class="data-table">
       <thead><tr>
         <th>Nr.</th><th>Datum</th><th>Fällig</th><th>Kunde</th><th>Beschreibung</th><th>Betrag</th><th>Status</th><th>Bezahlt am</th><th>Aktionen</th>
@@ -959,8 +964,21 @@ textarea.form-input{resize:vertical;min-height:72px}
   <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
     <button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 CSV Export</button>
   </div>
-  <div class="card" style="overflow-x:auto">
+  <div class="card table-scroll-wrap">
     <table class="data-table">
+      <colgroup>
+        <col style="width:88px">  <!-- Datum -->
+        <col style="width:22%">   <!-- Beschreibung -->
+        <col style="width:14%">   <!-- Gegenpartei -->
+        <col style="width:72px">  <!-- Typ -->
+        <col style="width:13%">   <!-- Kategorie -->
+        <col style="width:13%">   <!-- Steuerkategorie -->
+        <col style="width:90px">  <!-- Konto -->
+        <col style="width:80px">  <!-- Betrag -->
+        <col style="width:58px">  <!-- Bezahlt -->
+        <col style="width:50px">  <!-- Beleg -->
+        <col style="width:70px">  <!-- Actions -->
+      </colgroup>
       <thead><tr>
         <th>Datum</th><th>Beschreibung</th><th>Gegenpartei</th><th>Typ</th><th>Kategorie</th><th>Steuerkategorie</th><th>Konto</th><th>Betrag</th><th>Bezahlt</th><th>Beleg</th><th></th>
       </tr></thead>
@@ -1862,10 +1880,14 @@ function renderAll(){
 // NAVIGATION
 // ═══════════════════════════════════════════
 function go(id){
+  // BUG-06: remove active from ALL pages and nav tabs before setting new one
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  document.querySelector(`[data-page="${id}"]`).classList.add('active');
+  const page=document.getElementById('page-'+id);
+  if(!page){ console.warn('go(): unknown page',id); return; }
+  page.classList.add('active');
+  // Use querySelectorAll (not querySelector) so all matching nav tabs get active (defensive)
+  document.querySelectorAll(`[data-page="${id}"]`).forEach(t=>t.classList.add('active'));
   if(id==='einstellungen') renderSettings();
   window.scrollTo(0,0);
 }
@@ -1916,19 +1938,25 @@ function renderDash(){
     return Math.max(mi,me);
   }),1);
   const curM=new Date().getMonth();
-  document.getElementById('cfBars').innerHTML=MONTHS.map((m,i)=>{
-    const mi=ytx.filter(t=>t.type==='Einnahme'&&getMonth(t.date)===i).reduce((s,t)=>s+t.amount,0);
-    const me=ytx.filter(t=>t.type==='Ausgabe'&&getMonth(t.date)===i).reduce((s,t)=>s+t.amount,0);
-    const ih=Math.max(2,Math.round(mi/maxVal*90));
-    const eh=Math.max(2,Math.round(me/maxVal*90));
-    return `<div class="cf-bar-group">
-      <div style="display:flex;gap:2px;align-items:flex-end;height:90px">
-        <div class="cf-bar inc" style="height:${mi?ih:0}px;flex:1;opacity:${i===curM?1:.75}"></div>
-        <div class="cf-bar exp" style="height:${me?eh:0}px;flex:1;opacity:${i===curM?1:.75}"></div>
-      </div>
-      <div class="cf-month-label" style="font-weight:${i===curM?700:400};color:${i===curM?'var(--ink)':'var(--muted)'}">${m}</div>
-    </div>`;
-  }).join('');
+  const cfEl=document.getElementById('cfBars');
+  if(maxVal<=1&&ytx.length===0){
+    cfEl.innerHTML='<div style="width:100%;text-align:center;padding:28px 0;color:var(--muted);font-size:13px">Noch keine Buchungen für '+YEAR+'</div>';
+  } else {
+    cfEl.innerHTML=MONTHS.map((m,i)=>{
+      const mi=ytx.filter(t=>t.type==='Einnahme'&&getMonth(t.date)===i).reduce((s,t)=>s+t.amount,0);
+      const me=ytx.filter(t=>t.type==='Ausgabe'&&getMonth(t.date)===i).reduce((s,t)=>s+t.amount,0);
+      const ih=mi>0?Math.max(3,Math.round(mi/maxVal*88)):0;
+      const eh=me>0?Math.max(3,Math.round(me/maxVal*88)):0;
+      const tip=mi||me?`title="Ein: CHF ${fmt(mi)} / Aus: CHF ${fmt(me)}"`:''
+      return `<div class="cf-bar-group" ${tip}>
+        <div style="display:flex;gap:2px;align-items:flex-end;height:90px">
+          <div class="cf-bar inc" style="height:${ih}px;flex:1;opacity:${i===curM?1:.75}"></div>
+          <div class="cf-bar exp" style="height:${eh}px;flex:1;opacity:${i===curM?1:.75}"></div>
+        </div>
+        <div class="cf-month-label" style="font-weight:${i===curM?700:400};color:${i===curM?'var(--ink)':'var(--muted)'}">${m}</div>
+      </div>`;
+    }).join('');
+  }
 
   // Einnahmen nach Quelle
   const srcMap={};
@@ -2362,10 +2390,7 @@ async function saveTxEdit(editId, amt, btn){
   }
 }
 function showFeedback(msg,color){
-  // Also update inline text for backward compat
-  const el=document.getElementById('saveFeedback');
-  if(el){el.textContent=msg; setTimeout(()=>el.textContent='',5000);}
-  // Show toast
+  // Show toast only (saveFeedback inline text removed to avoid duplicate messages — BUG-14)
   const type=color==='red'?'error':color==='amber'?'warning':'success';
   const icon=color==='red'?'❌':color==='amber'?'⚠️':'✅';
   showToast(type,icon,msg,'',[]); 
