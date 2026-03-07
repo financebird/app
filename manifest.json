@@ -1,18 +1,29 @@
 {
-  "name": "Budget · Einzelfirma",
-  "short_name": "Budget",
-  "description": "Buchhaltung für Einzelfirma",
-  "start_url": "/budget-app/Budget_OHKT_V2.html",
+  "name": "FinanceBird",
+  "short_name": "FinanceBird",
+  "description": "Your birdtastic finance companion",
+  "start_url": "/budget-app/financebird_v1.html",
   "display": "standalone",
-  "background_color": "#faf9f7",
-  "theme_color": "#161412",
+  "background_color": "#f5f0e8",
+  "theme_color": "#2c1f0e",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icon512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
   ]
 }
