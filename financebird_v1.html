@@ -460,7 +460,7 @@ tr.unconfirmed td:first-child::before{ content:'◷ '; font-style:normal; color:
     <div id="recurInboxList"></div>
     <div id="recurInboxProgress" class="inbox-progress" style="display:none"></div>
     <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn btn-outline" style="flex:1" onclick="closeRecurInbox()">Spaeter</button>
+      <button class="btn btn-outline" style="flex:1" onclick="closeRecurInbox()">Später</button>
       <button class="btn btn-primary" style="flex:1" id="recurInboxDoneBtn" onclick="closeRecurInbox()">Fertig</button>
     </div>
   </div>
@@ -474,13 +474,13 @@ tr.unconfirmed td:first-child::before{ content:'◷ '; font-style:normal; color:
     <div style="font-size:15px;opacity:.8;margin-bottom:20px">Kein lokales Vorschaubild</div>
     <a id="lbDriveLink" href="#" target="_blank" onclick="closeLightbox()"
        style="background:white;color:#333;padding:10px 24px;border-radius:10px;font-weight:600;font-size:14px;text-decoration:none">
-      Auf Google Drive oeffnen
+      Auf Google Drive öffnen
     </a>
   </div>
   <div id="lbDriveBadge" style="display:none;position:absolute;bottom:28px;left:50%;transform:translateX(-50%)">
     <a id="lbDriveLink2" href="#" target="_blank" onclick="closeLightbox()"
        style="background:rgba(255,255,255,.18);color:white;padding:8px 18px;border-radius:8px;font-size:13px;text-decoration:none;white-space:nowrap">
-      Google Drive oeffnen
+      Google Drive öffnen
     </a>
   </div>
 </div>
@@ -2843,7 +2843,7 @@ async function syncClockify(){
     let newCount=0, updatedCount=0;
 
     for(const cp of cfProjs){
-      const cfType=cfProjType(cp,[]);
+      const cfType=cfProjType(cp,existingLocal);
       // Skip overhead from main projekt list — they live in Overhead tab only
       if(cfType==='overhead') continue;
 
@@ -3256,11 +3256,47 @@ function renderTx(){
 async function deleteTxNotion(id){
   const t=txCache.find(x=>x.id===id);
   const label=t?(t.desc||fmt(t.amount)+' CHF'):'diese Buchung';
-  if(!confirm('Buchung "'+label+'" wirklich löschen?\n\nSie wird auch in Notion archiviert und auf allen Geräten entfernt.')) return;
+  const hasReceipt=t&&t.receiptLink&&t.receiptLink.length>0;
+  const confirmMsg='Buchung "'+label+'" wirklich löschen?\n\nSie wird auch in Notion archiviert und auf allen Geräten entfernt.'
+    +(hasReceipt?'\n\nDer Beleg wird auf Google Drive in den Ordner "Archiv" verschoben.':'');
+  if(!confirm(confirmMsg)) return;
+
+  // Move receipt to Archive folder on Drive (if present)
+  if(hasReceipt && t.receiptLink){
+    try{
+      const fileIdMatch=t.receiptLink.match(/\/d\/([a-zA-Z0-9_-]+)/)||t.receiptLink.match(/id=([a-zA-Z0-9_-]+)/);
+      if(fileIdMatch){
+        const fileId=fileIdMatch[1];
+        const token=await getGDriveToken();
+        // Determine the year-folder this receipt lives in
+        const year=(t.date||toDay()).slice(0,4);
+        const bereich=t.bereich==='private'?'private':'business';
+        const direction=t.type==='Einnahme'?'IN':'OUT';
+        // Get the parent year-folder (creates if missing)
+        const yearFolderId=await getDeepFolder(token, bereich, direction, year);
+        // Get or create "Archiv" subfolder inside the year-folder
+        const archivId=await getOrCreateFolderInParent(token,'Archiv',yearFolderId);
+        // Get current parents of the file
+        const metaResp=await fetch(
+          `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`,
+          {headers:{Authorization:'Bearer '+token}}
+        );
+        const meta=await metaResp.json();
+        const oldParents=(meta.parents||[]).join(',');
+        // Move: add new parent, remove old parents
+        await fetch(
+          `https://www.googleapis.com/drive/v3/files/${fileId}`
+          +`?addParents=${archivId}&removeParents=${encodeURIComponent(oldParents)}&fields=id`,
+          {method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'}}
+        );
+      }
+    }catch(e){ console.warn('Beleg-Archivierung fehlgeschlagen:',e); }
+  }
+
   await notionFetch(`/pages/${id}`,'PATCH',{archived:true});
   txCache=txCache.filter(t=>t.id!==id);
   renderTx(); renderDash(); updateBadges();
-  showToast('info','🗑','Buchung gelöscht',label);
+  showToast('info','🗑','Buchung gelöscht',label+(hasReceipt?' · Beleg archiviert':''));
 }
 
 // ═══════════════════════════════════════════
@@ -4397,7 +4433,7 @@ function renderInbox(invItems, recurItems, daysSince){
   if(daysSince>1){
     sub.textContent='Du warst '+daysSince+' Tage weg — '+total+' '+(total===1?'Eintrag wartet':'Eintraege warten')+' auf Bestaetigung.';
   } else {
-    sub.textContent=total+' '+(total===1?'faelliger Eintrag':'faellige Eintraege')+' — bitte durcharbeiten.';
+    sub.textContent=total+' '+(total===1?'fälliger Eintrag':'fällige Einträge')+' — bitte durcharbeiten.';
   }
   document.getElementById('recurInboxProgress').style.display='none';
 
@@ -4407,10 +4443,11 @@ function renderInbox(invItems, recurItems, daysSince){
   // Section: Rechnungen (Einnahmen)
   let html='';
   if(invItems.length>0){
-    html+='<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 0 8px">Einnahmen — Zahlungseingang bestaetigen</div>';
+    html+='<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 0 8px">Einnahmen — Zahlungseingang bestätigen</div>';
     html+=invItems.map(i=>{
       const daysDue=Math.round((new Date(today)-new Date(i.due))/(1000*60*60*24));
-      const dueLabel=daysDue===0?'Heute faellig':daysDue===1?'Gestern faellig':daysDue+' Tage ueberfaellig';
+      const fmtDue=d=>d?d.split('-').reverse().join('.'):'?';
+      const dueLabel=daysDue===0?'Heute fällig':daysDue===1?'Gestern fällig':daysDue+' Tage überfällig (seit '+fmtDue(i.due)+')';
       return `<div class="inbox-item overdue" id="inbox_inv_${i.id}">
         <div class="inbox-item-header">
           <div>
@@ -4421,15 +4458,15 @@ function renderInbox(invItems, recurItems, daysSince){
         </div>
         <div class="inbox-actions">
           <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;border:none;font-weight:600"
-            onclick="inboxInvPaid('${i.id}')">Zahlungseingang bestaetigt</button>
+            onclick="inboxInvPaid('${i.id}')">Zahlungseingang bestätigt</button>
           <button class="btn btn-sm" style="background:#e0f2fe;color:#075985;border:none"
-            onclick="inboxInvShift('${i.id}')">Faelligkeit verschieben</button>
+            onclick="inboxInvShift('${i.id}')">Fälligkeit verschieben</button>
           <button class="btn btn-sm" style="background:#f3f4f6;color:var(--muted);border:none"
-            onclick="inboxItemDone('inv_${i.id}')">Spaeter erinnern</button>
+            onclick="inboxItemDone('inv_${i.id}')">Später erinnern</button>
         </div>
         <div id="inbox_inv_${i.id}_datepicker" style="display:none;margin-top:8px;gap:8px;align-items:center">
           <input type="date" id="inv_newdue_${i.id}" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
-          <button class="btn btn-sm btn-primary" onclick="inboxInvConfirmShift('${i.id}')">Bestaetigen</button>
+          <button class="btn btn-sm btn-primary" onclick="inboxInvConfirmShift('${i.id}')">Bestätigen</button>
           <button class="btn btn-sm btn-outline" onclick="document.getElementById('inbox_inv_${i.id}_datepicker').style.display='none'">Abbrechen</button>
         </div>
       </div>`;
@@ -4443,10 +4480,11 @@ function renderInbox(invItems, recurItems, daysSince){
 
   // Section: Recurrings (Ausgaben/Transfers)
   if(recurItems.length>0){
-    html+='<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 0 8px">Ausgaben & Transfers — Ausfuehrung bestaetigen</div>';
+    html+='<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 0 8px">Ausgaben & Transfers — Ausführung bestätigen</div>';
     html+=recurItems.map(r=>{
       const daysDue=Math.round((new Date(today)-new Date(r.nextDate))/(1000*60*60*24));
-      const dueLabel=daysDue===0?'Heute faellig':daysDue===1?'Gestern faellig':daysDue+' Tage ueberfaellig';
+      const fmtDue=d=>d?d.split('-').reverse().join('.'):'?';
+      const dueLabel=daysDue===0?'Heute fällig':daysDue===1?'Gestern fällig':daysDue+' Tage überfällig (seit '+fmtDue(r.nextDate)+')';
       const isTransfer=r.account&&!nonPocket.includes(r.account);
       return `<div class="inbox-item overdue" id="inbox_${r.id}">
         <div class="inbox-item-header">
@@ -4458,9 +4496,9 @@ function renderInbox(invItems, recurItems, daysSince){
         </div>
         <div class="inbox-actions">
           <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;border:none;font-weight:600"
-            onclick="inboxBook('${r.id}','${isTransfer?'transfer':'extern'}')">Bezahlt / ausgefuehrt</button>
+            onclick="inboxBook('${r.id}','${isTransfer?'transfer':'extern'}')">Bezahlt / ausgeführt</button>
           <button class="btn btn-sm" style="background:#fef3c7;color:#92400e;border:none"
-            onclick="inboxSkipItem('${r.id}','${r.nextDate}')">Ueberspringen</button>
+            onclick="inboxSkipItem('${r.id}','${r.nextDate}')">Überspringen</button>
           <button class="btn btn-sm" style="background:#f3f4f6;color:var(--muted);border:none"
             onclick="inboxSnooze('${r.id}')">Nicht bezahlt</button>
         </div>
@@ -4517,7 +4555,7 @@ async function inboxInvPaid(id){
       'Bezahlt am':{date:{start:toDay()}}
     }});
     const inv=invCache.find(i=>i.id===id);
-    showToast('success','💰','Zahlungseingang bestaetigt',inv?(inv.nr+' — CHF '+fmt(inv.amount)):'');
+    showToast('success','💰','Zahlungseingang bestätigt',inv?(inv.nr+' — CHF '+fmt(inv.amount)):'');
     await loadAll();
   }catch(e){
     showToast('error','ERR','Fehler',e.message);
@@ -4542,7 +4580,7 @@ async function inboxInvConfirmShift(id){
     await notionFetch('/pages/'+id,'PATCH',{properties:{
       'Fällig am':{date:{start:inp.value}}
     }});
-    showToast('success','Datum','Faelligkeit verschoben',inp.value);
+    showToast('success','Datum','Fälligkeit verschoben',inp.value);
     await loadAll();
   }catch(e){
     showToast('error','ERR','Fehler',e.message);
