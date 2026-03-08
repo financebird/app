@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>FinanceBird · Finanzen</title>
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FinanceBird">
+<meta name="theme-color" content="#2c1f0e">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" defer></script>
 <style>
@@ -502,6 +507,7 @@ tr.unconfirmed td:first-child::before{ content:'◷ '; font-style:normal; color:
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button onclick="event.stopPropagation();closeLightbox()" style="position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);border:none;color:white;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:401;-webkit-tap-highlight-color:transparent">×</button>
   <img id="lbImg" src="" alt="" style="display:none">
   <div id="lbNothumb" style="display:none;text-align:center;color:white">
     <div style="font-size:64px;margin-bottom:16px">PDF</div>
@@ -908,14 +914,15 @@ tr.unconfirmed td:first-child::before{ content:'◷ '; font-style:normal; color:
         <label class="form-label">Beleg</label>
         <div class="scan-zone" id="scanZone" onclick="triggerUpload()" ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
           <div class="scan-zone-icon">📎</div>
-          <div class="scan-zone-text">Foto, PDF oder Datei hochladen<br><span style="font-size:11px;color:#b5b0aa">JPG · PNG · PDF · HEIC · Drag & Drop<br>wird auf Google Drive gespeichert</span></div>
+          <div class="scan-zone-text">Foto, PDF oder Datei hochladen<br><span style="font-size:11px;color:#b5b0aa">JPG · PNG · PDF · HEIC · Drag & Drop</span><br><span id="driveHint" style="font-size:11px;color:#b5b0aa">optional: Google Drive Backup</span></div>
         </div>
         <div id="receiptPreview"></div>
         <input type="file" id="fileInput" accept="image/*,.pdf" style="display:none" onchange="onFilePicked(event)">
+        <input type="file" id="camInput" accept="image/*" capture="environment" style="display:none" onchange="onFilePicked(event)">
       </div>
 
       <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-outline btn-sm" onclick="openCam()">📷 Kamera</button>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('camInput').click()">📷 Kamera</button>
       </div>
 
       <div style="margin-top:20px">
@@ -1382,7 +1389,8 @@ tr.unconfirmed td:first-child::before{ content:'◷ '; font-style:normal; color:
     <div class="settings-row" style="border-bottom:none">
       <div>
         <div style="font-weight:600;font-size:14px">OAuth 2.0</div>
-        <div style="font-size:12px;color:var(--muted)" id="gdriveStatus">Nicht angemeldet — wird beim ersten Beleg-Upload abgefragt</div>
+        <div style="font-size:12px;color:var(--muted)" id="gdriveStatus">Nicht angemeldet</div>
+        <button id="gdriveConnectBtn" class="btn btn-outline btn-sm" style="margin-top:8px" onclick="connectGDriveNow()">☁️ Google Drive jetzt verbinden</button>
       </div>
       <button class="btn btn-danger btn-sm" onclick="clearGDrive()">✕ Reset</button>
     </div>
@@ -2487,7 +2495,10 @@ async function saveTx(){
       receiptLink=up.link; receiptFileName=up.filename;
     }catch(e){
       console.warn('GDrive fail:',e);
-      showFeedback('⚠️ Beleg-Upload fehlgeschlagen, Buchung wird gespeichert','amber');
+      gdriveToken=null; sessionStorage.removeItem('gdriveToken');
+      showToast('warning','☁️','Google Drive nicht erreichbar',
+        e.message||'Beleg lokal gespeichert. Drive neu verbinden in ⚙️ Keys.',[],
+        {label:'Drive verbinden',fn:()=>{ go('einstellungen'); setTimeout(()=>document.getElementById('gdriveConnectBtn')?.scrollIntoView({behavior:'smooth'}),300); }},0);
     }
     btn.textContent='Speichert…';
   }
@@ -4058,7 +4069,12 @@ function showReceiptUI(thumb,filename,isPDF){
     setTimeout(()=>analyseBeleg(null, true), 100);
   } else {
     const sl=document.getElementById('aiStatusLine');
-    if(sl) sl.textContent='Wird auf Google Drive hochgeladen';
+    if(sl){
+      sl.innerHTML=`<span style="color:var(--amber)">⚠ Kein Claude API Key —
+        <a href="#" onclick="event.preventDefault();go('einstellungen')" 
+           style="color:var(--gold);text-decoration:underline">in ⚙ Keys eintragen</a>
+        um KI-Analyse zu aktivieren</span>`;
+    }
   }
 }
 function removeReceipt(){ currentReceipt=null; document.getElementById('receiptPreview').innerHTML=''; document.getElementById('scanZone').style.display=''; }
@@ -4133,6 +4149,9 @@ Felder:
 - mwst: Zahl oder null (MwSt-Betrag falls auf Beleg ersichtlich)
 - typ: "Ausgabe" oder "Einnahme"
 - konfidenz: Object mit Feldern betrag/datum/gegenpartei/kategorie je "high"/"mid"/"low"
+- originalWaehrung: 3-Buchstaben ISO-Währungscode falls Beleg NICHT in CHF ist (z.B. "EUR", "USD", "GBP"), sonst null
+- originalBetrag: Zahl — der Betrag in der Originalwährung falls nicht CHF, sonst null
+- betrag: Bei Fremdwährung den Betrag trotzdem als Zahl angeben (in Originalwährung) — die App rechnet um
 
 Regeln:
 - Bei Restaurants/Cafés und klar privaten Einkäufen: bereich="Privat"
@@ -4179,7 +4198,7 @@ Antworte nur mit dem JSON-Objekt.`});
     if(overlay) overlay.style.display='none';
     if(statusLine) statusLine.textContent='✅ KI hat Beleg gelesen';
 
-    showAiResult(parsed);
+    await showAiResult(parsed);
 
   } catch(e){
     if(overlay) overlay.style.display='none';
@@ -4191,7 +4210,7 @@ Antworte nur mit dem JSON-Objekt.`});
   }
 }
 
-function showAiResult(data){
+async function showAiResult(data){
   const banner=document.getElementById('aiResultBanner');
   if(!banner) return;
 
@@ -4200,8 +4219,40 @@ function showAiResult(data){
                       '<span class="ai-field-conf low">?</span>';
   const k=data.konfidenz||{};
 
+  // FX: fetch historical rate if foreign currency detected
+  const isFX = data.originalWaehrung && data.originalWaehrung !== 'CHF' && data.originalBetrag;
+  let fxChf = null, fxRate = null, fxSource = null;
+  if(isFX){
+    const cur = data.originalWaehrung.toUpperCase();
+    const date = data.datum || toDay();
+    try{
+      // Try historical rate for the receipt date
+      const r = await fetch(`https://api.frankfurter.app/${date}?from=${cur}&to=CHF`);
+      const rd = await r.json();
+      fxRate = rd?.rates?.CHF;
+      if(fxRate){
+        fxChf = Number(data.originalBetrag) * fxRate;
+        fxSource = 'historisch ' + date;
+      }
+    }catch(e){}
+    // Fallback to cached rates if historical failed
+    if(!fxRate && fxRates[cur]){
+      fxRate = fxRates[cur];
+      fxChf = Number(data.originalBetrag) / fxRate;
+      fxSource = 'aktuell (historisch nicht verfügbar)';
+    }
+    // Store for applyAiResult
+    data._fxChf = fxChf;
+    data._fxRate = fxRate;
+    data._fxSource = fxSource;
+  }
+
+  const betragsLabel = isFX && fxChf
+    ? `${Number(data.originalBetrag).toFixed(2)} ${data.originalWaehrung} → CHF ${fxChf.toFixed(2)}`
+    : (data.betrag!=null ? 'CHF '+Number(data.betrag).toFixed(2) : null);
+
   const rows=[
-    data.betrag!=null ? {label:'Betrag',val:'CHF '+Number(data.betrag).toFixed(2),conf:k.betrag} : null,
+    betragsLabel ? {label:'Betrag',val:betragsLabel,conf:k.betrag} : null,
     data.datum        ? {label:'Datum',val:data.datum,conf:k.datum} : null,
     data.gegenpartei  ? {label:'Von/An',val:data.gegenpartei,conf:k.gegenpartei} : null,
     data.beschreibung ? {label:'Beschreibung',val:data.beschreibung,conf:'high'} : null,
@@ -4211,6 +4262,16 @@ function showAiResult(data){
     data.konto ? {label:'Konto',val:data.konto,conf:'mid'} : null,
   ].filter(Boolean);
 
+  const fxBanner = isFX ? `<div style="background:var(--gold-light);border:1px solid var(--gold);border-radius:8px;padding:9px 12px;margin-bottom:8px;font-size:12px">
+    <div style="font-weight:600;color:var(--gold);margin-bottom:3px">🌐 Fremdwährung erkannt: ${data.originalWaehrung}</div>
+    ${fxChf
+      ? `<div style="color:var(--ink2)">${Number(data.originalBetrag).toFixed(2)} ${data.originalWaehrung} × ${fxRate?.toFixed(4)} = <strong>CHF ${fxChf.toFixed(2)}</strong></div>
+         <div style="color:var(--muted);font-size:10.5px;margin-top:2px">Kurs: ${fxSource} · via frankfurter.app</div>`
+      : `<div style="color:var(--terracotta)">⚠ Kurs konnte nicht geladen werden — Betrag bitte manuell umrechnen</div>
+         <div style="color:var(--muted);font-size:10.5px;margin-top:2px">${Number(data.originalBetrag).toFixed(2)} ${data.originalWaehrung} — manuell in CHF eintragen</div>`
+    }
+  </div>` : '';
+
   banner.style.display='';
   window._lastAiResult = data;
   banner.innerHTML=`<div class="ai-result-banner">
@@ -4219,6 +4280,7 @@ function showAiResult(data){
       KI-Erkennung — bitte prüfen
       <span style="margin-left:auto;font-weight:400;font-size:10px;color:var(--muted)">✓ sicher  ~ unsicher  ? unklar</span>
     </div>
+    ${fxBanner}
     ${rows.map(r=>`<div class="ai-field">
       <span class="ai-field-label">${r.label}</span>
       <span class="ai-field-val">${r.val}</span>
@@ -4233,8 +4295,15 @@ function showAiResult(data){
 function applyAiResult(){
   const data=window._lastAiResult; if(!data) return;
 
-  // Betrag
-  if(data.betrag!=null){
+  // Betrag — wenn FX: umgerechneten CHF-Betrag verwenden, Originalwährung in Notiz
+  if(data._fxChf){
+    document.getElementById('eAmt').value=data._fxChf.toFixed(2);
+    const noteEl=document.getElementById('eNote');
+    if(noteEl){
+      const fxNote=`${Number(data.originalBetrag).toFixed(2)} ${data.originalWaehrung} @ ${data._fxRate?.toFixed(4)} (${data._fxSource})`;
+      noteEl.value=(noteEl.value?noteEl.value+' · ':'')+fxNote;
+    }
+  } else if(data.betrag!=null){
     document.getElementById('eAmt').value=Number(data.betrag).toFixed(2);
   }
   // Datum
@@ -4369,12 +4438,24 @@ async function waitForGoogle(maxMs=5000){
   }
 }
 async function getGDriveToken(){
+  // Check in-memory first
   if(gdriveToken) return gdriveToken;
+  // Try sessionStorage (survives PWA background/foreground within same session)
+  const cached=sessionStorage.getItem('gdriveToken');
+  if(cached){ gdriveToken=cached; return gdriveToken; }
   await waitForGoogle();
   return new Promise((resolve,reject)=>{
     const client=google.accounts.oauth2.initTokenClient({
       client_id:GDRIVE_CLIENT_ID,scope:GDRIVE_SCOPE,
-      callback:(resp)=>{ if(resp.error){reject(new Error(resp.error));return;} gdriveToken=resp.access_token; resolve(gdriveToken); }
+      callback:(resp)=>{
+        if(resp.error){reject(new Error(resp.error));return;}
+        gdriveToken=resp.access_token;
+        sessionStorage.setItem('gdriveToken',resp.access_token);
+        // Update Drive status indicator
+        const el=document.getElementById('gdriveStatus');
+        if(el) el.textContent='✅ Angemeldet (Session)';
+        resolve(gdriveToken);
+      }
     });
     client.requestAccessToken();
   });
@@ -5573,7 +5654,10 @@ function renderSettings(){
   document.getElementById('clockifyKeyStatus').textContent=ck?'✅ …'+ck.slice(-8):'❌ Nicht gesetzt';
   const ak=loadLocal('claudeApiKey','');
   document.getElementById('claudeKeyStatus').textContent=ak?'✅ sk-ant-…'+ak.slice(-6):'❌ Nicht gesetzt';
-  document.getElementById('gdriveStatus').textContent=gdriveToken?'✅ Angemeldet (Session)':'Nicht angemeldet — wird beim ersten Upload abgefragt';
+  const _ds=document.getElementById('gdriveStatus');
+  const _cb=document.getElementById('gdriveConnectBtn');
+  if(_ds) _ds.textContent=gdriveToken?'✅ Angemeldet (Session)':'Nicht angemeldet';
+  if(_cb){ _cb.textContent=gdriveToken?'✅ Verbunden':'☁️ Google Drive jetzt verbinden'; _cb.disabled=!!gdriveToken; }
 }
 
 function changeNotionToken(){
@@ -5600,7 +5684,21 @@ function changeClaudeKey(){
   saveLocal('claudeApiKey',k.trim()); renderSettings();
 }
 function clearClaudeKey(){ localStorage.removeItem('claudeApiKey'); renderSettings(); }
-function clearGDrive(){ gdriveToken=null; renderSettings(); showToast('info','✓','GDrive Session zurückgesetzt',''); }
+function clearGDrive(){ gdriveToken=null; sessionStorage.removeItem('gdriveToken'); renderSettings(); showToast('info','✓','GDrive Session zurückgesetzt',''); }
+async function connectGDriveNow(){
+  const btn=document.getElementById('gdriveConnectBtn');
+  const st=document.getElementById('gdriveStatus');
+  if(btn) btn.textContent='⏳ Verbinde…';
+  try{
+    await getGDriveToken();
+    if(st) st.textContent='✅ Angemeldet (Session)';
+    if(btn){ btn.textContent='✅ Verbunden'; btn.disabled=true; }
+    showToast('success','☁️','Google Drive verbunden','Belege werden automatisch hochgeladen.');
+  }catch(e){
+    if(btn) btn.textContent='☁️ Google Drive jetzt verbinden';
+    showToast('error','☁️','Verbindung fehlgeschlagen',e.message||'Bitte erneut versuchen.');
+  }
+}
 function clearQueue(){
   const q=loadLocal('pendingQueue',[]);
   if(q.length===0){ showToast('info','ℹ️','Keine ausstehenden Einträge','Queue ist leer'); return; }
