@@ -344,7 +344,7 @@ tr.unconfirmed td:first-child::before{ content:'◷ '; font-style:normal; color:
 .projekt-meta{font-size:11px;color:var(--muted);margin:3px 0 8px}
 .projekt-bar-wrap{border-radius:6px;overflow:hidden;height:10px;background:#f3f4f6;display:flex;margin:8px 0}
 .proj-bar-reserved{background:#93c5fd;height:100%}
-.proj-bar-paid{background:var(--accent);height:100%}
+.proj-bar-paid{background:var(--green);height:100%}
 .proj-bar-open{background:#e5e7eb;height:100%}
 .proj-amounts{display:flex;gap:12px;font-size:11px;margin-top:4px}
 .proj-amt-label{color:var(--muted)}
@@ -358,7 +358,7 @@ tr.unconfirmed td:first-child::before{ content:'◷ '; font-style:normal; color:
 .cf-bars{display:flex;gap:4px;align-items:flex-end;height:100px}
 .cf-bar-group{flex:1;display:flex;flex-direction:column;gap:2px;align-items:center}
 .cf-bar{width:100%;border-radius:3px 3px 0 0;min-height:2px;transition:height .4s}
-.cf-bar.inc{background:var(--accent)}
+.cf-bar.inc{background:var(--green)}
 .cf-bar.exp{background:var(--red)}
 .cf-month-label{font-size:9px;color:var(--muted);margin-top:3px;text-align:center;font-weight:600}
 .nav-icon{font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;font-style:normal;line-height:1}
@@ -811,7 +811,7 @@ tr.unconfirmed td:first-child::before{ content:'◷ '; font-style:normal; color:
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div class="card-title">Cashflow 2026</div>
       <div style="display:flex;gap:12px;font-size:11px;color:var(--muted)">
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--accent);border-radius:2px;display:inline-block"></span>Einnahmen</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--green);border-radius:2px;display:inline-block"></span>Einnahmen</span>
         <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--red);border-radius:2px;display:inline-block"></span>Ausgaben</span>
         <span style="display:flex;align-items:center;gap:4px;opacity:.6"><span style="width:10px;height:10px;background:var(--muted);border-radius:2px;opacity:.4;display:inline-block"></span>unbestätigt</span>
       </div>
@@ -2039,6 +2039,40 @@ function updateSidebarActive(page){ document.querySelectorAll('.sidebar-item').f
 
 /* Escape zum Schliessen der Sidebar */
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSidebar(); });
+
+// ── Swipe-Geste: Sidebar auf/zu ──
+(function initSwipe(){
+  let startX=0, startY=0, dragging=false;
+  const EDGE=30, THRESHOLD=60, MAX_Y=80;
+
+  document.addEventListener('touchstart', e=>{
+    startX=e.touches[0].clientX;
+    startY=e.touches[0].clientY;
+    dragging=false;
+  }, {passive:true});
+
+  document.addEventListener('touchmove', e=>{
+    if(!dragging){
+      const dx=e.touches[0].clientX-startX;
+      const dy=Math.abs(e.touches[0].clientY-startY);
+      // Nur horizontale Swipes berücksichtigen
+      if(dy>MAX_Y) return;
+      const sidebarOpen=document.getElementById('sidebar').classList.contains('open');
+      // Öffnen: von links (Edge-Zone), nach rechts
+      if(!sidebarOpen && startX<=EDGE && dx>0) dragging='open';
+      // Schliessen: Sidebar offen, nach links wischen
+      if(sidebarOpen && dx<0) dragging='close';
+    }
+  }, {passive:true});
+
+  document.addEventListener('touchend', e=>{
+    if(!dragging) return;
+    const dx=e.changedTouches[0].clientX-startX;
+    if(dragging==='open' && dx>=THRESHOLD) openSidebar();
+    if(dragging==='close' && dx<=-THRESHOLD) closeSidebar();
+    dragging=false;
+  }, {passive:true});
+})();
 function setSyncStatus(state,label){
   const dot=document.getElementById('syncDot');
   dot.className='sync-dot'+(state?' '+state:'');
