@@ -190,7 +190,7 @@ textarea.form-input{resize:vertical;min-height:72px}
 /* TYPE TOGGLE */
 .type-toggle{display:flex;background:#f3f2f0;border-radius:11px;padding:4px;gap:4px;margin-bottom:16px}
 .type-btn{flex:1;padding:9px;border:none;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;color:var(--muted);background:transparent}
-.type-btn.income.active{background:var(--accent);color:white}
+.type-btn.income.active{background:var(--green);color:white}
 .type-btn.expense.active{background:var(--red);color:white}
 
 /* SECTION TOGGLE */
@@ -5985,6 +5985,74 @@ async function notionSaveWithQueue(dbId, props, meta={}){
     return {success:false, error:e.message, qId};
   }
 }
+
+
+// ═══════════════════════════════════════════
+// WEB SHARE TARGET — Service Worker + Beleg-Empfang
+// ═══════════════════════════════════════════
+(function initShareTarget(){
+  // 1. Service Worker registrieren
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/budget-app/sw.js', { scope: '/budget-app/' })
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.warn('SW registration failed:', err));
+
+    // 2. Nachricht vom SW empfangen (App war bereits offen)
+    navigator.serviceWorker.addEventListener('message', event => {
+      if(event.data && event.data.type === 'SHARED_BELEG'){
+        handleSharedBeleg(event.data.payload);
+      }
+    });
+  }
+
+  // 3. Beim App-Start prüfen ob eine Datei im SW-Cache wartet (App war zu)
+  async function checkSharedBelegCache(){
+    if(!('caches' in window)) return;
+    try{
+      const cache = await caches.open('financebird-v1');
+      const response = await cache.match('/__shared_beleg__');
+      if(response){
+        const data = await response.json();
+        await cache.delete('/__shared_beleg__');
+        // Nur verwenden wenn jünger als 2 Minuten
+        if(Date.now() - data.timestamp < 120000){
+          handleSharedBeleg(data);
+        }
+      }
+    }catch(e){ console.warn('Share cache check failed:', e); }
+  }
+
+  // 4. Geteilten Beleg ins Erfassen-Formular laden
+  function handleSharedBeleg(payload){
+    if(!payload || !payload.data) return;
+    // Kurz warten bis App vollständig initialisiert ist
+    setTimeout(()=>{
+      go('erfassen');
+      const isPDF = payload.type === 'application/pdf';
+      const dataUrl = payload.data;
+      const filename = payload.name || 'geteilter_beleg';
+
+      if(isPDF){
+        currentReceipt = { thumb: null, original: dataUrl, filename, isPDF: true };
+        showReceiptUI(null, filename, true);
+      } else {
+        compress(dataUrl, thumb => {
+          currentReceipt = { thumb, original: dataUrl, filename, isPDF: false };
+          showReceiptUI(thumb, filename, false);
+        });
+      }
+
+      // Toast anzeigen
+      showToast('📎 Beleg aus ' + (payload.source || 'Teilen') + ' geladen', 'success');
+
+      // KI-Analyse automatisch starten
+      setTimeout(() => analyseBeleg(dataUrl, isPDF), 400);
+    }, notionToken ? 600 : 200);
+  }
+
+  // checkSharedBelegCache beim Start aufrufen (nach kurzem Delay damit App ready ist)
+  window.addEventListener('load', () => setTimeout(checkSharedBelegCache, 800));
+})();
 
 </script>
 </body>
