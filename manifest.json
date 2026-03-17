@@ -2,8 +2,8 @@
   "name": "FinanceBird",
   "short_name": "FinanceBird",
   "description": "Finanzen für Einzelfirma",
-  "start_url": "/budget-app/financebird_v1.html",
-  "scope": "/budget-app/",
+  "start_url": "/app/financebird_v2.html",
+  "scope": "/app/",
   "display": "standalone",
   "background_color": "#f5f0e8",
   "theme_color": "#c4441a",
@@ -22,7 +22,7 @@
     { "src": "icons/icon-512-transparent.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "share_target": {
-    "action": "/budget-app/financebird_v1.html",
+    "action": "/app/financebird_v2.html",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
