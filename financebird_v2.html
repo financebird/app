@@ -1298,125 +1298,83 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
         Wir könnten einen zentralen Worker betreiben — aber dann würden deine Notion-Daten durch unsere Infrastruktur fliessen. Das widerspricht unserem Grundversprechen: <strong>Deine Finanzdaten gehören dir allein.</strong> Dein eigener Worker ist die sauberste Lösung.
       </div>
 
-      <!-- Schritt-für-Schritt -->
+      <!-- 2-Schritt Auto-Deploy -->
       <div style="margin-bottom:16px">
-        <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">So geht's — 3 Schritte</div>
+        <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">So geht's — 2 Schritte</div>
 
-        <!-- Schritt 1 -->
+        <!-- Schritt 1: Cloudflare Account + API Token -->
         <div class="worker-step" id="workerStep1">
           <div class="worker-step-header">
             <span class="worker-step-num" id="workerStepNum1">1</span>
             <div>
-              <div style="font-weight:600;font-size:14px;color:var(--ink)">Worker-Datei herunterladen</div>
-              <div style="font-size:12px;color:var(--muted)">Den fertigen Code für deinen Worker</div>
+              <div style="font-weight:600;font-size:14px;color:var(--ink)">Cloudflare API Token erstellen</div>
+              <div style="font-size:12px;color:var(--muted)">Kostenloser Account — nur Email nötig</div>
             </div>
           </div>
-          <a href="https://financebird.github.io/app/notion-worker.js"
-             download="notion-worker.js"
+          <a href="https://dash.cloudflare.com/profile/api-tokens/create?permissionGroupKeys=workers_scripts,workers_routes,workers_tail,account_settings&name=FinanceBird+Worker&permissionLevel=edit"
+             target="_blank"
              onclick="workerMarkStep(1)"
              style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:11px;background:var(--ink);color:white;border-radius:9px;text-decoration:none;font-size:13px;font-weight:600">
-            ↓ notion-worker.js herunterladen
+            → Token in Cloudflare erstellen
           </a>
-          <!-- Helper -->
-          <button class="worker-helper-toggle" style="margin-top:8px" onclick="workerToggleHelper('step1')">
-            <span>Hast du den Download nicht gefunden?</span><span id="workerStep1Icon">›</span>
+          <div style="margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6">
+            Im nächsten Fenster: Template <strong>"Edit Cloudflare Workers"</strong> wählen → <strong>"Create Token"</strong> → Token kopieren.
+          </div>
+
+          <!-- Hilfe -->
+          <button class="worker-helper-toggle" style="margin-top:10px" onclick="workerToggleHelper('step1')">
+            <span>Brauchst du Hilfe oder Erläuterungen?</span><span id="workerStep1Icon">›</span>
           </button>
           <div id="workerHelperStep1" class="worker-helper-panel" style="display:none">
-            Falls der Download nicht startet: <a href="https://financebird.github.io/app/notion-worker.js" target="_blank" style="color:var(--accent)">Datei direkt öffnen</a>, dann rechtsklick → "Speichern unter" → als <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">notion-worker.js</code> speichern.
+            <strong>Noch kein Cloudflare-Konto?</strong> Die Registrierung ist kostenlos, dauert 2 Minuten und braucht nur eine Email-Adresse — keine Kreditkarte.
+            <a href="https://dash.cloudflare.com/sign-up" target="_blank" style="color:var(--accent);display:inline-block;margin-top:4px">Jetzt registrieren →</a>
+            <div style="margin-top:10px"><strong>Warum Cloudflare?</strong> FinanceBird braucht eine kleine Brücke zwischen deinem Browser und Notion — das ist der Worker. Er läuft auf deinem eigenen kostenlosen Cloudflare-Account, vollständig unter deiner Kontrolle. Wir sehen deine Daten nie.</div>
+            <div style="margin-top:8px"><strong>Was ist ein API Token?</strong> Ein einmaliger Schlüssel der FinanceBird erlaubt, in deinem Namen einen Worker zu deployen. Du kannst ihn danach löschen — der Worker läuft weiter.</div>
           </div>
         </div>
 
-        <!-- Schritt 2 -->
+        <!-- Schritt 2: Token eingeben → Auto-Deploy -->
         <div class="worker-step" id="workerStep2" style="opacity:.5;transition:opacity .3s">
           <div class="worker-step-header">
             <span class="worker-step-num" id="workerStepNum2">2</span>
             <div>
-              <div style="font-weight:600;font-size:14px;color:var(--ink)">In Cloudflare deployen</div>
-              <div style="font-size:12px;color:var(--muted)">Kostenloser Account genügt</div>
-            </div>
-          </div>
-          <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--ink2);line-height:1.6">
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="background:var(--bg2);border-radius:4px;padding:1px 7px;font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px">a</span>
-              <span>Öffne <a href="https://dash.cloudflare.com" target="_blank" style="color:var(--accent);font-weight:600">dash.cloudflare.com</a> — registriere dich falls nötig (kostenlos)</span>
-            </div>
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="background:var(--bg2);border-radius:4px;padding:1px 7px;font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px">b</span>
-              <span>Linke Sidebar: <strong>Workers &amp; Pages</strong> → Button <strong>"Create"</strong></span>
-            </div>
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="background:var(--bg2);border-radius:4px;padding:1px 7px;font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px">c</span>
-              <span>"Create Worker" → Namen vergeben (z.B. <em>financebird</em>) → <strong>"Deploy"</strong></span>
-            </div>
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="background:var(--bg2);border-radius:4px;padding:1px 7px;font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px">d</span>
-              <span>Button <strong>"Edit code"</strong> → gesamten Inhalt löschen → Inhalt der <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">notion-worker.js</code> einfügen → <strong>"Deploy"</strong></span>
-            </div>
-          </div>
-          <!-- Helper: Kein Cloudflare Account -->
-          <button class="worker-helper-toggle" style="margin-top:10px" onclick="workerToggleHelper('noaccount')">
-            <span>Ich habe noch kein Cloudflare-Konto</span><span id="workerNoacountIcon">›</span>
-          </button>
-          <div id="workerHelperNoaccount" class="worker-helper-panel" style="display:none">
-            Kein Problem — die Registrierung ist kostenlos und dauert 2 Minuten. Nur Email-Adresse nötig, keine Kreditkarte. <a href="https://dash.cloudflare.com/sign-up" target="_blank" style="color:var(--accent)">Jetzt registrieren →</a>
-          </div>
-          <!-- Helper: Worker nicht finden -->
-          <button class="worker-helper-toggle" style="margin-top:6px" onclick="workerToggleHelper('navhelp')">
-            <span>Ich finde "Workers &amp; Pages" nicht</span><span id="workerNavhelpIcon">›</span>
-          </button>
-          <div id="workerHelperNavhelp" class="worker-helper-panel" style="display:none">
-            Im Cloudflare Dashboard: Linke Sidebar ganz oben → <strong>Workers &amp; Pages</strong>. Falls du ein Team-Konto hast, zuerst dein persönliches Konto oben links auswählen. Direkt-Link: <a href="https://dash.cloudflare.com/?to=/:account/workers" target="_blank" style="color:var(--accent)">dash.cloudflare.com/workers →</a>
-          </div>
-          <button class="worker-step-done-btn" onclick="workerMarkStep(2)" style="margin-top:10px">
-            ✓ Worker deployed
-          </button>
-        </div>
-
-        <!-- Schritt 3 -->
-        <div class="worker-step" id="workerStep3" style="opacity:.5;transition:opacity .3s">
-          <div class="worker-step-header">
-            <span class="worker-step-num" id="workerStepNum3">3</span>
-            <div>
-              <div style="font-weight:600;font-size:14px;color:var(--ink)">Worker-URL eingeben &amp; testen</div>
-              <div style="font-size:12px;color:var(--muted)">Steht auf der Worker-Seite nach dem Deploy</div>
+              <div style="font-weight:600;font-size:14px;color:var(--ink)">Token eingeben — Worker wird automatisch deployed</div>
+              <div style="font-size:12px;color:var(--muted)">FinanceBird erledigt den Rest</div>
             </div>
           </div>
           <div style="margin-top:10px">
             <div style="display:flex;gap:8px;align-items:stretch">
-              <input type="url" id="ownWorkerUrlInput" class="form-input" style="flex:1;min-width:0"
-                placeholder="https://financebird.workers.dev/v1"
-                oninput="workerUrlChanged()"
+              <input type="password" id="cfApiTokenInput" class="form-input" style="flex:1;min-width:0"
+                placeholder="Cloudflare API Token einfügen"
+                oninput="workerTokenChanged()"
                 autocomplete="off">
-              <button id="workerTestBtn" onclick="workerTestConnection()"
-                style="padding:0 14px;background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;font-size:13px;cursor:pointer;white-space:nowrap;color:var(--ink2);font-family:inherit">
-                Testen
+              <button id="workerDeployBtn" onclick="workerAutoDeploy()"
+                style="padding:0 14px;background:var(--accent);color:white;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;opacity:.4;pointer-events:none">
+                Deployen
               </button>
             </div>
-            <div id="workerTestResult" style="margin-top:6px;font-size:12px;min-height:16px"></div>
-          </div>
-          <!-- Helper: URL-Format -->
-          <button class="worker-helper-toggle" style="margin-top:8px" onclick="workerToggleHelper('urlformat')">
-            <span>Wo finde ich die URL? Welches Format?</span><span id="workerUrlformatIcon">›</span>
-          </button>
-          <div id="workerHelperUrlformat" class="worker-helper-panel" style="display:none">
-            Nach dem Deploy siehst du oben im Cloudflare-Dashboard die Worker-URL — sie endet auf <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">.workers.dev</code>. <strong>Füge am Ende /v1 hinzu:</strong><br>
-            <code style="background:var(--bg2);padding:3px 6px;border-radius:4px;display:inline-block;margin-top:4px">https://financebird.workers.dev<strong>/v1</strong></code>
-          </div>
-          <!-- Helper: Test schlägt fehl -->
-          <button class="worker-helper-toggle" style="margin-top:6px" onclick="workerToggleHelper('testfail')">
-            <span>Test schlägt fehl — was tun?</span><span id="workerTestfailIcon">›</span>
-          </button>
-          <div id="workerHelperTestfail" class="worker-helper-panel" style="display:none">
-            <strong>Häufige Ursachen:</strong>
-            <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
-              <div>• URL endet nicht auf <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">/v1</code> — bitte ergänzen</div>
-              <div>• Worker noch nicht vollständig deployed — 30 Sek. warten und erneut testen</div>
-              <div>• Code nicht korrekt eingefügt — Schritt 2d wiederholen</div>
-              <div>• Cloudflare braucht manchmal 1–2 Min. für globale Verteilung</div>
+            <div id="workerDeployResult" style="margin-top:8px;font-size:12px;min-height:16px"></div>
+            <!-- Deployed URL (erscheint nach erfolgreichem Deploy) -->
+            <div id="workerDeployedUrlWrap" style="display:none;margin-top:10px;background:var(--green-light);border:1px solid var(--green);border-radius:9px;padding:10px 14px">
+              <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:3px">✓ Worker läuft</div>
+              <div id="workerDeployedUrl" style="font-family:monospace;font-size:12px;color:var(--ink);word-break:break-all"></div>
             </div>
-            Immer noch ein Problem? <a href="mailto:oswald@koenig.xyz?subject=FinanceBird Worker Setup" style="color:var(--accent)">Schreib uns →</a>
+          </div>
+
+          <!-- Hilfe -->
+          <button class="worker-helper-toggle" style="margin-top:10px" onclick="workerToggleHelper('step2')">
+            <span>Brauchst du Hilfe oder Erläuterungen?</span><span id="workerStep2Icon">›</span>
+          </button>
+          <div id="workerHelperStep2" class="worker-helper-panel" style="display:none">
+            <strong>Wo ist mein Token?</strong> Nach dem Erstellen zeigt Cloudflare den Token einmalig an. Kopiere ihn vollständig und füge ihn oben ein.
+            <div style="margin-top:8px"><strong>Deploy schlägt fehl?</strong> Prüfe ob du das Template <em>"Edit Cloudflare Workers"</em> gewählt hast — andere Templates haben nicht die nötigen Rechte.</div>
+            <div style="margin-top:8px"><strong>Was passiert mit dem Token?</strong> Er wird nur für den einmaligen Deploy verwendet und danach nicht gespeichert. Du kannst ihn in Cloudflare nach dem Setup löschen.</div>
+            <div style="margin-top:8px">Immer noch ein Problem? <a href="mailto:oswald@koenig.xyz?subject=FinanceBird Worker Setup" style="color:var(--accent)">Schreib uns →</a></div>
           </div>
         </div>
+
+        <!-- Versteckte Felder für Kompatibilität mit workerSetupContinue() -->
+        <input type="hidden" id="ownWorkerUrlInput">
       </div>
 
       <!-- Continue Button -->
@@ -1424,7 +1382,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
         Weiter → Notion verbinden
       </button>
       <div style="margin-top:10px;text-align:center;font-size:11px;color:var(--muted)">
-        Der Button wird aktiv sobald die Verbindung erfolgreich getestet wurde.
+        Der Button wird aktiv sobald dein Worker erfolgreich deployed wurde.
       </div>
     </div>
   </div>
@@ -7940,11 +7898,16 @@ function workerToggleHelper(key) {
   if (!panel) return;
   const nowOpen = panel.style.display === 'none';
   panel.style.display = nowOpen ? '' : 'none';
-  // Update arrow on the button (last <span> child of previousElementSibling)
-  const btn = panel.previousElementSibling;
-  if (btn) {
-    const spans = btn.querySelectorAll('span');
-    if (spans.length) spans[spans.length - 1].textContent = nowOpen ? '‹' : '›';
+  const iconId = 'worker' + key.charAt(0).toUpperCase() + key.slice(1) + 'Icon';
+  const icon   = document.getElementById(iconId);
+  // fallback: find last span in previous sibling button
+  if (icon) { icon.textContent = nowOpen ? '‹' : '›'; }
+  else {
+    const btn = panel.previousElementSibling;
+    if (btn) {
+      const spans = btn.querySelectorAll('span');
+      if (spans.length) spans[spans.length - 1].textContent = nowOpen ? '‹' : '›';
+    }
   }
 }
 
@@ -7952,76 +7915,138 @@ function workerToggleHelper(key) {
 function workerMarkStep(step) {
   _workerStepsDone.add(step);
   const numEl = document.getElementById('workerStepNum' + step);
-  if (numEl) { numEl.classList.add('done'); numEl.textContent = ''; }
+  if (numEl) { numEl.classList.add('done'); numEl.textContent = '✓'; }
   const nextEl = document.getElementById('workerStep' + (step + 1));
   if (nextEl) nextEl.style.opacity = '1';
+  // Unlock deploy button after step 1
+  if (step === 1) {
+    const deployBtn = document.getElementById('workerDeployBtn');
+    if (deployBtn) { deployBtn.style.opacity = '1'; deployBtn.style.pointerEvents = 'auto'; }
+  }
 }
 
-/** Called on URL input — reset test state */
-function workerUrlChanged() {
-  _workerTestPassed = false;
-  const btn = document.getElementById('workerContinueBtn');
-  if (btn) { btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none'; }
-  const res = document.getElementById('workerTestResult');
+/** Enable deploy button when token is entered */
+function workerTokenChanged() {
+  const token = (document.getElementById('cfApiTokenInput')?.value || '').trim();
+  const btn   = document.getElementById('workerDeployBtn');
+  const res   = document.getElementById('workerDeployResult');
+  if (btn) {
+    const ready = token.length > 20 && _workerStepsDone.has(1);
+    btn.style.opacity       = ready ? '1' : '0.4';
+    btn.style.pointerEvents = ready ? 'auto' : 'none';
+  }
   if (res) res.textContent = '';
 }
 
-/** Live-test the worker by calling its /health endpoint */
-async function workerTestConnection() {
-  const input = document.getElementById('ownWorkerUrlInput');
-  const res   = document.getElementById('workerTestResult');
-  const btn   = document.getElementById('workerTestBtn');
-  if (!input || !res) return;
+/** Auto-deploy the notion-worker via Cloudflare API */
+async function workerAutoDeploy() {
+  const token  = (document.getElementById('cfApiTokenInput')?.value || '').trim();
+  const res    = document.getElementById('workerDeployResult');
+  const btn    = document.getElementById('workerDeployBtn');
+  if (!token || !res) return;
 
-  let url = input.value.trim();
-  if (!url) {
-    res.innerHTML = '<span style="color:var(--red)">Bitte Worker-URL eingeben</span>';
-    return;
-  }
-  // Auto-append /v1 if missing
-  if (!url.match(/\/v1\/?$/)) {
-    url = url.replace(/\/$/, '') + '/v1';
-    input.value = url;
-  }
+  // Worker script — fetched from our repo at runtime
+  const WORKER_NAME = 'financebird-worker';
+  const SCRIPT_URL  = 'https://raw.githubusercontent.com/siio-kunto/budget-app/main/notion-worker.js';
 
-  btn.textContent = '…';
-  btn.disabled    = true;
-  res.innerHTML   = '<span style="color:var(--muted)">Verbinde…</span>';
+  btn.textContent    = '…';
+  btn.disabled       = true;
+  res.innerHTML      = '<span style="color:var(--muted)">Lade Worker-Code…</span>';
 
   try {
-    const healthUrl = url.replace(/\/v1\/?$/, '/health');
-    const resp = await fetch(healthUrl, { signal: AbortSignal.timeout(9000) });
-    if (resp.ok) {
-      const data = await resp.json().catch(() => ({}));
-      if (data.ok || data.service) {
-        res.innerHTML = '<span style="color:var(--green)">✓ Verbindung erfolgreich — Worker läuft</span>';
-        _workerTestPassed = true;
-        workerMarkStep(3);
-        const cb = document.getElementById('workerContinueBtn');
-        if (cb) { cb.style.opacity = '1'; cb.style.pointerEvents = 'auto'; }
-      } else {
-        res.innerHTML = '<span style="color:var(--amber)">⚠️ Worker antwortet, unbekanntes Format — trotzdem fortfahren?</span>';
-        _workerTestPassed = true;
-        const cb = document.getElementById('workerContinueBtn');
-        if (cb) { cb.style.opacity = '1'; cb.style.pointerEvents = 'auto'; }
-      }
-    } else {
-      res.innerHTML = '<span style="color:var(--red)">✗ Fehler ' + resp.status + ' — Schritt 2 prüfen</span>';
+    // 1. Fetch the worker script
+    const scriptResp = await fetch(SCRIPT_URL);
+    if (!scriptResp.ok) throw new Error('Worker-Code konnte nicht geladen werden');
+    const scriptText = await scriptResp.text();
+
+    res.innerHTML = '<span style="color:var(--muted)">Deploye Worker auf deinem Cloudflare-Account…</span>';
+
+    // 2. Get account ID from Cloudflare
+    const meResp = await fetch('https://api.cloudflare.com/client/v4/accounts', {
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+    });
+    const meData = await meResp.json();
+    if (!meData.success || !meData.result?.length) {
+      throw new Error('Token ungültig oder keine Cloudflare-Accounts gefunden');
     }
+    const accountId = meData.result[0].id;
+
+    // 3. Deploy worker script
+    const form = new FormData();
+    form.append('metadata', JSON.stringify({
+      main_module: 'worker.js',
+      compatibility_date: '2024-01-01'
+    }));
+    form.append('worker.js', new Blob([scriptText], { type: 'application/javascript+module' }), 'worker.js');
+
+    const deployResp = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/workers/scripts/${WORKER_NAME}`,
+      { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }, body: form }
+    );
+    const deployData = await deployResp.json();
+    if (!deployData.success) {
+      const msg = deployData.errors?.[0]?.message || 'Deploy fehlgeschlagen';
+      throw new Error(msg);
+    }
+
+    // 4. Enable the worker route (workers.dev)
+    await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/workers/scripts/${WORKER_NAME}/subdomain`,
+      { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: true }) }
+    );
+
+    // 5. Get subdomain
+    const subResp = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/workers/subdomain`,
+      { headers: { 'Authorization': 'Bearer ' + token } }
+    );
+    const subData = await subResp.json();
+    const subdomain = subData.result?.subdomain || accountId.slice(0,8);
+    const workerUrl = `https://${WORKER_NAME}.${subdomain}.workers.dev/v1`;
+
+    // 6. Save and unlock continue
+    const hiddenInput = document.getElementById('ownWorkerUrlInput');
+    if (hiddenInput) hiddenInput.value = workerUrl;
+    const inp1 = document.getElementById('workerUrlInput');
+    const inp2 = document.getElementById('workerUrlTokenInput');
+    if (inp1) inp1.value = workerUrl;
+    if (inp2) inp2.value = workerUrl;
+
+    // Show success
+    res.innerHTML = '<span style="color:var(--green)">✓ Worker erfolgreich deployed</span>';
+    const urlWrap = document.getElementById('workerDeployedUrlWrap');
+    const urlEl   = document.getElementById('workerDeployedUrl');
+    if (urlWrap) urlWrap.style.display = 'block';
+    if (urlEl)   urlEl.textContent = workerUrl;
+
+    workerMarkStep(2);
+    _workerTestPassed = true;
+    AppState.workerUrl = workerUrl;
+    saveLocal('fb_worker_url', workerUrl);
+
+    const cb = document.getElementById('workerContinueBtn');
+    if (cb) { cb.style.opacity = '1'; cb.style.pointerEvents = 'auto'; }
+
   } catch (e) {
-    res.innerHTML = e.name === 'TimeoutError'
-      ? '<span style="color:var(--red)">✗ Timeout — URL korrekt? /v1 am Ende?</span>'
-      : '<span style="color:var(--red)">✗ Keine Verbindung — URL prüfen, ggf. 1 Min. warten</span>';
+    res.innerHTML = `<span style="color:var(--red)">✗ ${e.message}</span>`;
   } finally {
-    btn.textContent = 'Testen';
+    btn.textContent = 'Deployen';
     btn.disabled    = false;
   }
 }
 
+/** Called on URL input — legacy compat, now unused in normal flow */
+function workerUrlChanged() {
+  _workerTestPassed = false;
+  const btn = document.getElementById('workerContinueBtn');
+  if (btn) { btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none'; }
+}
+
 function workerSetupContinue() {
-  const url = (document.getElementById('ownWorkerUrlInput')?.value || '').trim();
+  const url = AppState.workerUrl || (document.getElementById('ownWorkerUrlInput')?.value || '').trim();
   if (!url || !_workerTestPassed) {
-    showToast('error', '⚠️', 'Verbindungstest nötig', 'Bitte erst "Testen" klicken');
+    showToast('error', '⚠️', 'Worker-Deploy nötig', 'Bitte erst den Worker deployen');
     return;
   }
   const inp1 = document.getElementById('workerUrlInput');
