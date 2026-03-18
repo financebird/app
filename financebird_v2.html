@@ -2328,89 +2328,219 @@ const Auth = {
   },
 
   /**
+   * Shared Secret für Worker-Requests.
+   * Muss mit FB_SHARED_SECRET im Worker übereinstimmen.
+   * Im Build-Prozess ersetzen oder als Konstante setzen.
+   */
+  FB_SHARED_SECRET: 'fb-v2-2026', // ← in Production durch sicheren Wert ersetzen
+
+  /**
+   * Worker-Basis-URL (ohne /v1).
+   */
+  get workerBase() {
+    return (AppState.workerUrl || '').replace(/\/v1\/?$/, '');
+  },
+
+  /**
+   * Standard-Headers für Worker-Requests.
+   */
+  workerHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'X-FB-Key':     this.FB_SHARED_SECRET,
+    };
+  },
+
+  /**
    * Start Notion OAuth flow.
-   * Redirects to Worker's /oauth/start endpoint.
-   * Worker handles callback + token exchange.
+   * Speichert State-Code für CSRF-Schutz + Polling.
    */
   async startOAuth(workerUrl) {
     if (!workerUrl) throw new Error('Worker URL required for OAuth');
+    const base  = workerUrl.replace(/\/v1\/?$/, '');
     const state = uid();
     saveLocal('fb_oauth_state', state);
-    const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
-    const authUrl = `${workerUrl}/oauth/start?state=${state}&redirect_uri=${redirectUri}`;
-    window.location.href = authUrl;
+    saveLocal('fb_oauth_worker', base);
+    // Polling starten — wartet bis Token in KV landet (iOS PWA Fix)
+    this._startPolling(state, base);
+    const authUrl = `${base}/oauth/start?state=${encodeURIComponent(state)}`;
+    window.open(authUrl, '_blank');
   },
 
   /**
-   * Handle OAuth callback (called on page load if ?code= in URL).
-   * Exchanges code for token via Worker.
-   * Returns true if OAuth callback was handled.
+   * Polling — fragt Worker alle 2s ob Token bereit (iOS PWA Fix).
+   * Weg A: Token kommt über KV-Polling.
+   * Fallback: Token kommt über URL-Fragment (Weg B) oder manuell (Weg C).
    */
-  async handleOAuthCallback(workerUrl) {
-    const params = new URLSearchParams(window.location.search);
-    const code  = params.get('code');
-    const state = params.get('state');
-    if (!code) return false;
+  _pollInterval: null,
+  _pollTimeout:  null,
 
-    const savedState = loadLocal('fb_oauth_state', null);
-    if (state !== savedState) throw new Error('OAuth state mismatch — possible CSRF');
+  _startPolling(state, workerBase) {
+    // Bereits aktiv?
+    if (this._pollInterval) clearInterval(this._pollInterval);
+    if (this._pollTimeout)  clearTimeout(this._pollTimeout);
 
-    showLoading('Verbinde mit Notion…');
-    const resp = await fetch(`${workerUrl}/oauth/callback`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, redirect_uri: window.location.origin + window.location.pathname })
-    });
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({ message: resp.statusText }));
-      throw new Error(err.message || 'OAuth callback failed');
-    }
-    const data = await resp.json();
-    AppState.notionToken = data.access_token;
-    AppState.authMode    = 'oauth';
-    AppState.workerUrl   = workerUrl;
-    saveAppState();
+    let attempts = 0;
+    const maxAttempts = 150; // 5 Min bei 2s Intervall
 
-    // Clean URL
-    window.history.replaceState({}, '', window.location.pathname);
-    localStorage.removeItem('fb_oauth_state');
-    return true;
+    this._pollInterval = setInterval(async () => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        this._stopPolling();
+        showToast('error', '⏱', 'Verbindungs-Timeout', 'Bitte erneut versuchen oder Token manuell eingeben');
+        return;
+      }
+      try {
+        const url  = `${workerBase}/oauth/poll?state=${encodeURIComponent(state)}`;
+        const resp = await fetch(url, { headers: { 'X-FB-Key': this.FB_SHARED_SECRET } });
+        const data = await resp.json();
+        if (data.ready && data.token) {
+          this._stopPolling();
+          await this._applyToken(data.token, workerBase);
+        }
+      } catch { /* Netz-Fehler — weiter polling */ }
+    }, 2000);
+  },
+
+  _stopPolling() {
+    if (this._pollInterval) { clearInterval(this._pollInterval); this._pollInterval = null; }
+    if (this._pollTimeout)  { clearTimeout(this._pollTimeout);   this._pollTimeout  = null; }
   },
 
   /**
-   * Set manual token (fallback mode).
-   * Validates token against Notion before saving.
+   * Token aus OAuth-Callback verarbeiten.
+   * Weg B: Token kommt als URL-Fragment (#token=...).
+   * Wird beim App-Start geprüft.
+   */
+  async handleOAuthCallback() {
+    // Weg B: URL-Fragment prüfen
+    const hash   = window.location.hash;
+    const params = new URLSearchParams(window.location.search);
+
+    if (hash && hash.includes('token=')) {
+      const tokenStr = decodeURIComponent(hash.replace(/^#token=/, ''));
+      try {
+        const tokenData   = JSON.parse(tokenStr);
+        const workerBase  = loadLocal('fb_oauth_worker', null) ||
+                            (AppState.workerUrl || '').replace(/\/v1\/?$/, '');
+        // CSRF: state prüfen wenn vorhanden
+        const returnState = params.get('state');
+        const savedState  = loadLocal('fb_oauth_state', null);
+        if (returnState && savedState && returnState !== savedState) {
+          throw new Error('OAuth state mismatch');
+        }
+        this._stopPolling();
+        await this._applyToken(tokenData, workerBase);
+        window.history.replaceState({}, '', window.location.pathname);
+        localStorage.removeItem('fb_oauth_state');
+        return true;
+      } catch (e) {
+        console.error('[Auth] Fragment token parse error:', e);
+      }
+    }
+
+    // oauth_error im URL?
+    if (params.get('oauth_error')) {
+      showToast('error', '❌', 'OAuth Fehler', params.get('oauth_error'));
+      window.history.replaceState({}, '', window.location.pathname);
+      return false;
+    }
+
+    return false;
+  },
+
+  /**
+   * Token manuell eingeben (Weg C — letzter Ausweg).
+   * Auch für manuell kopierten Token aus Callback-Seite.
+   */
+  async applyManualTokenPayload(tokenPayloadStr) {
+    try {
+      const tokenData  = JSON.parse(tokenPayloadStr);
+      const workerBase = loadLocal('fb_oauth_worker', null) ||
+                         (AppState.workerUrl || '').replace(/\/v1\/?$/, '');
+      this._stopPolling();
+      await this._applyToken(tokenData, workerBase);
+      return true;
+    } catch (e) {
+      throw new Error('Token konnte nicht verarbeitet werden: ' + e.message);
+    }
+  },
+
+  /**
+   * Manueller ntn_-Token Fallback.
    */
   async setManualToken(token, workerUrl) {
     if (!token || token.length < 10) throw new Error('Ungültiger Token');
-    const testUrl = workerUrl || 'https://notion-proxy.holy-forest-0174.workers.dev/v1';
-    // Validate by fetching user info
+    const base    = (workerUrl || '').replace(/\/v1\/?$/, '');
+    const testUrl = base ? base + '/v1' : null;
+    if (!testUrl) throw new Error('Worker URL fehlt');
+
     const resp = await fetch(`${testUrl}/users/me`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization':  `Bearer ${token}`,
         'Notion-Version': '2022-06-28',
+        'X-FB-Key':       this.FB_SHARED_SECRET,
       }
     });
     const data = await resp.json();
     if (data.object === 'error') throw new Error(data.message);
+
     AppState.notionToken = token;
     AppState.authMode    = 'token';
     AppState.workerUrl   = testUrl;
     saveAppState();
-    return data; // user object
+    return data;
   },
 
-  /** Clear all auth state — logout */
+  /**
+   * Token anwenden — gemeinsame Logik für alle drei Wege.
+   */
+  async _applyToken(tokenData, workerBase) {
+    const token = typeof tokenData === 'string'
+      ? tokenData
+      : tokenData.access_token;
+    if (!token) throw new Error('Kein Token im Payload');
+
+    AppState.notionToken = token;
+    AppState.authMode    = 'oauth';
+    AppState.workerUrl   = workerBase + '/v1';
+    saveAppState();
+    localStorage.removeItem('fb_oauth_state');
+    localStorage.removeItem('fb_oauth_worker');
+
+    showToast('success', '✅', 'Notion verbunden', tokenData.workspace_name || 'OAuth erfolgreich');
+
+    // Onboarding weiterführen falls noch nicht abgeschlossen
+    const onboardDone = loadLocal('fb_onboard_complete', false);
+    if (!onboardDone) {
+      showQuizAfterAuth();
+    } else {
+      showApp();
+      restoreTab();
+      setTimeout(async () => {
+        try { await fullSync(); renderAll(); InboxEngine.updateBadge(); } catch {}
+      }, 300);
+    }
+  },
+
+  /**
+   * Re-Auth — bei 401 von Notion.
+   * Zeigt Banner, wartet auf User-Aktion.
+   */
+  triggerReAuth(reason = '') {
+    this._stopPolling();
+    showReAuthBanner(reason);
+  },
+
+  /** Clear all auth — logout / reset */
   logout() {
+    this._stopPolling();
     AppState.notionToken = null;
     AppState.authMode    = 'oauth';
     saveAppState();
   },
 
-  /** Is authenticated? */
-  get isAuthenticated() {
-    return !!AppState.notionToken;
-  }
+  get isAuthenticated() { return !!AppState.notionToken; }
 };
 
 
@@ -2639,20 +2769,49 @@ const DB = {
 
 const NOTION_VER = '2022-06-28';
 
-/** Base Notion API call via Worker */
-async function notionFetch(path, method = 'GET', body = null) {
-  const token = await Auth.getToken();
-  const base  = AppState.workerUrl || 'https://notion-proxy.holy-forest-0174.workers.dev/v1';
-  const opts  = {
+/** Base Notion API call via Worker — mit 401/429-Handling */
+async function notionFetch(path, method = 'GET', body = null, _retry = 0) {
+  const token = AppState.notionToken;
+  const base  = AppState.workerUrl || '';
+
+  if (!base) throw new Error('Worker URL nicht konfiguriert');
+  if (!token) { Auth.triggerReAuth('Kein Token'); throw new Error('Nicht authentifiziert'); }
+
+  const opts = {
     method,
     headers: {
-      'Authorization':    `Bearer ${token}`,
-      'Notion-Version':   NOTION_VER,
-      'Content-Type':     'application/json',
+      'Authorization':  `Bearer ${token}`,
+      'Notion-Version': NOTION_VER,
+      'Content-Type':   'application/json',
+      'X-FB-Key':       Auth.FB_SHARED_SECRET,
     }
   };
   if (body) opts.body = JSON.stringify(body);
+
   const resp = await fetch(base + path, opts);
+
+  // 401 — Token ungültig: Re-Auth-Flow triggern
+  if (resp.status === 401) {
+    Auth.triggerReAuth('Notion-Verbindung unterbrochen — Token ungültig');
+    throw new Error('AUTH_EXPIRED');
+  }
+
+  // 429 — Rate Limit: Exponential Backoff, max 3 Versuche
+  if (resp.status === 429) {
+    if (_retry >= 3) throw new Error('Notion Rate Limit — bitte kurz warten');
+    const retryAfter = parseInt(resp.headers.get('Retry-After') || '2', 10);
+    const waitMs = Math.max(retryAfter * 1000, (2 ** _retry) * 1500);
+    setAppStatus('syncing', `Kurze Pause… (${Math.round(waitMs/1000)}s)`);
+    await new Promise(r => setTimeout(r, waitMs));
+    return notionFetch(path, method, body, _retry + 1);
+  }
+
+  // 5xx — Notion-Fehler: einmal retry
+  if (resp.status >= 500 && _retry === 0) {
+    await new Promise(r => setTimeout(r, 2000));
+    return notionFetch(path, method, body, 1);
+  }
+
   return resp.json();
 }
 
@@ -4368,6 +4527,95 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+
+/* ══════════════════════════════════════════════════════
+   UI LAYER — RE-AUTH BANNER + ESCAPE HATCH
+   Wird bei 401 oder Token-Verlust angezeigt.
+   ══════════════════════════════════════════════════════ */
+
+function showReAuthBanner(reason = '') {
+  // Bestehenden Banner entfernen
+  const existing = document.getElementById('reAuthBanner');
+  if (existing) existing.remove();
+
+  const banner = document.createElement('div');
+  banner.id = 'reAuthBanner';
+  banner.style.cssText = `
+    position:fixed;top:0;left:0;right:0;z-index:9000;
+    background:#c4441a;color:white;
+    padding:12px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;
+    box-shadow:0 2px 12px rgba(0,0,0,.2);
+  `;
+  banner.innerHTML = `
+    <div style="flex:1;min-width:0">
+      <strong style="display:block;font-size:13px">Notion-Verbindung unterbrochen</strong>
+      <span style="font-size:11px;opacity:.85">${reason || 'Bitte neu verbinden um fortzufahren'}</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button onclick="triggerReAuthFlow()"
+        style="background:white;color:#c4441a;border:none;border-radius:7px;
+               padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;
+               font-family:inherit">
+        Neu verbinden
+      </button>
+      <button onclick="triggerReset()"
+        style="background:rgba(255,255,255,.2);color:white;border:none;border-radius:7px;
+               padding:7px 14px;font-size:12px;cursor:pointer;font-family:inherit">
+        Zurücksetzen
+      </button>
+    </div>
+  `;
+  document.body.prepend(banner);
+}
+
+function hideReAuthBanner() {
+  const banner = document.getElementById('reAuthBanner');
+  if (banner) banner.remove();
+}
+
+/** Re-Auth starten — OAuth neu über Worker B */
+async function triggerReAuthFlow() {
+  const workerBase = (AppState.workerUrl || '').replace(/\/v1\/?$/, '');
+  if (!workerBase) {
+    showToast('error', '⚠️', 'Worker URL fehlt', 'Bitte Worker URL in Einstellungen prüfen');
+    return;
+  }
+  try {
+    hideReAuthBanner();
+    await Auth.startOAuth(workerBase + '/v1');
+    showToast('info', '🔗', 'Verbindung läuft…', 'Notion-Fenster wurde geöffnet');
+  } catch (e) {
+    showToast('error', '❌', 'Fehler', e.message);
+  }
+}
+
+/** Vollständiger Reset — löscht Token + Cache, startet von vorn */
+function triggerReset() {
+  if (!confirm('Verbindung zurücksetzen? Du musst dich neu mit Notion verbinden. Deine Daten in Notion bleiben erhalten.')) return;
+  Auth.logout();
+  // Cache leeren
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('fb_') || k.startsWith('buchungen') || k.startsWith('rechnungen'));
+    keys.forEach(k => localStorage.removeItem(k));
+  } catch {}
+  showToast('info', '↺', 'Zurückgesetzt', 'Bitte neu verbinden');
+  setTimeout(() => window.location.reload(), 1500);
+}
+
+/** Manuellen Token-Payload aus Callback-Seite einfügen */
+async function applyPastedToken() {
+  const input = document.getElementById('pastedTokenInput');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) { showToast('error', '⚠️', 'Kein Token', 'Bitte Token einfügen'); return; }
+  try {
+    await Auth.applyManualTokenPayload(val);
+  } catch (e) {
+    showToast('error', '❌', 'Fehler', e.message);
+  }
+}
 
 /* ══════════════════════════════════════════════════════
    UI LAYER — LOADING OVERLAY
@@ -8382,6 +8630,7 @@ async function startOAuth() {
   try {
     AppState.workerUrl = workerUrl;
     saveAppState();
+    showToast('info', '🔗', 'Verbindung läuft…', 'Notion-Fenster wurde geöffnet — wechsle zurück wenn fertig');
     await Auth.startOAuth(workerUrl);
   } catch (e) {
     showToast('error', '❌', 'OAuth Fehler', e.message);
@@ -8397,7 +8646,6 @@ async function saveManualToken() {
   try {
     await Auth.setManualToken(token, workerUrl);
     hideLoading();
-    // Check if onboarding complete → go to quiz, else go straight to app
     if (loadLocal('fb_onboard_complete', false)) {
       showApp();
       await fullSync();
@@ -8768,17 +9016,12 @@ function renderEinstellungen() {
   loadFXRates().catch(() => {});
   pruneTrash();
 
-  // 4. Check for OAuth callback
-  const workerUrl = AppState.workerUrl;
-  if (workerUrl) {
-    try {
-      const handled = await Auth.handleOAuthCallback(workerUrl);
-      if (handled) {
-        showToast('success', '✅', 'Notion verbunden', 'OAuth erfolgreich');
-      }
-    } catch (e) {
-      showToast('error', '❌', 'OAuth Fehler', e.message);
-    }
+  // 4. Check for OAuth callback (Weg B: URL-Fragment)
+  try {
+    const handled = await Auth.handleOAuthCallback();
+    if (handled) return; // _applyToken übernimmt routing
+  } catch (e) {
+    showToast('error', '❌', 'OAuth Fehler', e.message);
   }
 
   // 5. Route: authenticated vs. setup
