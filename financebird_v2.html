@@ -1271,149 +1271,46 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
         <strong style="color:var(--ink2)">Deine Daten gehören dir, leben bei dir, und wir sehen sie nie.</strong></div>
       </div>
 
-      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('welcome','worker')">
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('welcome','license')">
         Einrichten →
       </button>
     </div>
   </div>
 
-  <!-- ── PHASE B: Worker Setup (E3) ── -->
-  <div id="onboardWorker" class="onboard-screen" style="display:none">
-    <div class="onboard-card" style="max-width:500px">
-      <button class="onboard-back" onclick="onboardNext('worker','welcome')">← Zurück</button>
-      <div class="onboard-step-label">Schritt 1 von 3 — Infrastruktur</div>
+  <!-- ── PHASE B: Lizenz-Key (E2) ── -->
+  <div id="onboardLicense" class="onboard-screen" style="display:none">
+    <div class="onboard-card" style="max-width:440px;text-align:center">
+      <button class="onboard-back" onclick="onboardNext('license','welcome')">← Zurück</button>
+      <div class="onboard-step-label">Schritt 1 von 3 — Lizenz</div>
 
-      <!-- Header -->
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;margin-bottom:6px">Dein eigener Worker</h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">
-        FinanceBird braucht eine kleine Brücke zu Notion — einen <em>Cloudflare Worker</em>. Er läuft auf deinem kostenlosen Account. Einmal eingerichtet, läuft er still im Hintergrund.
+      <div style="font-size:40px;margin-bottom:12px">🗝</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:8px">
+        Dein Lizenz-Key
+      </h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">
+        Du hast einen Key per E-Mail erhalten.
       </p>
 
-      <!-- Warum eigener Worker — aufklappbar -->
-      <button class="worker-helper-toggle" onclick="workerToggleHelper('why')">
-        <span>💡 Warum nicht einfach eurer?</span><span id="workerWhyIcon">›</span>
+      <input type="text" id="onboardLicenseInput" class="form-input"
+        placeholder="LK-XXXXXXXX"
+        style="text-align:center;font-family:'Courier Prime',monospace;font-size:20px;
+               letter-spacing:.12em;text-transform:uppercase;padding:14px;margin-bottom:8px"
+        oninput="this.value=this.value.toUpperCase();onboardLicenseInputChanged()"
+        autocomplete="off" autocorrect="off" spellcheck="false">
+      <div id="onboardLicenseError" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:16px"></div>
+
+      <button class="btn btn-primary" id="onboardLicenseBtn"
+        style="width:100%;padding:14px;font-size:15px"
+        onclick="onboardCheckLicense()">
+        Prüfen
       </button>
-      <div id="workerHelperWhy" class="worker-helper-panel" style="display:none">
-        Wir könnten einen zentralen Worker betreiben — aber dann würden deine Notion-Daten durch unsere Infrastruktur fliessen. Das widerspricht unserem Grundversprechen: <strong>Deine Finanzdaten gehören dir allein.</strong> Dein eigener Worker ist die sauberste Lösung.
-      </div>
 
-      <!-- Schritt-für-Schritt -->
-      <div style="margin-bottom:16px">
-        <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">So geht's — 3 Schritte</div>
-
-        <!-- Schritt 1: Cloudflare Account -->
-        <div class="worker-step" id="workerStep1">
-          <div class="worker-step-header">
-            <span class="worker-step-num" id="workerStepNum1">1</span>
-            <div>
-              <div style="font-weight:600;font-size:14px;color:var(--ink)">Cloudflare-Account bereit</div>
-              <div style="font-size:12px;color:var(--muted)">Kostenlos — nur Email nötig</div>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:10px">
-            <a href="https://dash.cloudflare.com/sign-up" target="_blank"
-               style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--ink);border-radius:9px;text-decoration:none;font-size:13px;font-weight:600">
-              Registrieren →
-            </a>
-            <a href="https://dash.cloudflare.com/login" target="_blank"
-               onclick="workerMarkStep(1)"
-               style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px;background:var(--ink);color:white;border-radius:9px;text-decoration:none;font-size:13px;font-weight:600">
-              Einloggen ✓
-            </a>
-          </div>
-          <button class="worker-helper-toggle" style="margin-top:10px" onclick="workerToggleHelper('step1')">
-            <span>Brauchst du Hilfe oder Erläuterungen?</span><span id="workerStep1Icon">›</span>
-          </button>
-          <div id="workerHelperStep1" class="worker-helper-panel" style="display:none">
-            <strong>Warum Cloudflare?</strong> FinanceBird braucht eine kleine Brücke zwischen deinem Browser und Notion — das ist der Worker. Er läuft vollständig auf deinem eigenen Account, unter deiner Kontrolle. Wir sehen deine Daten nie.<br><br>
-            Die Registrierung ist kostenlos, dauert 2 Minuten, braucht nur eine Email-Adresse — keine Kreditkarte.
-          </div>
-        </div>
-
-        <!-- Schritt 2: Worker deployen -->
-        <div class="worker-step" id="workerStep2" style="opacity:.5;transition:opacity .3s">
-          <div class="worker-step-header">
-            <span class="worker-step-num" id="workerStepNum2">2</span>
-            <div>
-              <div style="font-weight:600;font-size:14px;color:var(--ink)">Worker deployen</div>
-              <div style="font-size:12px;color:var(--muted)">Dauert ca. 3 Minuten</div>
-            </div>
-          </div>
-          <a href="https://dash.cloudflare.com/?to=/:account/workers-and-pages/create/workers/new"
-             target="_blank"
-             style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:11px;background:var(--ink);color:white;border-radius:9px;text-decoration:none;font-size:13px;font-weight:600">
-            → Worker erstellen in Cloudflare
-          </a>
-          <div style="margin-top:10px;display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--ink2);line-height:1.6">
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="background:var(--bg2);border-radius:4px;padding:1px 7px;font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px">a</span>
-              <span><strong>"Start with Hello World"</strong> wählen → Namen vergeben (z.B. <em>financebird</em>) → <strong>"Deploy"</strong></span>
-            </div>
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="background:var(--bg2);border-radius:4px;padding:1px 7px;font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px">b</span>
-              <span>Button <strong>"Edit code"</strong> klicken → gesamten Code löschen</span>
-            </div>
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="background:var(--bg2);border-radius:4px;padding:1px 7px;font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px">c</span>
-              <span>
-                <a href="https://raw.githubusercontent.com/siio-kunto/budget-app/main/notion-worker.js" target="_blank" style="color:var(--accent);font-weight:600">Worker-Code hier öffnen →</a> — alles kopieren → einfügen → <strong>"Deploy"</strong>
-              </span>
-            </div>
-          </div>
-          <button class="worker-step-done-btn" onclick="workerMarkStep(2)" style="margin-top:12px">
-            ✓ Worker deployed
-          </button>
-          <button class="worker-helper-toggle" style="margin-top:8px" onclick="workerToggleHelper('step2')">
-            <span>Brauchst du Hilfe oder Erläuterungen?</span><span id="workerStep2Icon">›</span>
-          </button>
-          <div id="workerHelperStep2" class="worker-helper-panel" style="display:none">
-            <strong>Link öffnet falsche Seite?</strong> Du bist möglicherweise nicht eingeloggt — zuerst Schritt 1 abschliessen, dann nochmal klicken.<br><br>
-            <strong>Wo ist "Start with Hello World"?</strong> Nach dem Klick auf "Create" erscheint ein Auswahlmenü. "Start with Hello World" ist eine der Optionen — wähle diese, nicht GitHub oder Templates.<br><br>
-            <strong>Wo finde ich "Edit code"?</strong> Nach dem ersten Deploy erscheint oben rechts ein Button "Edit code" — damit öffnet sich der Code-Editor.<br><br>
-            Immer noch ein Problem? <a href="mailto:oswald@koenig.xyz?subject=FinanceBird Worker Setup" style="color:var(--accent)">Schreib uns →</a>
-          </div>
-        </div>
-
-        <!-- Schritt 3: URL eingeben + testen -->
-        <div class="worker-step" id="workerStep3" style="opacity:.5;transition:opacity .3s">
-          <div class="worker-step-header">
-            <span class="worker-step-num" id="workerStepNum3">3</span>
-            <div>
-              <div style="font-weight:600;font-size:14px;color:var(--ink)">Worker-URL eingeben &amp; testen</div>
-              <div style="font-size:12px;color:var(--muted)">Steht im Cloudflare Dashboard nach dem Deploy</div>
-            </div>
-          </div>
-          <div style="margin-top:10px">
-            <div style="display:flex;gap:8px;align-items:stretch">
-              <input type="url" id="ownWorkerUrlInput" class="form-input" style="flex:1;min-width:0"
-                placeholder="https://financebird.workers.dev/v1"
-                oninput="workerUrlChanged()"
-                autocomplete="off">
-              <button id="workerTestBtn" onclick="workerTestConnection()"
-                style="padding:0 14px;background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;font-size:13px;cursor:pointer;white-space:nowrap;color:var(--ink2);font-family:inherit">
-                Testen
-              </button>
-            </div>
-            <div id="workerTestResult" style="margin-top:6px;font-size:12px;min-height:16px"></div>
-          </div>
-          <button class="worker-helper-toggle" style="margin-top:8px" onclick="workerToggleHelper('step3')">
-            <span>Brauchst du Hilfe oder Erläuterungen?</span><span id="workerStep3Icon">›</span>
-          </button>
-          <div id="workerHelperStep3" class="worker-helper-panel" style="display:none">
-            <strong>Wo finde ich die URL?</strong> Nach dem Deploy siehst du die Worker-URL oben im Cloudflare Dashboard — sie endet auf <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">.workers.dev</code>. Füge am Ende <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">/v1</code> hinzu:<br>
-            <code style="background:var(--bg2);padding:3px 6px;border-radius:4px;display:inline-block;margin-top:4px">https://financebird.workers.dev<strong>/v1</strong></code><br><br>
-            <strong>Test schlägt fehl?</strong> 30 Sekunden warten — Cloudflare braucht manchmal kurz für die globale Verteilung. Dann erneut testen.<br><br>
-            Immer noch ein Problem? <a href="mailto:oswald@koenig.xyz?subject=FinanceBird Worker Setup" style="color:var(--accent)">Schreib uns →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Continue Button -->
-      <button id="workerContinueBtn" class="btn btn-primary" style="width:100%;padding:13px;opacity:0.4;pointer-events:none" onclick="workerSetupContinue()">
-        Weiter → Notion verbinden
-      </button>
-      <div style="margin-top:10px;text-align:center;font-size:11px;color:var(--muted)">
-        Der Button wird aktiv sobald die Verbindung erfolgreich getestet wurde.
+      <div style="margin-top:16px;font-size:12px;color:var(--muted);line-height:1.7">
+        Noch keinen Key?
+        <a href="/cdn-cgi/l/email-protection#b6ded3dadad9f6d9c5c1d7dad2ddd9d3d8dfd198d5de" style="color:var(--accent);text-decoration:none">
+          <span class="__cf_email__" data-cfemail="e38b868f8f8ca38c9094828f87888c868d8a84cd808b">[email&#160;protected]</span>
+        </a><br>
+        <span style="font-size:11px">Jederzeit in den Einstellungen änderbar.</span>
       </div>
     </div>
   </div>
@@ -1421,63 +1318,67 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <!-- ── PHASE C: Verbindung ── -->
   <div id="onboardConnect" class="onboard-screen" style="display:none">
     <div class="onboard-card">
-      <button class="onboard-back" onclick="onboardNext('connect','worker')">← Zurück</button>
+      <button class="onboard-back" onclick="onboardNext('connect','license')">← Zurück</button>
       <div class="onboard-step-label">Schritt 2 von 3 — Verbinden</div>
+
       <div class="setup-logo" style="font-size:28px;margin-bottom:6px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:6px">Mit Notion verbinden</h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
-        FinanceBird speichert alle Daten in <em>deinem</em> Notion-Workspace.
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">Verbinde dein Notion</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7">
+        Deine Finanzdaten werden bei dir zu Hause sein — in deinem eigenen Notion.
+        FinanceBird legt dort Datenbanken an für Buchungen, Konten, Projekte und mehr.
+        Einzig Belege werden in deinem Google Drive gespeichert.
       </p>
 
-      <!-- Auth Mode Toggle -->
-      <div style="display:flex;gap:8px;margin-bottom:20px;background:var(--bg2);border-radius:10px;padding:4px">
-        <button id="authOAuthBtn" class="btn btn-sm"
-          style="flex:1;background:var(--ink);color:white;border-radius:7px"
-          onclick="setAuthMode('oauth')">Via Notion OAuth</button>
-        <button id="authTokenBtn" class="btn btn-sm"
-          style="flex:1;background:transparent;color:var(--muted);border-radius:7px"
-          onclick="setAuthMode('token')">Manueller Token</button>
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="startOAuth()">
+        Mit Notion verbinden →
+      </button>
+
+      <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--muted)">
+        Noch kein Notion?
+        <a href="https://notion.so" target="_blank" style="color:var(--accent);text-decoration:none">
+          notion.so</a> (kostenlos)
       </div>
 
-      <!-- OAuth -->
-      <div id="authOAuthSection">
-        <div class="form-group">
-          <label class="form-label">Worker URL <span style="font-weight:400;color:var(--muted)">(aus Cloudflare Deploy)</span></label>
-          <input type="url" id="workerUrlInput" class="form-input"
-            placeholder="https://dein-worker.workers.dev/v1" value="">
-          <div style="font-size:11px;color:var(--muted);margin-top:4px">
-            Noch kein Worker? →
-            <a href="#" onclick="setAuthMode('token');return false" style="color:var(--accent);text-decoration:none">Token manuell verwenden</a>
-          </div>
+      <!-- Polling-Status (wird eingeblendet nach OAuth-Start) -->
+      <div id="onboardConnectPolling" style="display:none;margin-top:20px;text-align:center">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">
+          <span id="onboardConnectStatus">Warte auf Notion-Verbindung…</span>
         </div>
-        <button class="btn btn-primary" style="width:100%;padding:13px" onclick="startOAuth()">
-          Mit Notion verbinden
-        </button>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">
+          Ein Notion-Tab sollte sich geöffnet haben.<br>
+          Verbinde FinanceBird dort mit deinem Workspace.
+        </div>
+        <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
+          <button class="btn btn-outline btn-sm" onclick="startOAuth()" style="font-size:12px">
+            Nochmal versuchen
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="showManualTokenFallback()" style="font-size:12px">
+            Token manuell eingeben
+          </button>
+        </div>
       </div>
 
-      <!-- Token fallback -->
-      <div id="authTokenSection" style="display:none">
-        <div class="form-group">
-          <label class="form-label">Notion Integration Token</label>
-          <input type="password" id="tokenInput" class="form-input"
-            placeholder="ntn_…" autocomplete="off">
-          <div id="tokenError" style="color:var(--red);font-size:12px;margin-top:6px"></div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Worker URL <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-          <input type="url" id="workerUrlTokenInput" class="form-input"
-            placeholder="https://dein-worker.workers.dev/v1"
-            value="https://notion-proxy.holy-forest-0174.workers.dev/v1">
-          <div style="font-size:11px;color:var(--muted);margin-top:4px">Standard-Worker vorausgefüllt. Eigenen Worker empfohlen.</div>
-        </div>
-        <button class="btn btn-primary" style="width:100%;padding:13px" onclick="saveManualToken()">
+      <!-- Manueller Token Fallback (Weg C) -->
+      <div id="onboardManualToken" style="display:none;margin-top:16px">
+        <div style="font-size:11px;font-family:'Courier Prime',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Manueller Token (Fallback)</div>
+        <input type="password" id="onboardTokenInput" class="form-input"
+          placeholder="ntn_…" autocomplete="off"
+          style="margin-bottom:8px">
+        <button class="btn btn-primary" style="width:100%;padding:12px"
+          onclick="onboardSaveManualToken()">
           Verbinden
         </button>
+        <div id="onboardTokenError" style="color:var(--red);font-size:12px;margin-top:6px;min-height:16px"></div>
       </div>
 
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center;line-height:1.6">
+      <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center;line-height:1.6">
         🔒 Deine Daten bleiben in deinem Notion-Workspace. FinanceBird sieht sie nie.
+        <span style="display:inline-block;margin-top:4px">
+          <a href="#" onclick="showDatenschutz('onboardDatenschutzContainer');return false"
+            style="color:var(--accent);text-decoration:none;font-size:11px">Datenschutzerklärung →</a>
+        </span>
       </div>
+      <div id="onboardDatenschutzContainer" style="display:none;margin-top:12px"></div>
     </div>
   </div>
 
@@ -1486,7 +1387,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
     <div class="onboard-card" style="max-width:520px">
       <div class="onboard-step-label">Schritt 3 von 3 — Kurze Fragen</div>
       <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:6px">Fast geschafft</h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">9 Fragen, je 1 Tap — konfiguriert FinanceBird für dich.</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">8 Fragen, je 1 Tap — konfiguriert FinanceBird für dich.</p>
 
       <div id="quizContent"></div>
 
@@ -1503,7 +1404,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   </div>
 
   <!-- ── PHASE D2: Steuer-Mapping bestätigen (Layer 2) ── -->
-  <div id="onboardTaxMap" class="onboard-screen" style="display:none">
+  <div id="onboardTaxmap" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:520px">
       <div class="onboard-step-label">Fast geschafft — Steuerkategorien</div>
       <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:6px">Steuer-Mapping prüfen</h2>
@@ -1525,17 +1426,160 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
 
   <!-- ── PHASE D: Fertig / Transition ── -->
   <div id="onboardDone" class="onboard-screen" style="display:none">
-    <div class="onboard-card" style="text-align:center">
-      <div style="font-size:56px;margin-bottom:16px">🎉</div>
-      <div class="setup-logo" style="font-size:28px;margin-bottom:8px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:12px">Dein FinanceBird ist bereit!</h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.7">
-        Wir laden jetzt deine Daten aus Notion.<br>
-        Das dauert beim ersten Mal 5–10 Sekunden.
-      </p>
+    <div class="onboard-card" style="max-width:480px">
+      <div style="font-size:48px;margin-bottom:12px;text-align:center">🎉</div>
+      <div class="setup-logo" style="font-size:28px;margin-bottom:4px;text-align:center">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:20px;text-align:center">
+        Dein FinanceBird Start-Set-Up ist startklar.
+      </h2>
+
+      <!-- Block: Weiteres Gerät -->
+      <details id="doneDeviceBlock" style="margin-bottom:16px;border:1.5px solid var(--border);border-radius:14px;overflow:hidden">
+        <summary style="padding:14px 16px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:var(--ink);user-select:none"
+          onclick="onDoneDeviceOpen(this)">
+          <span>📱 App auf weiteren Geräten nutzen</span>
+          <span style="font-size:16px;color:var(--muted)">+</span>
+        </summary>
+        <div style="padding:0 16px 16px">
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+            Scanne den QR-Code oder gib die URL ein. Installiere die App auf dem Homescreen und gib dann den Kopplungscode ein.
+          </p>
+
+          <!-- QR Code -->
+          <div id="doneQrContainer" style="display:flex;justify-content:center;margin-bottom:14px">
+            <div id="doneQrCode" style="width:140px;height:140px;background:var(--bg2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)">
+              Lädt…
+            </div>
+          </div>
+
+          <!-- App URL -->
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px">
+            <input type="text" id="doneAppUrl" class="form-input"
+              readonly style="font-size:11px;color:var(--muted);flex:1;cursor:text">
+            <button onclick="copyDoneUrl()"
+              style="padding:8px 12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;font-size:11px;cursor:pointer;white-space:nowrap;color:var(--ink2);font-family:inherit"
+              id="doneCopyUrlBtn">
+              Kopieren
+            </button>
+          </div>
+
+          <!-- Kopplungscode -->
+          <div style="background:var(--bg2);border-radius:12px;padding:14px 16px;text-align:center">
+            <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Kopplungscode</div>
+            <div id="donePairingCode" style="font-family:'Courier Prime',monospace;font-size:32px;letter-spacing:.2em;font-weight:700;color:var(--ink);margin-bottom:6px">
+              ······
+            </div>
+            <div id="donePairingCountdown" style="font-size:11px;color:var(--muted)">Lädt…</div>
+            <button onclick="refreshPairingCode()"
+              id="doneRefreshBtn"
+              style="margin-top:8px;background:none;border:none;font-size:11px;color:var(--accent);cursor:pointer;font-family:inherit;padding:0">
+              Neuen Code generieren
+            </button>
+          </div>
+
+          <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;text-align:center">
+            Auch später jederzeit unter Einstellungen → Weiteres Gerät einrichten.
+          </p>
+        </div>
+      </details>
+
+      <!-- Block: PWA installieren (Desktop) -->
+      <div id="donePwaBlock" style="display:none;margin-bottom:16px;padding:14px 16px;background:var(--bg2);border-radius:12px;font-size:12px;color:var(--muted)">
+        <strong style="color:var(--ink);display:block;margin-bottom:4px">💻 Tipp: Als App installieren</strong>
+        Installiere FinanceBird auf diesem Gerät als App für schnelleren Zugriff.
+        <button id="donePwaInstallBtn" onclick="triggerPwaInstall()"
+          style="margin-top:10px;width:100%;padding:10px;background:var(--ink);color:white;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">
+          Installieren
+        </button>
+      </div>
+
       <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardFinish()">
         Zum Cockpit →
       </button>
+    </div>
+  </div>
+
+  <!-- ── PHASE: Mobile Onboarding ── -->
+
+  <!-- Screen M1: PWA installieren (erscheint in Browser, nicht in installierter PWA) -->
+  <div id="onboardMobileInstall" class="onboard-screen" style="display:none">
+    <div class="onboard-card" style="max-width:400px;text-align:center">
+      <div class="setup-logo" style="font-size:24px;margin-bottom:16px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
+      <div style="font-size:40px;margin-bottom:12px" id="mobileInstallIcon">📱</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;margin-bottom:8px">
+        Füge FinanceBird zu deinem Homescreen hinzu
+      </h2>
+
+      <!-- iOS Anleitung -->
+      <div id="mobileInstallIos" style="display:none;margin-bottom:20px">
+        <div style="background:var(--bg2);border-radius:12px;padding:14px 16px;text-align:left;font-size:13px;color:var(--ink2);line-height:1.8">
+          <div>1. Tippe auf <strong>⬆ Teilen</strong> (unten in Safari)</div>
+          <div>2. Wähle <strong>„Zum Home-Bildschirm"</strong></div>
+          <div>3. Tippe <strong>„Hinzufügen"</strong></div>
+        </div>
+      </div>
+
+      <!-- Android Anleitung -->
+      <div id="mobileInstallAndroid" style="display:none;margin-bottom:20px">
+        <div style="background:var(--bg2);border-radius:12px;padding:14px 16px;text-align:left;font-size:13px;color:var(--ink2);line-height:1.8">
+          <div>1. Tippe auf <strong>⋮ Menü</strong> (oben rechts)</div>
+          <div>2. Wähle <strong>„Zum Startbildschirm hinzufügen"</strong></div>
+          <div>3. Tippe <strong>„Hinzufügen"</strong></div>
+        </div>
+        <button id="androidInstallBtn" onclick="triggerPwaInstall()"
+          style="display:none;margin-top:10px;width:100%;padding:12px;background:var(--ink);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
+          Installieren
+        </button>
+      </div>
+
+      <!-- Desktop Fallback -->
+      <div id="mobileInstallDesktop" style="display:none;margin-bottom:20px">
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Öffne diese URL auf deinem Mobilgerät, um die App zu installieren.</p>
+      </div>
+
+      <p style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+        Öffne danach die App von deinem Homescreen — dann kannst du den Kopplungscode eingeben.
+      </p>
+      <p style="font-size:11px;color:var(--muted);line-height:1.5">
+        Mit der Web-App auf deinem Homescreen hast du deinen Finanz-Companion mobil oder am Desktop von überall zur Hand und kannst z.B. direkt mit der Handykamera Belege scannen.
+      </p>
+    </div>
+  </div>
+
+  <!-- Screen M2: Kopplungscode eingeben (in installierter PWA) -->
+  <div id="onboardMobilePairing" class="onboard-screen" style="display:none">
+    <div class="onboard-card" style="max-width:380px;text-align:center">
+      <div class="setup-logo" style="font-size:24px;margin-bottom:16px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
+      <div style="font-size:40px;margin-bottom:12px">🔗</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">
+        Kopplungscode eingeben
+      </h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">
+        Den Code findest du auf dem anderen Gerät nach dem Setup.
+      </p>
+
+      <input type="text" id="mobilePairingInput" class="form-input"
+        placeholder="A8F3X9"
+        maxlength="6"
+        style="text-align:center;font-family:'Courier Prime',monospace;font-size:28px;
+               letter-spacing:.25em;text-transform:uppercase;padding:16px;margin-bottom:8px"
+        oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
+        autocomplete="off" autocorrect="off" spellcheck="false">
+      <div id="mobilePairingError" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:16px"></div>
+
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px"
+        id="mobilePairingBtn"
+        onclick="submitPairingCode()">
+        Verbinden
+      </button>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">
+        Keinen Code?
+        <a href="#" onclick="onboardNext('mobile-pairing','license');return false"
+          style="color:var(--accent);text-decoration:none">
+          Lizenz-Key direkt eingeben →
+        </a>
+      </div>
     </div>
   </div>
 
@@ -1591,7 +1635,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <div class="sidebar-item" data-tab="einstellungen" onclick="nav('einstellungen')"><span class="nav-icon">🦤</span> Einstellungen</div>
     </nav>
     <div class="sidebar-footer">
-      <a class="sidebar-contact" href="mailto:oh@siio.ch">
+      <a class="sidebar-contact" href="/cdn-cgi/l/email-protection#b7dfd2dbdbd8f7d8c4c0d6dbd3dcd8d2d9ded099d4df">
         <span>✉</span> Kontakt
       </a>
     </div>
@@ -2079,7 +2123,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <div class="toast-action" id="toastAction" style="display:none"></div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 'use strict';
 /* ═══════════════════════════════════════════════════════════════
    FINANCEBIRD v2
@@ -2328,36 +2372,115 @@ const Auth = {
   },
 
   /**
-   * Shared Secret für Worker-Requests.
+   * Shared Secret für Worker-Requests (Spam-Filter, nicht Security).
    * Muss mit FB_SHARED_SECRET im Worker übereinstimmen.
-   * Im Build-Prozess ersetzen oder als Konstante setzen.
    */
-  FB_SHARED_SECRET: 'fb-v2-2026', // ← in Production durch sicheren Wert ersetzen
+  FB_SHARED_SECRET: 'DET8>HCxdw@n', // ← in Production durch sicheren Wert ersetzen
 
   /**
-   * Worker-Basis-URL (ohne /v1).
+   * Zentraler Proxy-Worker (Worker A) — CORS-Proxy zu Notion.
+   * Prüft X-FB-Key + X-FB-License bei jedem Request.
+   */
+  FB_WORKER_PROXY: 'https://financebird-proxy.holy-forest-0174.workers.dev/v1',
+
+  /**
+   * Auth-Worker (Worker B) — OAuth, Lizenz, Device-Pairing, Admin.
+   */
+  FB_WORKER_AUTH: 'https://financebird-auth.holy-forest-0174.workers.dev',
+
+  /**
+   * Lizenz-Key abrufen (aus localStorage).
+   */
+  get licenseKey() {
+    return loadLocal('fb_license_key', null);
+  },
+
+  /**
+   * Worker-Basis-URL (Worker A ohne /v1).
+   * Fällt zurück auf zentralen Worker wenn kein custom URL gesetzt.
    */
   get workerBase() {
-    return (AppState.workerUrl || '').replace(/\/v1\/?$/, '');
+    const url = AppState.workerUrl || this.FB_WORKER_PROXY;
+    return url.replace(/\/v1\/?$/, '');
   },
 
   /**
    * Standard-Headers für Worker-Requests.
+   * Enthält X-FB-Key (Shared Secret) + X-FB-License (Lizenz-Key).
    */
   workerHeaders() {
-    return {
+    const h = {
       'Content-Type': 'application/json',
       'X-FB-Key':     this.FB_SHARED_SECRET,
     };
+    const lk = this.licenseKey;
+    if (lk) h['X-FB-License'] = lk;
+    return h;
   },
 
   /**
-   * Start Notion OAuth flow.
-   * Speichert State-Code für CSRF-Schutz + Polling.
+   * Lizenz-Key validieren via Worker B.
+   * Returns { valid, plan, expiresAt } oder { valid: false, reason }
    */
-  async startOAuth(workerUrl) {
-    if (!workerUrl) throw new Error('Worker URL required for OAuth');
-    const base  = workerUrl.replace(/\/v1\/?$/, '');
+  async verifyLicense(key) {
+    try {
+      const resp = await fetch(`${this.FB_WORKER_AUTH}/license/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-FB-Key': this.FB_SHARED_SECRET },
+        body: JSON.stringify({ key }),
+      });
+      if (!resp.ok) return { valid: false, reason: 'network_error' };
+      return await resp.json();
+    } catch (e) {
+      return { valid: false, reason: 'network_error' };
+    }
+  },
+
+  /**
+   * Kopplungscode generieren (Device-Pairing, Done-Screen + Einstellungen).
+   * Returns { code, expiresAt } oder null bei Fehler.
+   */
+  async generatePairingCode() {
+    const lk = this.licenseKey;
+    if (!lk) return null;
+    try {
+      const resp = await fetch(`${this.FB_WORKER_AUTH}/device/setup`, {
+        method: 'POST',
+        headers: this.workerHeaders(),
+        body: JSON.stringify({ licenseKey: lk }),
+      });
+      if (!resp.ok) return null;
+      return await resp.json(); // { code, expiresAt }
+    } catch (e) {
+      return null;
+    }
+  },
+
+  /**
+   * Kopplungscode einlösen (Mobile-Onboarding Screen M2).
+   * Returns { licenseKey, plan } oder null bei Fehler/abgelaufen.
+   */
+  async claimPairingCode(code) {
+    try {
+      const resp = await fetch(`${this.FB_WORKER_AUTH}/device/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-FB-Key': this.FB_SHARED_SECRET },
+        body: JSON.stringify({ code: code.toLowerCase() }),
+      });
+      if (resp.status === 404 || resp.status === 410) return { error: 'expired' };
+      if (!resp.ok) return { error: 'network_error' };
+      return await resp.json(); // { licenseKey, plan }
+    } catch (e) {
+      return { error: 'network_error' };
+    }
+  },
+
+  /**
+   * Start Notion OAuth flow via Worker B.
+   * workerUrl ist optional (Legacy-Kompatibilität), verwendet sonst FB_WORKER_AUTH.
+   */
+  async startOAuth() {
+    const base  = this.FB_WORKER_AUTH;
     const state = uid();
     saveLocal('fb_oauth_state', state);
     saveLocal('fb_oauth_worker', base);
@@ -2396,7 +2519,7 @@ const Auth = {
         const data = await resp.json();
         if (data.ready && data.token) {
           this._stopPolling();
-          await this._applyToken(data.token, workerBase);
+          await this._applyToken(data.token);
         }
       } catch { /* Netz-Fehler — weiter polling */ }
     }, 2000);
@@ -2413,24 +2536,23 @@ const Auth = {
    * Wird beim App-Start geprüft.
    */
   async handleOAuthCallback() {
-    // Weg B: URL-Fragment prüfen
-    const hash   = window.location.hash;
-    const params = new URLSearchParams(window.location.search);
+    // Weg B: URL-Fragment prüfen (#fb_token=...&fb_state=...)
+    const hash = window.location.hash;
 
-    if (hash && hash.includes('token=')) {
-      const tokenStr = decodeURIComponent(hash.replace(/^#token=/, ''));
+    if (hash && hash.includes('fb_token=')) {
+      const fragParams  = new URLSearchParams(hash.replace(/^#/, ''));
+      const tokenStr    = fragParams.get('fb_token');
+      const returnState = fragParams.get('fb_state');
+      if (!tokenStr) return false;
       try {
-        const tokenData   = JSON.parse(tokenStr);
-        const workerBase  = loadLocal('fb_oauth_worker', null) ||
-                            (AppState.workerUrl || '').replace(/\/v1\/?$/, '');
-        // CSRF: state prüfen wenn vorhanden
-        const returnState = params.get('state');
-        const savedState  = loadLocal('fb_oauth_state', null);
+        const tokenData  = JSON.parse(decodeURIComponent(tokenStr));
+        // CSRF: state prüfen
+        const savedState = loadLocal('fb_oauth_state', null);
         if (returnState && savedState && returnState !== savedState) {
           throw new Error('OAuth state mismatch');
         }
         this._stopPolling();
-        await this._applyToken(tokenData, workerBase);
+        await this._applyToken(tokenData);
         window.history.replaceState({}, '', window.location.pathname);
         localStorage.removeItem('fb_oauth_state');
         return true;
@@ -2440,8 +2562,9 @@ const Auth = {
     }
 
     // oauth_error im URL?
-    if (params.get('oauth_error')) {
-      showToast('error', '❌', 'OAuth Fehler', params.get('oauth_error'));
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('oauth_error')) {
+      showToast('error', '❌', 'OAuth Fehler', searchParams.get('oauth_error'));
       window.history.replaceState({}, '', window.location.pathname);
       return false;
     }
@@ -2455,11 +2578,9 @@ const Auth = {
    */
   async applyManualTokenPayload(tokenPayloadStr) {
     try {
-      const tokenData  = JSON.parse(tokenPayloadStr);
-      const workerBase = loadLocal('fb_oauth_worker', null) ||
-                         (AppState.workerUrl || '').replace(/\/v1\/?$/, '');
+      const tokenData = JSON.parse(tokenPayloadStr);
       this._stopPolling();
-      await this._applyToken(tokenData, workerBase);
+      await this._applyToken(tokenData);
       return true;
     } catch (e) {
       throw new Error('Token konnte nicht verarbeitet werden: ' + e.message);
@@ -2495,7 +2616,7 @@ const Auth = {
   /**
    * Token anwenden — gemeinsame Logik für alle drei Wege.
    */
-  async _applyToken(tokenData, workerBase) {
+  async _applyToken(tokenData) {
     const token = typeof tokenData === 'string'
       ? tokenData
       : tokenData.access_token;
@@ -2503,12 +2624,36 @@ const Auth = {
 
     AppState.notionToken = token;
     AppState.authMode    = 'oauth';
-    AppState.workerUrl   = workerBase + '/v1';
+    AppState.workerUrl   = Auth.FB_WORKER_PROXY;
     saveAppState();
     localStorage.removeItem('fb_oauth_state');
     localStorage.removeItem('fb_oauth_worker');
 
     showToast('success', '✅', 'Notion verbunden', tokenData.workspace_name || 'OAuth erfolgreich');
+
+    // DB-Setup: Discover oder erstellen (Audit-Fix K1 — Multi-User)
+    if (!dbsConfigured()) {
+      showLoading('Datenbanken einrichten…');
+      try {
+        const { found, missing } = await discoverDatabases();
+        if (missing.length > 0) {
+          showLoading(`Erstelle ${missing.length} Datenbanken…`);
+          const parentPageId = await findSharedParentPage();
+          if (parentPageId) {
+            await createMissingDatabases(parentPageId, missing);
+          } else {
+            console.warn('No shared parent page found — DB creation skipped');
+            showToast('warning', '⚠️', 'Notion-Datenbanken', 'Bitte teile eine Seite mit der FinanceBird-Integration in Notion.');
+          }
+        }
+        if (found > 0 || dbsConfigured()) {
+          showToast('success', '🗄️', `${Object.values(DB).filter(Boolean).length} Datenbanken bereit`, '');
+        }
+      } catch (e) {
+        console.warn('DB setup failed:', e.message);
+      }
+      hideLoading();
+    }
 
     // Onboarding weiterführen falls noch nicht abgeschlossen
     const onboardDone = loadLocal('fb_onboard_complete', false);
@@ -2645,8 +2790,18 @@ const TimeAdapterInterface = {
 /* ── Google Drive constants ── */
 const GDRIVE_CLIENT_ID = '525241680265-ecrm63sckhdllc59gv8j7k19tecl7ulu.apps.googleusercontent.com';
 const GDRIVE_SCOPE     = 'https://www.googleapis.com/auth/drive.file';
-const GDRIVE_PARENT    = '1FPM0-YqwcsoJEYlZDdDirPE-RBOamEJL'; // FinanceBird root folder
 let   _gdriveToken     = null; // in-memory token (session only)
+
+/** Get or create user's FinanceBird root folder in GDrive (Audit-Fix K2) */
+async function getGDriveParent() {
+  const cached = loadLocal('fb_gdrive_parent', null);
+  if (cached) return cached;
+  // Create "FinanceBird" folder in user's Drive root
+  const token = await getGDriveToken();
+  const folderId = await getOrCreateFolderInParent(token, 'FinanceBird', 'root');
+  saveLocal('fb_gdrive_parent', folderId);
+  return folderId;
+}
 
 /** Get Google Drive OAuth token — prompts if not cached */
 async function getGDriveToken() {
@@ -2701,7 +2856,7 @@ async function uploadToGDrive(dataURL, filename, isPDF) {
   const dir    = Erf.type === 'income' ? 'IN' : 'OUT';
   const bereich= Erf.bereich === 'business' ? 'Geschaeftlich' : 'Privat';
   // Build folder hierarchy
-  const bereichId = await getOrCreateFolderInParent(token, bereich, GDRIVE_PARENT);
+  const bereichId = await getOrCreateFolderInParent(token, bereich, await getGDriveParent());
   const dirId     = await getOrCreateFolderInParent(token, dir,    bereichId);
   const yearId    = await getOrCreateFolderInParent(token, year,   dirId);
   // Upload file
@@ -2727,23 +2882,217 @@ async function uploadToGDrive(dataURL, filename, isPDF) {
   return { filename: file.name, link: file.webViewLink, id: file.id };
 }
 
-const DB = {
-  BUCHUNGEN:    '9fcdf5fe3b9648ac8b19c66ecd33417a',
-  RECHNUNGEN:   '966caa95a0334bb18a2cc9bac7de2ddf',
-  TRANSFERS:    '1dd17e6663d04fb9bcd873b8228e2ef9',
-  PROJEKTE:     '90f9ea24161d4aff91898618a62913c4',
-  KONTEN:       'bab0304784e34979aa40ed3ffa916da9',
-  RECURRINGS:   'a5484d733cfb4e34855a56fe2ff1e5d9',
-  EINSTELLUNGEN:'4ad959db50874b34a0520b0c31c17ecd',
-  CHECKINS:     null, // TBD — new DB, schema after Kompass-Konzept session
-  ZIELE:        null, // TBD — new DB, getrennt von Projekten
+/**
+ * Notion DB-IDs — dynamisch pro User (Audit-Fix K1).
+ * Werden nach OAuth via discoverOrCreateDatabases() befüllt und in localStorage gespeichert.
+ * Fallback: manueller Eingabe-Screen in Einstellungen.
+ */
+let DB = loadLocal('fb_db_ids', null) || {
+  BUCHUNGEN:    null,
+  RECHNUNGEN:   null,
+  TRANSFERS:    null,
+  PROJEKTE:     null,
+  KONTEN:       null,
+  RECURRINGS:   null,
+  EINSTELLUNGEN:null,
+  CHECKINS:     null,
+  ZIELE:        null,
 };
+
+/** Check if essential DBs are configured */
+function dbsConfigured() {
+  return DB.BUCHUNGEN && DB.RECHNUNGEN && DB.TRANSFERS && DB.PROJEKTE && DB.KONTEN && DB.RECURRINGS && DB.EINSTELLUNGEN;
+}
+
+/** DB title prefix for discovery */
+const DB_PREFIX = 'FB · ';
+
+/** Expected DB titles (used for discovery + creation) */
+const DB_SCHEMAS = {
+  BUCHUNGEN:     { title: DB_PREFIX + 'Buchungen',      icon: '💰' },
+  RECHNUNGEN:    { title: DB_PREFIX + 'Rechnungen',     icon: '📬' },
+  TRANSFERS:     { title: DB_PREFIX + 'Transfers',      icon: '💸' },
+  PROJEKTE:      { title: DB_PREFIX + 'Projekte',       icon: '🎯' },
+  KONTEN:        { title: DB_PREFIX + 'Konten',         icon: '🏦' },
+  RECURRINGS:    { title: DB_PREFIX + 'Recurrings',     icon: '🔁' },
+  EINSTELLUNGEN: { title: DB_PREFIX + 'Einstellungen',  icon: '⚙️' },
+};
+
+/**
+ * Discover existing FinanceBird DBs in user's Notion workspace.
+ * Searches by title prefix "FB · ". Returns { found: number, missing: string[] }.
+ */
+async function discoverDatabases() {
+  try {
+    const resp = await notionFetch('/search', 'POST', {
+      query: DB_PREFIX,
+      filter: { value: 'database', property: 'object' },
+      page_size: 20,
+    });
+    if (!resp.results) return { found: 0, missing: Object.keys(DB_SCHEMAS) };
+
+    let found = 0;
+    const missing = [];
+    for (const [key, schema] of Object.entries(DB_SCHEMAS)) {
+      const match = resp.results.find(r =>
+        r.title?.[0]?.plain_text === schema.title ||
+        r.title?.[0]?.plain_text?.startsWith(schema.title)
+      );
+      if (match) {
+        DB[key] = match.id;
+        found++;
+      } else {
+        missing.push(key);
+      }
+    }
+    saveLocal('fb_db_ids', DB);
+    return { found, missing };
+  } catch (e) {
+    console.warn('DB discovery failed:', e.message);
+    return { found: 0, missing: Object.keys(DB_SCHEMAS) };
+  }
+}
+
+/**
+ * Create missing FinanceBird DBs in user's Notion workspace.
+ * Requires a parent page ID (the page the user shared with the integration).
+ */
+async function createMissingDatabases(parentPageId, missingKeys) {
+  const schemas = {
+    BUCHUNGEN: {
+      'Beschreibung': { title: {} },
+      'Datum': { date: {} },
+      'Typ': { select: { options: [{ name: 'Einnahme', color: 'green' }, { name: 'Ausgabe', color: 'red' }] } },
+      'Bereich': { select: { options: [{ name: 'Geschäftlich', color: 'blue' }, { name: 'Privat', color: 'purple' }] } },
+      'Kategorie': { select: { options: [] } },
+      'Steuerkategorie': { select: { options: [] } },
+      'Einnahmequelle': { select: { options: [] } },
+      'Betrag': { number: { format: 'number' } },
+      'Konto': { select: { options: [] } },
+      'Gegenpartei': { rich_text: {} },
+      'Bezahlt': { checkbox: {} },
+      'Rechnungs-Nr': { rich_text: {} },
+      'Beleg-Dateiname': { rich_text: {} },
+      'Beleg-Link': { url: {} },
+      'Projekt': { rich_text: {} },
+      'Notiz': { rich_text: {} },
+    },
+    RECHNUNGEN: {
+      'Rechnungs-Nr': { title: {} },
+      'Datum': { date: {} },
+      'Fällig am': { date: {} },
+      'Kunde': { rich_text: {} },
+      'Beschreibung': { rich_text: {} },
+      'Betrag': { number: { format: 'number' } },
+      'MwSt': { number: { format: 'number' } },
+      'Status': { select: { options: [{ name: 'Offen', color: 'orange' }, { name: 'Bezahlt', color: 'green' }, { name: 'Überfällig', color: 'red' }, { name: 'Entwurf', color: 'gray' }] } },
+      'Konto': { select: { options: [] } },
+      'Bezahlt am': { date: {} },
+      'Typ': { select: { options: [] } },
+      'Projekt': { rich_text: {} },
+      'Notiz': { rich_text: {} },
+    },
+    TRANSFERS: {
+      'Beschreibung': { title: {} },
+      'Datum': { date: {} },
+      'Typ': { select: { options: [{ name: 'Interner Transfer', color: 'blue' }, { name: 'Pocket-Einzahlung', color: 'green' }, { name: 'Kontostand-Korrektur', color: 'yellow' }] } },
+      'Von Konto': { select: { options: [] } },
+      'Nach Konto': { select: { options: [] } },
+      'Betrag': { number: { format: 'number' } },
+      'Betrag CHF': { number: { format: 'number' } },
+      'Status': { select: { options: [{ name: 'Ausgeführt', color: 'green' }, { name: 'Geplant', color: 'gray' }] } },
+      'Projekt-Referenz': { rich_text: {} },
+      'Notiz': { rich_text: {} },
+      'App-Referenz': { rich_text: {} },
+    },
+    PROJEKTE: {
+      'Name': { title: {} },
+      'Typ': { select: { options: [{ name: 'Schuld', color: 'red' }, { name: 'Spar', color: 'green' }, { name: 'Investition', color: 'blue' }] } },
+      'Konto': { rich_text: {} },
+      'Konto-ID': { rich_text: {} },
+      'Gesamtziel': { number: { format: 'number' } },
+      'Reserviert': { number: { format: 'number' } },
+      'Bezahlt': { number: { format: 'number' } },
+      'Zieldatum': { date: {} },
+      'Absicht pro Woche': { number: { format: 'number' } },
+      'Absicht pro Monat': { number: { format: 'number' } },
+      'Aktiv': { checkbox: {} },
+      'Notiz': { rich_text: {} },
+    },
+    KONTEN: {
+      'Name': { title: {} },
+      'App-ID': { rich_text: {} },
+      'Gruppe': { select: { options: [] } },
+      'Typ': { select: { options: [{ name: 'Girokonto', color: 'green' }, { name: 'Sparkonto', color: 'yellow' }, { name: 'Pocket', color: 'blue' }, { name: 'Kreditkarte', color: 'orange' }, { name: 'Bargeld', color: 'brown' }, { name: 'Investition', color: 'purple' }] } },
+      'Icon': { rich_text: {} },
+      'Aktiv': { checkbox: {} },
+      'Sortierung': { number: { format: 'number' } },
+      'Aktueller Stand': { number: { format: 'number' } },
+      'Saldo-Datum': { date: {} },
+    },
+    RECURRINGS: {
+      'Name': { title: {} },
+      'Betrag': { number: { format: 'number' } },
+      'Frequenz': { select: { options: [{ name: 'weekly', color: 'green' }, { name: 'monthly', color: 'blue' }, { name: 'yearly', color: 'orange' }] } },
+      'Kategorie': { select: { options: [] } },
+      'Konto': { select: { options: [] } },
+      'Bereich': { select: { options: [{ name: 'Privat', color: 'purple' }, { name: 'Geschäftlich', color: 'blue' }] } },
+      'Nächstes Datum': { date: {} },
+      'Notiz': { rich_text: {} },
+      'Pausiert': { checkbox: {} },
+    },
+    EINSTELLUNGEN: {
+      'Key': { title: {} },
+      'Value': { rich_text: {} },
+    },
+  };
+
+  let created = 0;
+  for (const key of missingKeys) {
+    const schema = schemas[key];
+    const meta   = DB_SCHEMAS[key];
+    if (!schema || !meta) continue;
+    try {
+      const result = await notionFetch('/databases', 'POST', {
+        parent: { type: 'page_id', page_id: parentPageId },
+        title: [{ type: 'text', text: { content: meta.title } }],
+        icon: { type: 'emoji', emoji: meta.icon },
+        properties: schema,
+      });
+      if (result.id) {
+        DB[key] = result.id;
+        created++;
+      }
+    } catch (e) {
+      console.warn(`Failed to create DB ${key}:`, e.message);
+    }
+  }
+  saveLocal('fb_db_ids', DB);
+  return created;
+}
+
+/**
+ * Find the parent page shared with the integration (for DB creation).
+ * Uses Notion Search to find pages the integration has access to.
+ */
+async function findSharedParentPage() {
+  try {
+    const resp = await notionFetch('/search', 'POST', {
+      filter: { value: 'page', property: 'object' },
+      page_size: 5,
+      sort: { direction: 'descending', timestamp: 'last_edited_time' },
+    });
+    // Return first page that's not a child of a database
+    const page = resp.results?.find(r => r.parent?.type === 'workspace' || r.parent?.type === 'page_id');
+    return page?.id || resp.results?.[0]?.id || null;
+  } catch { return null; }
+}
 
 /*
  * NOTION DB SCHEMAS — v2
  * ══════════════════════
  *
- * RECURRINGS (DB: a5484d733cfb4e34855a56fe2ff1e5d9)
+ * RECURRINGS (DB: dynamisch per User — siehe DB_SCHEMAS)
  * ─────────────────────────────────────────────────
  * v1 stored recurrings in localStorage only. v2 moves them to Notion.
  * Required Notion DB properties (add via Notion UI or Setup Assistant):
@@ -2772,9 +3121,9 @@ const NOTION_VER = '2022-06-28';
 /** Base Notion API call via Worker — mit 401/429-Handling */
 async function notionFetch(path, method = 'GET', body = null, _retry = 0) {
   const token = AppState.notionToken;
-  const base  = AppState.workerUrl || '';
+  // Zentraler Proxy-Worker (Worker A) — AppState.workerUrl wird bei OAuth gesetzt
+  const base  = AppState.workerUrl || Auth.FB_WORKER_PROXY;
 
-  if (!base) throw new Error('Worker URL nicht konfiguriert');
   if (!token) { Auth.triggerReAuth('Kein Token'); throw new Error('Nicht authentifiziert'); }
 
   const opts = {
@@ -2786,6 +3135,10 @@ async function notionFetch(path, method = 'GET', body = null, _retry = 0) {
       'X-FB-Key':       Auth.FB_SHARED_SECRET,
     }
   };
+  // Lizenz-Key mitsenden falls vorhanden
+  const lk = Auth.licenseKey;
+  if (lk) opts.headers['X-FB-License'] = lk;
+
   if (body) opts.body = JSON.stringify(body);
 
   const resp = await fetch(base + path, opts);
@@ -2794,6 +3147,12 @@ async function notionFetch(path, method = 'GET', body = null, _retry = 0) {
   if (resp.status === 401) {
     Auth.triggerReAuth('Notion-Verbindung unterbrochen — Token ungültig');
     throw new Error('AUTH_EXPIRED');
+  }
+
+  // 403 — Lizenz abgelaufen oder ungültig
+  if (resp.status === 403) {
+    showLicenseExpiredBanner();
+    throw new Error('LICENSE_INVALID');
   }
 
   // 429 — Rate Limit: Exponential Backoff, max 3 Versuche
@@ -3351,6 +3710,13 @@ function saveCache(entity) {
  * Used on first start and after long offline periods (>24h).
  */
 async function fullSync() {
+  // Guard: DBs müssen konfiguriert sein (Audit-Fix K1)
+  if (!dbsConfigured()) {
+    console.warn('fullSync aborted — DBs not configured');
+    setAppStatus('error', 'Datenbanken nicht eingerichtet');
+    showToast('warning', '⚠️', 'Notion-Datenbanken fehlen', 'Bitte Onboarding abschliessen oder Einstellungen prüfen');
+    return;
+  }
   setAppStatus('syncing', t('app.syncing'));
 
   const entityLabels = {
@@ -3455,6 +3821,7 @@ async function migrateV1Recurrings() {
  *   - Critical entities fail
  */
 async function deltaSync() {
+  if (!dbsConfigured()) { console.warn('deltaSync aborted — DBs not configured'); return; }
   if (!AppState.lastSyncTime) { await fullSync(); return; }
 
   // Staleness check: >24h → force full sync
@@ -4577,21 +4944,126 @@ function hideReAuthBanner() {
 
 /** Re-Auth starten — OAuth neu über Worker B */
 async function triggerReAuthFlow() {
-  const workerBase = (AppState.workerUrl || '').replace(/\/v1\/?$/, '');
-  if (!workerBase) {
-    showToast('error', '⚠️', 'Worker URL fehlt', 'Bitte Worker URL in Einstellungen prüfen');
-    return;
-  }
   try {
     hideReAuthBanner();
-    await Auth.startOAuth(workerBase + '/v1');
+    await Auth.startOAuth();
     showToast('info', '🔗', 'Verbindung läuft…', 'Notion-Fenster wurde geöffnet');
   } catch (e) {
     showToast('error', '❌', 'Fehler', e.message);
   }
 }
 
-/** Vollständiger Reset — löscht Token + Cache, startet von vorn */
+/** Lizenz-Banner — erscheint wenn 403 von Worker A zurückkommt */
+function showLicenseExpiredBanner() {
+  if (document.getElementById('licenseBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'licenseBanner';
+  banner.style.cssText = `
+    position:fixed;top:0;left:0;right:0;z-index:9001;
+    background:#7a3a0a;color:white;
+    padding:12px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;
+    box-shadow:0 2px 12px rgba(0,0,0,.2);
+  `;
+  banner.innerHTML = `
+    <div style="flex:1;min-width:0">
+      <strong style="display:block;font-size:13px">Lizenz abgelaufen oder ungültig</strong>
+      <span style="font-size:11px;opacity:.85">App zeigt gecachte Daten — neue Einträge werden nicht synchronisiert.</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button onclick="showLicenseKeyScreen()"
+        style="background:white;color:#7a3a0a;border:none;border-radius:7px;
+               padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;
+               font-family:inherit">
+        Key eingeben
+      </button>
+      <button onclick="document.getElementById('licenseBanner').remove()"
+        style="background:rgba(255,255,255,.15);color:white;border:none;border-radius:7px;
+               padding:7px 14px;font-size:12px;cursor:pointer;font-family:inherit">
+        ✕
+      </button>
+    </div>
+  `;
+  document.body.prepend(banner);
+}
+
+/** Lizenz-Key-Screen als Modal (für bestehende User nach Ablauf) */
+function showLicenseKeyScreen() {
+  const existing = document.getElementById('licenseKeyModal');
+  if (existing) { existing.style.display = 'flex'; return; }
+  const modal = document.createElement('div');
+  modal.id = 'licenseKeyModal';
+  modal.style.cssText = `
+    position:fixed;inset:0;z-index:9500;
+    background:rgba(22,20,18,.7);backdrop-filter:blur(4px);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  `;
+  modal.innerHTML = `
+    <div style="background:var(--paper);border-radius:18px;padding:32px 28px;width:100%;max-width:400px;
+                box-shadow:0 8px 48px rgba(44,31,14,.25);text-align:center">
+      <div style="font-size:32px;margin-bottom:12px">🗝</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">
+        Lizenz-Key
+      </h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+        Gib deinen Lizenz-Key ein um fortzufahren.
+      </p>
+      <input type="text" id="licenseKeyInput" class="form-input"
+        placeholder="LK-XXXXXXXX"
+        style="text-align:center;font-family:'Courier Prime',monospace;font-size:18px;
+               letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px"
+        oninput="this.value=this.value.toUpperCase()"
+        autocomplete="off" autocorrect="off" spellcheck="false">
+      <div id="licenseKeyError" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:12px"></div>
+      <button class="btn btn-primary" style="width:100%;padding:13px;font-size:15px"
+        onclick="submitLicenseKey()">
+        Prüfen
+      </button>
+      <div style="margin-top:14px;font-size:11px;color:var(--muted)">
+        Noch keinen Key?
+        <a href="mailto:hello@oswaldkoenig.ch" style="color:var(--accent);text-decoration:none">
+          hello@oswaldkoenig.ch
+        </a>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+async function submitLicenseKey() {
+  const input = document.getElementById('licenseKeyInput');
+  const errEl = document.getElementById('licenseKeyError');
+  const btn   = document.querySelector('#licenseKeyModal .btn-primary');
+  if (!input || !errEl) return;
+
+  const key = input.value.trim().toUpperCase();
+  if (!key.startsWith('LK-') || key.length < 5) {
+    errEl.textContent = 'Key ungültig — Format: LK-xxxxxxxx';
+    return;
+  }
+
+  errEl.textContent = '';
+  if (btn) { btn.textContent = 'Prüfe…'; btn.disabled = true; }
+
+  const result = await Auth.verifyLicense(key);
+
+  if (btn) { btn.textContent = 'Prüfen'; btn.disabled = false; }
+
+  if (result.valid) {
+    saveLocal('fb_license_key', key);
+    document.getElementById('licenseBanner')?.remove();
+    document.getElementById('licenseKeyModal')?.remove();
+    showToast('success', '✓', 'Lizenz aktiv', `Plan: ${result.plan || 'Standard'}`);
+  } else {
+    const msgs = {
+      expired:       'Lizenz abgelaufen — bitte verlängern.',
+      not_found:     'Key nicht gefunden — Schreibweise prüfen.',
+      network_error: 'Verbindung fehlgeschlagen — bitte nochmal versuchen.',
+    };
+    errEl.textContent = msgs[result.reason] || 'Key ungültig — kontaktiere hello@oswaldkoenig.ch';
+  }
+}
 function triggerReset() {
   if (!confirm('Verbindung zurücksetzen? Du musst dich neu mit Notion verbinden. Deine Daten in Notion bleiben erhalten.')) return;
   Auth.logout();
@@ -4614,6 +5086,36 @@ async function applyPastedToken() {
     await Auth.applyManualTokenPayload(val);
   } catch (e) {
     showToast('error', '❌', 'Fehler', e.message);
+  }
+}
+
+/** Show manual token input on Connect screen (Weg C Fallback) — Audit-Fix S7 */
+function showManualTokenFallback() {
+  const el = document.getElementById('onboardManualToken');
+  if (el) el.style.display = '';
+}
+
+/** Save manually pasted ntn_-Token from Connect screen — Audit-Fix S7 */
+async function onboardSaveManualToken() {
+  const input = document.getElementById('onboardTokenInput');
+  const errEl = document.getElementById('onboardTokenError');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) { if (errEl) errEl.textContent = 'Bitte Token einfügen'; return; }
+  if (errEl) errEl.textContent = '';
+  try {
+    AppState.workerUrl = Auth.FB_WORKER_PROXY;
+    saveAppState();
+    await Auth.setManualToken(val, Auth.FB_WORKER_PROXY);
+    if (loadLocal('fb_onboard_complete', false)) {
+      showApp();
+      await fullSync();
+      renderAll();
+    } else {
+      showQuizAfterAuth();
+    }
+  } catch (e) {
+    if (errEl) errEl.textContent = '❌ ' + e.message;
   }
 }
 
@@ -4723,7 +5225,7 @@ let fxRates = {}; // { USD: 0.89, EUR: 0.97, ... } → multiply to get CHF
 
 async function loadFXRates() {
   try {
-    const r    = await fetch('https://api.frankfurter.app/latest?to=CHF');
+    const r    = await fetch('https://api.frankfurter.app/latest?from=CHF');
     const data = await r.json();
     fxRates        = data.rates || {};
     fxRates['CHF'] = 1;
@@ -5047,6 +5549,29 @@ async function erfSaveBuchung() {
     receiptFile: receiptFile || '',
     receiptLink: receiptLink || null,
   };
+
+  // Edit-Mode: Update statt Create (Audit-Fix R1)
+  if (Erf.editId) {
+    try {
+      const result = await notionUpdate(Erf.editId, bookingToProps(data));
+      if (result.object === 'error') throw new Error(result.message);
+      // Update Store
+      const idx = Store.buchungen.findIndex(b => b._id === Erf.editId);
+      if (idx >= 0) { Object.assign(Store.buchungen[idx], data, { _id: Erf.editId }); saveCache('buchungen'); }
+      if (Erf.receipt?.thumb) {
+        const thumbs = loadLocal(CACHE.thumbs, {});
+        thumbs[Erf.editId] = Erf.receipt.thumb;
+        saveLocal(CACHE.thumbs, thumbs);
+      }
+      showToast('success', '✏️', 'Buchung aktualisiert', desc || '');
+      closeErfassen();
+      deltaSync().then(() => { renderAll(); InboxEngine.updateBadge(); });
+    } catch (e) {
+      btn.disabled = false; btn.textContent = '✏️ Änderungen speichern';
+      if (fbEl) fbEl.textContent = '❌ ' + e.message;
+    }
+    return;
+  }
 
   const { success, result, error } = await writeWithQueue(DB.BUCHUNGEN, bookingToProps(data), {
     desc: data.desc, amt: fmt(amt), type: 'buchung'
@@ -5733,7 +6258,11 @@ async function inboxRecurBook(recurId) {
 
   try {
     // Book as Buchung (external payment) or Transfer (pocket)
-    const isTransfer = r.account && !['Raiffeisen Privat','Raiffeisen Sparkonto','Revolut','Bar','Ting Community'].includes(r.account);
+    // Dynamic account detection (Audit-Fix R10 — keine hardcodierten Kontonamen)
+    const mainAccounts = Store.konten
+      .filter(k => k.typ === 'Girokonto' || k.typ === 'Sparkonto' || k.group === 'Hauptkonto')
+      .map(k => k.name);
+    const isTransfer = r.account && mainAccounts.length > 0 && !mainAccounts.includes(r.account);
 
     if (isTransfer) {
       // Internal transfer → Transfers DB
@@ -5741,7 +6270,7 @@ async function inboxRecurBook(recurId) {
         desc:        r.name,
         date:        toDay(),
         typ:         'Pocket-Einzahlung',
-        fromAccount: 'Raiffeisen Privat',
+        fromAccount: mainAccounts[0] || Store.konten[0]?.name || '',
         toAccount:   r.account,
         amount:      r.amt,
         status:      'Ausgeführt',
@@ -6787,7 +7316,7 @@ function kontoCardHTML(k) {
 
 function openKontoForm() {
   const types  = ['Girokonto','Sparkonto','Kreditkarte','Pocket','Bargeld','Investition','Schuld'];
-  const groups = ['Raiffeisen','Revolut','Ting','Sonstige'];
+  const groups = [...new Set(Store.konten.map(k => k.group).filter(Boolean)), 'Sonstige'];
   const icons  = ['🏦','💳','💰','🪣','💵','📈','💸'];
   const html   = `
     <div id="kontoFormOverlay" style="position:fixed;inset:0;z-index:400;background:rgba(22,20,18,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px">
@@ -6795,7 +7324,7 @@ function openKontoForm() {
         <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:16px">Neues Konto</div>
         <div class="form-group">
           <label class="form-label">Name</label>
-          <input id="kfName" class="form-input" placeholder="Raiffeisen Privat">
+          <input id="kfName" class="form-input" placeholder="z.B. Hauptkonto">
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div class="form-group">
@@ -7647,6 +8176,66 @@ function renderEinstellungen() {
         </div>
       </div>
 
+      <!-- Lizenz & Weiteres Gerät -->
+      <div class="section-head"><h3>Lizenz & Geräte</h3></div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">Lizenz-Key</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;color:var(--ink2)">
+              ${(function(){
+                const lk = loadLocal('fb_license_key', null);
+                if (!lk) return '<span style="color:var(--muted)">Kein Key gespeichert</span>';
+                return '<span style="font-family:\'Courier Prime\',monospace;font-size:13px">' + lk.slice(0,-4).replace(/[A-Z0-9]/g,'•') + lk.slice(-4) + '</span>';
+              })()}
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Jederzeit änderbar</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="showLicenseKeyScreen()">Ändern</button>
+        </div>
+
+        <div style="padding:12px 0">
+          <div style="font-weight:600;font-size:14px;margin-bottom:4px">Weiteres Gerät einrichten</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+            Installiere FinanceBird auf einem anderen Gerät und verbinde es mit deinem bestehenden Account.
+          </div>
+          <div id="settingsPairingBlock" style="display:none">
+            <div style="background:var(--bg2);border-radius:12px;padding:14px 16px;text-align:center;margin-bottom:10px">
+              <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Kopplungscode</div>
+              <div id="settingsPairingCode" style="font-family:'Courier Prime',monospace;font-size:32px;letter-spacing:.2em;font-weight:700;color:var(--ink);margin-bottom:6px">······</div>
+              <div id="settingsPairingCountdown" style="font-size:11px;color:var(--muted)"></div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+              <input type="text" id="settingsPairingUrl" class="form-input"
+                readonly style="font-size:11px;flex:1;cursor:text">
+              <button onclick="navigator.clipboard.writeText(document.getElementById('settingsPairingUrl').value).then(()=>showToast('success','✓','Kopiert',''))"
+                style="padding:8px 12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;font-size:11px;cursor:pointer;white-space:nowrap;color:var(--ink2);font-family:inherit">
+                Kopieren
+              </button>
+            </div>
+            <div id="settingsQrCode" style="display:flex;justify-content:center;margin-bottom:8px"></div>
+            <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.5">
+              Scanne den QR-Code oder öffne die URL. Installiere die App auf dem Homescreen und gib den Code ein.
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm" id="settingsGeneratePairingBtn"
+            onclick="settingsGeneratePairing()" style="width:100%">
+            Kopplungscode generieren
+          </button>
+        </div>
+      </div>
+
+      <!-- Datenschutz -->
+      <div class="section-head"><h3>Datenschutz</h3></div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:13px;color:var(--ink2)">Datenschutzerklärung</div>
+          <button class="btn btn-outline btn-sm"
+            onclick="showDatenschutz('settingsDatenschutzContainer')">Anzeigen</button>
+        </div>
+        <div id="settingsDatenschutzContainer" style="display:none;margin-top:10px"></div>
+      </div>
+
       <!-- Diagnose -->
       <div class="section-head"><h3>Diagnose & Daten</h3></div>
       <div class="card" style="margin-bottom:14px">
@@ -7807,24 +8396,19 @@ function showFeedbackForm() {
     userAgent: navigator.userAgent.slice(0,80),
   };
 
-  // Send to Worker /feedback endpoint (if available)
-  if (AppState.workerUrl) {
-    const base = AppState.workerUrl.replace('/v1', '');
-    fetch(base + '/feedback', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, diag: diagData }),
-    }).then(() => {
-      showToast('success', '💬', 'Feedback gesendet', 'Danke!');
-    }).catch(() => {
-      // Worker not yet configured — copy to clipboard as fallback
-      navigator.clipboard?.writeText(msg + '\n\n[Diag: ' + JSON.stringify(diagData) + ']')
-        .then(() => showToast('info', '📋', 'Feedback kopiert', 'Clipboard — bitte per Email senden'))
-        .catch(() => showToast('info', '💬', 'Feedback notiert', 'Danke für dein Feedback!'));
-    });
-  } else {
-    showToast('info', '💬', 'Feedback notiert', 'Kein Worker konfiguriert — danke!');
-  }
+  // Send to Worker B /feedback endpoint (Audit-Fix R2)
+  fetch(Auth.FB_WORKER_AUTH + '/feedback', {
+    method: 'POST',
+    headers: Auth.workerHeaders(),
+    body: JSON.stringify({ message: msg, context: JSON.stringify(diagData) }),
+  }).then(resp => {
+    if (resp.ok) showToast('success', '💬', 'Feedback gesendet', 'Danke!');
+    else throw new Error('Status ' + resp.status);
+  }).catch(() => {
+    navigator.clipboard?.writeText(msg + '\n\n[Diag: ' + JSON.stringify(diagData) + ']')
+      .then(() => showToast('info', '📋', 'Feedback kopiert', 'Clipboard — bitte per Email senden'))
+      .catch(() => showToast('info', '💬', 'Feedback notiert', 'Danke für dein Feedback!'));
+  });
 }
 
 
@@ -7887,7 +8471,7 @@ async function archiveDriveReceipt(receiptLink) {
     const meta    = await metaResp.json();
     const parents = (meta.parents || []).join(',');
     // Get/create Archiv folder inside parent
-    const parentId = meta.parents?.[0] || GDRIVE_PARENT;
+    const parentId = meta.parents?.[0] || await getGDriveParent();
     const archivId = await getOrCreateFolderInParent(token, 'Archiv', parentId);
     // Move file
     await fetch(
@@ -8131,12 +8715,46 @@ function erfShowReceiptUI(thumb, filename, isPDF, context) {
    ══════════════════════════════════════════════════════ */
 
 function onboardNext(from, to) {
-  const screens = ['welcome','worker','connect','quiz','taxmap','done'];
-  screens.forEach(s => {
-    const el = document.getElementById('onboard' + s.charAt(0).toUpperCase() + s.slice(1));
-    if (el) el.style.display = s === to ? '' : 'none';
+  // Alle bekannten Screens (inkl. neuer)
+  const screenIds = {
+    'welcome':        'onboardWelcome',
+    'license':        'onboardLicense',
+    'connect':        'onboardConnect',
+    'quiz':           'onboardQuiz',
+    'taxmap':         'onboardTaxmap',
+    'done':           'onboardDone',
+    'mobile-install': 'onboardMobileInstall',
+    'mobile-pairing': 'onboardMobilePairing',
+  };
+  Object.values(screenIds).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
   });
+  const targetId = screenIds[to];
+  if (targetId) {
+    const el = document.getElementById(targetId);
+    if (el) el.style.display = '';
+  }
   if (to === 'quiz') { quizStep = 0; quizAnswers = {}; renderQuizStep(); }
+  if (to === 'license') {
+    // Lizenz-Key vorausfüllen falls bereits gespeichert
+    const existing = loadLocal('fb_license_key', '');
+    const inp = document.getElementById('onboardLicenseInput');
+    if (inp && existing) inp.value = existing;
+  }
+  if (to === 'mobile-install') {
+    // Platform detection (Audit-Fix R7)
+    const ua = navigator.userAgent || '';
+    const isIOS     = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/.test(ua);
+    const iosEl     = document.getElementById('mobileInstallIos');
+    const androidEl = document.getElementById('mobileInstallAndroid');
+    const desktopEl = document.getElementById('mobileInstallDesktop');
+    if (iosEl)     iosEl.style.display     = isIOS     ? '' : 'none';
+    if (androidEl) androidEl.style.display = isAndroid  ? '' : 'none';
+    if (desktopEl) desktopEl.style.display = (!isIOS && !isAndroid) ? '' : 'none';
+  }
+  if (to === 'done') { initDoneScreen(); }
 }
 
 function showSetup() {
@@ -8145,12 +8763,12 @@ function showSetup() {
   const seen = loadLocal('fb_onboard_seen', false);
   if (!seen) {
     saveLocal('fb_onboard_seen', true);
-    onboardNext('connect', 'welcome');
+    onboardNext(null, 'welcome');
   } else {
-    // Returning user who didn't finish — skip worker setup, go straight to connect
-    onboardNext('welcome', 'connect');
+    // Returning user — zurück zum Connect (Lizenz-Key bereits gesetzt)
+    onboardNext(null, 'connect');
+    setAuthMode(AppState.authMode || 'oauth');
   }
-  setAuthMode(AppState.authMode || 'oauth');
 }
 
 function showApp() {
@@ -8159,117 +8777,339 @@ function showApp() {
 }
 
 function showQuizAfterAuth() {
-  document.getElementById('onboardConnect').style.display = 'none';
-  document.getElementById('onboardQuiz').style.display    = '';
-  quizStep = 0; quizAnswers = {};
-  renderQuizStep();
+  onboardNext(null, 'quiz');
 }
 
-/* ── E3: Worker Setup ── */
+/* ── Lizenz-Key (E2) ── */
 
-let _workerStepsDone  = new Set();
-let _workerTestPassed = false;
-
-/** Toggle a helper panel open/closed */
-function workerToggleHelper(key) {
-  const id    = 'workerHelper' + key.charAt(0).toUpperCase() + key.slice(1);
-  const panel = document.getElementById(id);
-  if (!panel) return;
-  const nowOpen = panel.style.display === 'none';
-  panel.style.display = nowOpen ? '' : 'none';
-  // Update arrow on the button (last <span> child of previousElementSibling)
-  const btn = panel.previousElementSibling;
-  if (btn) {
-    const spans = btn.querySelectorAll('span');
-    if (spans.length) spans[spans.length - 1].textContent = nowOpen ? '‹' : '›';
-  }
+function onboardLicenseInputChanged() {
+  document.getElementById('onboardLicenseError').textContent = '';
 }
 
-/** Mark a deploy step as done, unlock next */
-function workerMarkStep(step) {
-  _workerStepsDone.add(step);
-  const numEl = document.getElementById('workerStepNum' + step);
-  if (numEl) { numEl.classList.add('done'); numEl.textContent = '✓'; }
-  const nextEl = document.getElementById('workerStep' + (step + 1));
-  if (nextEl) nextEl.style.opacity = '1';
-}
+async function onboardCheckLicense() {
+  const input = document.getElementById('onboardLicenseInput');
+  const errEl = document.getElementById('onboardLicenseError');
+  const btn   = document.getElementById('onboardLicenseBtn');
+  if (!input || !errEl || !btn) return;
 
-/** Called on URL input — reset test state */
-function workerUrlChanged() {
-  _workerTestPassed = false;
-  const btn = document.getElementById('workerContinueBtn');
-  if (btn) { btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none'; }
-  const res = document.getElementById('workerTestResult');
-  if (res) res.textContent = '';
-}
-
-/** Live-test the worker by calling its /health endpoint */
-async function workerTestConnection() {
-  const input = document.getElementById('ownWorkerUrlInput');
-  const res   = document.getElementById('workerTestResult');
-  const btn   = document.getElementById('workerTestBtn');
-  if (!input || !res) return;
-
-  let url = input.value.trim();
-  if (!url) {
-    res.innerHTML = '<span style="color:var(--red)">Bitte Worker-URL eingeben</span>';
+  const key = input.value.trim().toUpperCase();
+  if (!key.startsWith('LK-') || key.length < 5) {
+    errEl.textContent = 'Key ungültig — Format: LK-xxxxxxxx';
     return;
   }
-  // Auto-append /v1 if missing
-  if (!url.match(/\/v1\/?$/)) {
-    url = url.replace(/\/$/, '') + '/v1';
-    input.value = url;
+
+  errEl.textContent = '';
+  btn.textContent   = 'Prüfe…';
+  btn.disabled      = true;
+
+  const result = await Auth.verifyLicense(key);
+
+  btn.textContent = 'Prüfen';
+  btn.disabled    = false;
+
+  if (result.valid) {
+    saveLocal('fb_license_key', key);
+    // Kurzes visuelles Feedback, dann weiter
+    btn.textContent = '✓ Aktiv';
+    btn.style.background = 'var(--green, #3a7a3a)';
+    setTimeout(() => {
+      btn.textContent = 'Prüfen';
+      btn.style.background = '';
+      onboardNext('license', 'connect');
+      setAuthMode('oauth');
+    }, 800);
+  } else {
+    const msgs = {
+      expired:       'Lizenz abgelaufen — bitte kontaktiere hello@oswaldkoenig.ch',
+      not_found:     'Key nicht gefunden — Schreibweise prüfen.',
+      network_error: 'Verbindung fehlgeschlagen — bitte nochmal versuchen.',
+    };
+    errEl.textContent = msgs[result.reason] || 'Key ungültig — prüfe die Schreibweise oder kontaktiere hello@oswaldkoenig.ch';
+  }
+}
+
+/* ── Done-Screen (Screen 5) ── */
+
+let _pairingCountdownInterval = null;
+
+function onDoneDeviceOpen(summaryEl) {
+  const details = summaryEl.closest('details');
+  if (!details) return;
+  // Nur laden wenn noch nicht geschehen
+  const codeEl = document.getElementById('donePairingCode');
+  if (codeEl && codeEl.textContent === '······') {
+    loadDonePairingCode();
+  }
+  renderDoneQrCode();
+  // Symbol wechseln
+  const sym = summaryEl.querySelector('span:last-child');
+  if (sym) sym.textContent = details.open ? '+' : '−';
+}
+
+async function loadDonePairingCode() {
+  const codeEl      = document.getElementById('donePairingCode');
+  const countdownEl = document.getElementById('donePairingCountdown');
+  if (!codeEl) return;
+
+  codeEl.textContent      = '…';
+  if (countdownEl) countdownEl.textContent = 'Lädt…';
+
+  const result = await Auth.generatePairingCode();
+  if (!result || !result.code) {
+    codeEl.textContent = '—';
+    if (countdownEl) countdownEl.textContent = 'Fehler — bitte nochmal versuchen';
+    return;
   }
 
-  btn.textContent = '…';
-  btn.disabled    = true;
-  res.innerHTML   = '<span style="color:var(--muted)">Verbinde…</span>';
+  codeEl.textContent = result.code.toUpperCase();
+  startPairingCountdown(result.expiresAt, countdownEl);
+}
 
-  try {
-    const healthUrl = url.replace(/\/v1\/?$/, '/health');
-    const resp = await fetch(healthUrl, { signal: AbortSignal.timeout(9000) });
-    if (resp.ok) {
-      const data = await resp.json().catch(() => ({}));
-      if (data.ok || data.service) {
-        res.innerHTML = '<span style="color:var(--green)">✓ Verbindung erfolgreich — Worker läuft</span>';
-        _workerTestPassed = true;
-        workerMarkStep(4);
-        const cb = document.getElementById('workerContinueBtn');
-        if (cb) { cb.style.opacity = '1'; cb.style.pointerEvents = 'auto'; }
-      } else {
-        res.innerHTML = '<span style="color:var(--amber)">⚠️ Worker antwortet, unbekanntes Format — trotzdem fortfahren?</span>';
-        _workerTestPassed = true;
-        const cb = document.getElementById('workerContinueBtn');
-        if (cb) { cb.style.opacity = '1'; cb.style.pointerEvents = 'auto'; }
-      }
-    } else {
-      res.innerHTML = '<span style="color:var(--red)">✗ Fehler ' + resp.status + ' — Schritt 2 prüfen</span>';
+function startPairingCountdown(expiresAt, el) {
+  if (_pairingCountdownInterval) clearInterval(_pairingCountdownInterval);
+  const expiry = new Date(expiresAt).getTime();
+  function tick() {
+    const remaining = Math.max(0, Math.floor((expiry - Date.now()) / 1000));
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    if (el) el.textContent = remaining > 0
+      ? `Gültig noch ${m}:${String(s).padStart(2,'0')} Min`
+      : 'Abgelaufen';
+    if (remaining === 0) {
+      clearInterval(_pairingCountdownInterval);
+      const codeEl = document.getElementById('donePairingCode');
+      if (codeEl) codeEl.textContent = '——';
     }
-  } catch (e) {
-    res.innerHTML = e.name === 'TimeoutError'
-      ? '<span style="color:var(--red)">✗ Timeout — URL korrekt? /v1 am Ende?</span>'
-      : '<span style="color:var(--red)">✗ Keine Verbindung — URL prüfen, ggf. 1 Min. warten</span>';
-  } finally {
-    btn.textContent = 'Testen';
-    btn.disabled    = false;
+  }
+  tick();
+  _pairingCountdownInterval = setInterval(tick, 1000);
+}
+
+async function refreshPairingCode() {
+  const codeEl      = document.getElementById('donePairingCode');
+  const countdownEl = document.getElementById('donePairingCountdown');
+  if (codeEl) codeEl.textContent = '…';
+  if (_pairingCountdownInterval) clearInterval(_pairingCountdownInterval);
+  await loadDonePairingCode();
+}
+
+function renderDoneQrCode() {
+  const container = document.getElementById('doneQrCode');
+  if (!container) return;
+  const url = window.location.origin + window.location.pathname;
+  // QR via qrcode.js falls geladen, sonst Link-Fallback
+  if (window.QRCode) {
+    container.innerHTML = '';
+    new window.QRCode(container, {
+      text: url, width: 140, height: 140,
+      colorDark: getComputedStyle(document.documentElement)
+        .getPropertyValue('--ink').trim() || '#1a1814',
+      colorLight: 'transparent',
+    });
+  } else {
+    // Fallback: einfacher Link
+    container.innerHTML = `<div style="font-size:11px;color:var(--muted);padding:10px;word-break:break-all;line-height:1.4">${url}</div>`;
   }
 }
 
-function workerSetupContinue() {
-  const url = (document.getElementById('ownWorkerUrlInput')?.value || '').trim();
-  if (!url || !_workerTestPassed) {
-    showToast('error', '⚠️', 'Verbindungstest nötig', 'Bitte erst "Testen" klicken');
+function copyDoneUrl() {
+  const url = window.location.origin + window.location.pathname;
+  navigator.clipboard?.writeText(url).then(() => {
+    const btn = document.getElementById('doneCopyUrlBtn');
+    if (btn) { btn.textContent = '✓'; setTimeout(() => btn.textContent = 'Kopieren', 1500); }
+  }).catch(() => {
+    showToast('info', '📋', 'URL', url);
+  });
+}
+
+/* ── PWA Install ── */
+
+let _deferredPwaPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _deferredPwaPrompt = e;
+  // Done-Screen Install-Block einblenden
+  const block = document.getElementById('donePwaBlock');
+  if (block) block.style.display = '';
+});
+
+function triggerPwaInstall() {
+  if (_deferredPwaPrompt) {
+    _deferredPwaPrompt.prompt();
+    _deferredPwaPrompt.userChoice.then(choice => {
+      _deferredPwaPrompt = null;
+      const block = document.getElementById('donePwaBlock');
+      if (block) block.style.display = 'none';
+    });
+  }
+}
+
+/* ── Mobile Pairing (Screen M2) ── */
+
+async function submitPairingCode() {
+  const input = document.getElementById('mobilePairingInput');
+  const errEl = document.getElementById('mobilePairingError');
+  const btn   = document.getElementById('mobilePairingBtn');
+  if (!input || !errEl) return;
+
+  const code = input.value.trim().toUpperCase();
+  if (code.length !== 6) {
+    errEl.textContent = 'Code muss 6 Zeichen haben.';
     return;
   }
-  const inp1 = document.getElementById('workerUrlInput');
-  const inp2 = document.getElementById('workerUrlTokenInput');
-  if (inp1) inp1.value = url;
-  if (inp2) inp2.value = url;
-  AppState.workerUrl = url;
-  saveLocal('fb_worker_url', url);
-  onboardNext('worker', 'connect');
-  setAuthMode('oauth');
+
+  errEl.textContent = '';
+  if (btn) { btn.textContent = 'Verbinde…'; btn.disabled = true; }
+
+  const result = await Auth.claimPairingCode(code);
+
+  if (btn) { btn.textContent = 'Verbinden'; btn.disabled = false; }
+
+  if (result.licenseKey) {
+    saveLocal('fb_license_key', result.licenseKey);
+    // Weiter zu Notion OAuth
+    onboardNext('mobile-pairing', 'connect');
+    setAuthMode('oauth');
+  } else if (result.error === 'expired') {
+    errEl.textContent = 'Code abgelaufen. Generiere einen neuen Code am anderen Gerät, oder gib deinen Lizenz-Key direkt ein.';
+  } else {
+    errEl.textContent = 'Code ungültig oder Verbindung fehlgeschlagen — bitte nochmal versuchen.';
+  }
 }
+
+/* ── Datenschutz-Container ── */
+
+function showDatenschutz(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (container.style.display !== 'none' && container.innerHTML) {
+    container.style.display = 'none';
+    return;
+  }
+  renderDatenschutz(containerId);
+  container.style.display = '';
+}
+
+function renderDatenschutz(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const today = new Date().toLocaleDateString('de-CH', { year:'numeric', month:'long', day:'numeric' });
+  el.innerHTML = `
+    <div style="background:var(--bg2);border-radius:12px;padding:16px 18px;font-size:11.5px;color:var(--ink2);line-height:1.7;text-align:left;max-height:60vh;overflow-y:auto">
+      <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">
+        Datenschutzerklärung · Stand: ${today}
+      </div>
+      <p><strong>Verantwortlich:</strong> Oswald H. König, Zürich, Schweiz · <a href="mailto:hello@oswaldkoenig.ch" style="color:var(--accent)">hello@oswaldkoenig.ch</a></p>
+      <p><strong>1. Was ist FinanceBird?</strong><br>
+      FinanceBird ist eine Web-App (Progressive Web App) für persönliche Finanzverwaltung. Die App läuft vollständig in deinem Browser — es gibt keinen Account auf unserem Server.</p>
+      <p><strong>2. Wo leben deine Daten?</strong><br>
+      Deine Finanzdaten leben ausschliesslich in deinem eigenen Notion-Workspace. Belegfotos werden in deinem eigenen Google Drive gespeichert. Wir haben keinen Zugriff auf diese Daten.</p>
+      <p><strong>3. Was fliesst durch unseren Server?</strong><br>
+      FinanceBird nutzt einen Proxy-Server (Cloudflare Workers), damit dein Browser mit der Notion-API kommunizieren kann. Dein Notion-Zugriffstoken wird dabei durchgeleitet, aber nicht gespeichert, nicht gelesen und nicht geloggt. Der Proxy ist technisch so gebaut, dass er den Inhalt deiner Requests nicht sieht.</p>
+      <p><strong>4. Was wird gespeichert?</strong><br>
+      <em>Auf unserem Server:</em> Dein Lizenz-Key (zur Prüfung deines Abonnements), temporäre OAuth-Tokens (10 Min TTL), temporäre Kopplungscodes (10 Min TTL).<br>
+      <em>Nicht gespeichert:</em> Keine Buchungen, Beträge, Belege, Kontoinformationen oder Nutzungsprofile.</p>
+      <p><strong>5. Wer sieht was?</strong><br>
+      Du: Alles. Wir (Oswald H. König): Deinen Lizenz-Status. Sonst nichts. Cloudflare (Infrastruktur): Standard-Server-Logs. Notion + Google: Deine Daten gemäss deiner jeweiligen Vereinbarung.</p>
+      <p><strong>6. Lokale Speicherung</strong><br>
+      FinanceBird verwendet keine Cookies. Die App speichert Konfigurationsdaten im lokalen Speicher deines Browsers (localStorage). Diese Daten verlassen dein Gerät nicht.</p>
+      <p><strong>7. Deine Rechte</strong><br>
+      Du kannst jederzeit: Notion-Zugang widerrufen (Notion → Einstellungen → Integrationen), Google-Drive-Zugang widerrufen, Lizenz-Key deaktivieren lassen (hello@oswaldkoenig.ch), alle lokalen Daten löschen (Einstellungen → Zurücksetzen). Gemäss DSG + DSGVO hast du das Recht auf Auskunft, Berichtigung und Löschung.</p>
+      <button onclick="document.getElementById('${containerId}').style.display='none'"
+        style="margin-top:10px;background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;display:block;width:100%;text-align:center">
+        Schliessen ×
+      </button>
+    </div>
+  `;
+}
+
+
+/* ── QR-Code Rendering ── */
+
+function renderQrCodeSvg(url, container) {
+  const size = 140;
+  const img  = document.createElement('img');
+  img.src    = 'https://chart.googleapis.com/chart?chs=' + size + 'x' + size + '&cht=qr&chl=' + encodeURIComponent(url) + '&choe=UTF-8';
+  img.width  = size;
+  img.height = size;
+  img.style.cssText = 'border-radius:8px;display:block';
+  img.alt = 'QR-Code';
+  img.onerror = () => {
+    container.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:10px">QR-Code nicht verfügbar</div>';
+  };
+  container.innerHTML = '';
+  container.appendChild(img);
+}
+
+/* ── Done-Screen Init ── */
+
+async function initDoneScreen() {
+  const appUrl = window.location.origin + window.location.pathname;
+  const qrEl   = document.getElementById('doneQrCode');
+  if (qrEl) renderQrCodeSvg(appUrl, qrEl);
+  const urlInput = document.getElementById('doneAppUrl');
+  if (urlInput) urlInput.value = appUrl;
+  const pwaBlock = document.getElementById('donePwaBlock');
+  if (pwaBlock && _deferredPwaPrompt) pwaBlock.style.display = 'block';
+}
+
+/* ── Mobile Pairing Fallback ── */
+
+function showPairingFallback() {
+  onboardNext('mobile-pairing', 'license');
+}
+
+let _settingsPairingInterval = null;
+
+async function settingsGeneratePairing() {
+  const btn         = document.getElementById('settingsGeneratePairingBtn');
+  const block       = document.getElementById('settingsPairingBlock');
+  const codeEl      = document.getElementById('settingsPairingCode');
+  const countdownEl = document.getElementById('settingsPairingCountdown');
+  const qrEl        = document.getElementById('settingsQrCode');
+
+  if (btn)   { btn.textContent = 'Generiere…'; btn.disabled = true; }
+
+  const result = await Auth.generatePairingCode();
+
+  if (btn)   { btn.textContent = 'Neuen Code generieren'; btn.disabled = false; }
+
+  if (!result || !result.code) {
+    showToast('error', '⚠️', 'Fehler', 'Kopplungscode konnte nicht generiert werden.');
+    return;
+  }
+
+  if (block) block.style.display = 'block';
+  if (codeEl) codeEl.textContent = result.code.toUpperCase();
+
+  // URL + QR-Code (Audit-Fix K3)
+  const pairingUrl = window.location.origin + window.location.pathname;
+  const urlInput = document.getElementById('settingsPairingUrl');
+  if (urlInput) urlInput.value = pairingUrl;
+  if (qrEl) renderQrCodeSvg(pairingUrl, qrEl);
+
+  // Countdown
+  if (_settingsPairingInterval) clearInterval(_settingsPairingInterval);
+  const expiresAt = new Date(result.expiresAt).getTime();
+  function tick() {
+    const secsLeft = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
+    const mins = Math.floor(secsLeft / 60);
+    const secs = String(secsLeft % 60).padStart(2, '0');
+    if (countdownEl) countdownEl.textContent = secsLeft > 0
+      ? 'Gültig noch ' + mins + ':' + secs
+      : 'Code abgelaufen';
+    if (secsLeft === 0) {
+      clearInterval(_settingsPairingInterval);
+      if (codeEl) codeEl.textContent = '······';
+      if (block) block.style.display = 'none';
+    }
+  }
+  tick();
+  _settingsPairingInterval = setInterval(tick, 1000);
+}
+
+/* ── onboardFinish ── */
 
 async function onboardFinish() {
   applyQuizConfig();
@@ -8288,7 +9128,6 @@ async function onboardFinish() {
   }
   hideSplashOnce();
 }
-
 
 /* ── E4: Schnell-Quiz ── */
 
@@ -8314,23 +9153,36 @@ const QUIZ_QUESTIONS = [
   },
   {
     id:'zeiterfassung', q:'Verwendest du ein Zeiterfassungstool?',
-    opts:[{val:'clockify',label:'Clockify'},{val:'toggl',label:'Toggl (Phase 2)'},{val:'manual',label:'Manuell'},{val:'none',label:'Noch keines'}],
+    opts:[{val:'clockify',label:'Clockify'},{val:'other',label:'Anderes Tool'},{val:'manual',label:'Manuell'},{val:'none',label:'Noch keines'}],
+    hint: 'Weitere Integrationen (Toggl, Harvest) folgen.',
   },
   {
-    id:'kategorien', q:'Ausgaben kategorisieren?',
-    opts:[{val:'5',label:'Kompakt — 5 Kategorien'},{val:'10',label:'Standard — 10 Kategorien (empfohlen)'}],
+    id:'kategorien', q:'Wie detailliert möchtest du deine Ausgaben aufschlüsseln?',
+    hint: 'Jederzeit in den Einstellungen anpassbar.',
+    tiles: true,
+    opts:[
+      {
+        val:'5', label:'Kompakt',
+        sub:'5 Kategorien',
+        cats:['Büro & Infrastruktur','Marketing & Akquise','Reise & Spesen','Externe Leistungen','Sonstiges'],
+      },
+      {
+        val:'10', label:'Detailliert',
+        sub:'10+ Kategorien (empfohlen)',
+        cats:['Büro & Infrastruktur','Software & Tools','Marketing','Reise & Spesen','Bildung & Weiterbildung','Externe Leistungen','Kommunikation','Beratung & Recht','Versicherung','Sonstiges'],
+      },
+    ],
   },
   {
-    id:'ki', q:'Beleganalyse mit KI aktivieren?',
-    opts:[{val:'yes',label:'Ja — Claude API Key eingeben'},{val:'no',label:'Nein / später'}],
+    id:'ki', q:'Belege per KI analysieren lassen?',
+    opts:[{val:'yes',label:'Ja — API Key einrichten'},{val:'no',label:'Später'}],
+    kiHint: 'Einmalig einrichten. Ab dann scannt FinanceBird deine Belege automatisch. Kosten: ca. CHF 0.01–0.03 pro Beleg.',
   },
   {
     id:'belegspeicher', q:'Wo sollen Belegfotos gespeichert werden?',
-    opts:[{val:'drive',label:'Google Drive (empfohlen)'},{val:'local',label:'Nur lokal'}],
-  },
-  {
-    id:'kompass', q:'Interessiert dich der Kompass-Tab?',
-    opts:[{val:'yes',label:'Ja — Geld, Zeit und Intention verbinden'},{val:'later',label:'Später, erst Buchhaltung'}],
+    opts:[{val:'drive',label:'Google Drive'}],
+    hint: 'Weitere Speicherorte folgen.',
+    singleOption: true,
   },
 ];
 
@@ -8350,19 +9202,38 @@ function renderQuizStep() {
   const selected = quizAnswers[q.id];
   document.getElementById('quizContent').innerHTML = `
     <div class="quiz-question">${q.q}</div>
-    <div class="quiz-options">
-      ${q.opts.map(opt => `
-        <button class="quiz-option ${selected === opt.val ? 'selected' : ''}"
-          onclick="quizSelect('${q.id}','${opt.val}')">
-          ${opt.label}
-        </button>`).join('')}
-    </div>
+    ${q.hint && !q.tiles ? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;text-align:center">${q.hint}</div>` : ''}
+    ${q.kiHint && selected === 'yes' ? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;text-align:center">${q.kiHint}</div>` : ''}
+    ${q.tiles ? `
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+        ${q.opts.map(opt => `
+          <button class="quiz-option ${selected === opt.val ? 'selected' : ''}"
+            onclick="quizSelect('${q.id}','${opt.val}')"
+            style="text-align:left;padding:14px 16px;height:auto">
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px">${opt.label}</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${opt.sub}</div>
+            <div style="font-size:10px;color:var(--muted);opacity:.8;line-height:1.5">
+              ${opt.cats ? opt.cats.join(' · ') : ''}
+            </div>
+          </button>`).join('')}
+      </div>
+      ${q.hint ? `<div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center">${q.hint}</div>` : ''}
+    ` : `
+      <div class="quiz-options">
+        ${q.opts.map(opt => `
+          <button class="quiz-option ${selected === opt.val ? 'selected' : ''}"
+            onclick="quizSelect('${q.id}','${opt.val}')">
+            ${opt.label}
+          </button>`).join('')}
+      </div>
+    `}
     ${q.id === 'ki' && selected === 'yes' ? `
       <div class="form-group" style="margin-top:12px">
         <label class="form-label">Claude API Key</label>
         <input type="password" class="form-input" placeholder="sk-ant-…"
           value="${loadLocal('fb_claude_key','')}"
           oninput="saveLocal('fb_claude_key', this.value.trim())">
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Einmalig einrichten. Ab dann scannt FinanceBird deine Belege automatisch. Kosten: ca. CHF 0.01–0.03 pro Beleg.</div>
       </div>` : ''}
     ${q.id === 'zeiterfassung' && selected === 'clockify' ? `
       <div class="form-group" style="margin-top:12px">
@@ -8370,6 +9241,15 @@ function renderQuizStep() {
         <input type="password" class="form-input" placeholder="API Key aus Profile Settings"
           value="${loadLocal('fb_clockify_key','')}"
           oninput="saveLocal('fb_clockify_key', this.value.trim())">
+      </div>` : ''}
+    ${q.id === 'zeiterfassung' && selected === 'other' ? `
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label">Welches Tool?</label>
+        <input type="text" class="form-input" placeholder="z.B. Toggl, Harvest, Timely…"
+          value="${loadLocal('fb_zeiterfassung_other','')}"
+          oninput="saveLocal('fb_zeiterfassung_other', this.value.trim())"
+          autocomplete="off">
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Hilft uns, Integrationen zu priorisieren. Danke!</div>
       </div>` : ''}
     <div style="margin-top:14px;font-size:11px;color:var(--muted);text-align:center">
       Frage ${quizStep + 1} von ${total}
@@ -8614,24 +9494,21 @@ function nav(tabId) {
 
 function setAuthMode(mode) {
   AppState.authMode = mode;
-  document.getElementById('authOAuthSection').style.display  = mode === 'oauth' ? '' : 'none';
-  document.getElementById('authTokenSection').style.display  = mode === 'token' ? '' : 'none';
-  const oBtn = document.getElementById('authOAuthBtn');
-  const tBtn = document.getElementById('authTokenBtn');
-  oBtn.style.background = mode === 'oauth' ? 'var(--ink)' : 'transparent';
-  oBtn.style.color      = mode === 'oauth' ? 'white'      : 'var(--muted)';
-  tBtn.style.background = mode === 'token' ? 'var(--ink)' : 'transparent';
-  tBtn.style.color      = mode === 'token' ? 'white'      : 'var(--muted)';
+  saveAppState();
+  // Legacy DOM-Referenzen entfernt (Audit-Fix 2026-03-22).
+  // Neue Onboarding-Screens brauchen keinen OAuth/Token-Toggle.
 }
 
 async function startOAuth() {
-  const workerUrl = (document.getElementById('workerUrlInput')?.value || '').trim();
-  if (!workerUrl) { showToast('error', '⚠️', 'Worker URL fehlt', 'Bitte Worker URL eingeben'); return; }
   try {
-    AppState.workerUrl = workerUrl;
+    // Worker-URL setzen (zentraler Proxy)
+    AppState.workerUrl = Auth.FB_WORKER_PROXY;
     saveAppState();
     showToast('info', '🔗', 'Verbindung läuft…', 'Notion-Fenster wurde geöffnet — wechsle zurück wenn fertig');
-    await Auth.startOAuth(workerUrl);
+    // Polling-Status einblenden (Connect-Screen)
+    const pollingEl = document.getElementById('onboardConnectPolling');
+    if (pollingEl) pollingEl.style.display = '';
+    await Auth.startOAuth();
   } catch (e) {
     showToast('error', '❌', 'OAuth Fehler', e.message);
   }
@@ -8861,8 +9738,8 @@ document.getElementById('saldoModalOverlay')?.addEventListener('click', e => {
 function getRechnungsInfo() {
   const e = Store.einstellungen || {};
   return {
-    name:    e['firma_name']    || loadLocal('fb_firma_name',    'Oswald H. König'),
-    adresse: e['firma_adresse'] || loadLocal('fb_firma_adresse', 'Zürich'),
+    name:    e['firma_name']    || loadLocal('fb_firma_name',    ''),
+    adresse: e['firma_adresse'] || loadLocal('fb_firma_adresse', ''),
     iban:    e['iban']          || loadLocal('fb_iban',          ''),
     uid:     e['uid']           || loadLocal('fb_uid',           ''),
     email:   e['email']         || loadLocal('fb_email',         ''),
@@ -8972,10 +9849,10 @@ function firmaDataSection() {
         Wird auf Rechnungen und im Jahresabschluss verwendet.
       </div>
       ${[
-        { key:'fb_firma_name',    label:'Name / Firma',    placeholder:'Oswald H. König',         val: info.name },
-        { key:'fb_firma_adresse', label:'Adresse',         placeholder:'Musterstrasse 1, 8001 Zürich', val: info.adresse },
+        { key:'fb_firma_name',    label:'Name / Firma',    placeholder:'Dein Name / Firma',           val: info.name },
+        { key:'fb_firma_adresse', label:'Adresse',         placeholder:'Strasse, PLZ Ort', val: info.adresse },
         { key:'fb_iban',          label:'IBAN',            placeholder:'CH56 0483 5012 3456 7800 9', val: info.iban },
-        { key:'fb_email',         label:'E-Mail',          placeholder:'oh@siio.ch',               val: info.email },
+        { key:'fb_email',         label:'E-Mail',          placeholder:'deine@email.ch',              val: info.email },
         { key:'fb_uid',           label:'UID (MwSt)',      placeholder:'CHE-123.456.789 MWST',     val: info.uid },
       ].map(f => `
         <div style="padding:9px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px">
@@ -9028,11 +9905,18 @@ function renderEinstellungen() {
   if (Auth.isAuthenticated) {
     const onboardDone = loadLocal('fb_onboard_complete', false);
     if (!onboardDone) {
-      // First time with token but no quiz yet — show quiz
+      // Token vorhanden aber Quiz noch nicht — Quiz zeigen
       document.getElementById('setupScreen').style.display = 'block';
       document.getElementById('mainApp').style.display     = 'none';
       showQuizAfterAuth();
     } else {
+      // Lizenz validieren im Hintergrund (nicht-blockierend)
+      const lk = Auth.licenseKey;
+      if (lk) {
+        Auth.verifyLicense(lk).then(result => {
+          if (!result.valid) showLicenseExpiredBanner();
+        }).catch(() => {}); // Netzwerkfehler ignorieren — App läuft mit Cache
+      }
       showApp();
       restoreTab();
     }
@@ -9066,21 +9950,31 @@ function renderEinstellungen() {
     }
 
   } else {
-    // Not authenticated — show setup
+    // Not authenticated — Onboarding starten
     hideSplashOnce();
     document.getElementById('setupScreen').style.display = 'block';
     document.getElementById('mainApp').style.display     = 'none';
-    const seen = loadLocal('fb_onboard_seen', false);
-    if (!seen) {
+
+    // Mobile-Erkennung: Ist es eine installierte PWA ohne Token?
+    const isPwa      = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const hasLicense = !!Auth.licenseKey;
+    const seen       = loadLocal('fb_onboard_seen', false);
+
+    if (isPwa && !seen && !hasLicense) {
+      // Installierte PWA ohne Setup — Kopplungscode-Screen
       saveLocal('fb_onboard_seen', true);
-      // Show welcome screen
-      ['onboardWelcome','onboardConnect','onboardQuiz','onboardDone'].forEach((id, i) => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = i === 0 ? '' : 'none';
-      });
+      onboardNext(null, 'mobile-pairing');
+    } else if (!seen) {
+      // Erster Besuch im Browser — Welcome Screen
+      saveLocal('fb_onboard_seen', true);
+      onboardNext(null, 'welcome');
+    } else if (hasLicense) {
+      // Lizenz bekannt, Token fehlt — direkt zu Notion-Connect
+      onboardNext(null, 'connect');
+      setAuthMode('oauth');
     } else {
-      onboardNext('welcome', 'connect');
-      setAuthMode(AppState.authMode || 'oauth');
+      // Lizenz-Key fehlt noch
+      onboardNext(null, 'license');
     }
   }
 })();
@@ -9388,7 +10282,7 @@ Regeln: Nur exakte Spaltennamen verwenden. Leerer String wenn keine passende Spa
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', 'x-api-key': apiKey, 'anthropic-version':'2023-06-01' },
+      headers: { 'Content-Type':'application/json', 'x-api-key': apiKey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 400,
@@ -9549,7 +10443,7 @@ async function csvExecuteImport() {
         bereich:    r.bereich === 'Geschäftlich' || r.bereich.toLowerCase().includes('gesch') ? 'Geschäftlich' : 'Privat',
         cat:        r.cat || '',
         paid:       r.bezahlt,
-        notes:      r.notiz,
+        note:       r.notiz,
       });
       await notionCreate(DB.BUCHUNGEN, props);
       done++;
@@ -9561,23 +10455,11 @@ async function csvExecuteImport() {
   }
 
   // Refresh store
-  try { await syncDB('buchungen'); renderAll(); } catch(_) {}
+  try { await deltaSync(); renderAll(); } catch(_) {}
 
   document.getElementById('csvResultIcon').textContent  = failed === 0 ? '✅' : '⚠️';
   document.getElementById('csvResultTitle').textContent = failed === 0 ? 'Import abgeschlossen' : 'Import mit Fehlern';
   document.getElementById('csvResultBody').innerHTML    =
     `<strong style="color:var(--green)">${done} Buchungen</strong> erfolgreich importiert.` +
     (failed ? `<br><span style="color:var(--amber)">${failed} konnten nicht importiert werden.</span>` : '') +
-    '<br><br>Tipp: Prüfe importierte Buchungen und ergänze fehlende Kategorien.';
-}
-
-/* ── Screen 2→3 transition ── */
-const _csvGoToScreen_orig = csvGoToScreen;
-/* Override to run csvBuildParsedRows when going to screen 3 */
-window.csvGoToScreen = function(n) {
-  if (n === 3) csvBuildParsedRows();
-  _csvGoToScreen_orig(n);
-};
-</script>
-</body>
-</html>
+    '<br><br>Tipp: Prüfe importierte Buchungen und ergänze fehlende Katego
