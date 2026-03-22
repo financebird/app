@@ -1307,8 +1307,8 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
 
       <div style="margin-top:16px;font-size:12px;color:var(--muted);line-height:1.7">
         Noch keinen Key?
-        <a href="/cdn-cgi/l/email-protection#b6ded3dadad9f6d9c5c1d7dad2ddd9d3d8dfd198d5de" style="color:var(--accent);text-decoration:none">
-          <span class="__cf_email__" data-cfemail="e38b868f8f8ca38c9094828f87888c868d8a84cd808b">[email&#160;protected]</span>
+        <a href="mailto:hello@oswaldkoenig.ch" style="color:var(--accent);text-decoration:none">
+          hello@oswaldkoenig.ch
         </a><br>
         <span style="font-size:11px">Jederzeit in den Einstellungen änderbar.</span>
       </div>
@@ -1635,7 +1635,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <div class="sidebar-item" data-tab="einstellungen" onclick="nav('einstellungen')"><span class="nav-icon">🦤</span> Einstellungen</div>
     </nav>
     <div class="sidebar-footer">
-      <a class="sidebar-contact" href="/cdn-cgi/l/email-protection#b7dfd2dbdbd8f7d8c4c0d6dbd3dcd8d2d9ded099d4df">
+      <a class="sidebar-contact" href="mailto:hello@oswaldkoenig.ch">
         <span>✉</span> Kontakt
       </a>
     </div>
@@ -2123,7 +2123,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <div class="toast-action" id="toastAction" style="display:none"></div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 'use strict';
 /* ═══════════════════════════════════════════════════════════════
    FINANCEBIRD v2
@@ -2375,7 +2375,7 @@ const Auth = {
    * Shared Secret für Worker-Requests (Spam-Filter, nicht Security).
    * Muss mit FB_SHARED_SECRET im Worker übereinstimmen.
    */
-  FB_SHARED_SECRET: 'CTZD1R7kJ9kZ', // ← in Production durch sicheren Wert ersetzen
+  FB_SHARED_SECRET: 'nkcHwG5FRkNW0y6pdaRLmtyQ4EsN3bUw', // ← in Production durch sicheren Wert ersetzen
 
   /**
    * Zentraler Proxy-Worker (Worker A) — CORS-Proxy zu Notion.
@@ -10462,4 +10462,16 @@ async function csvExecuteImport() {
   document.getElementById('csvResultBody').innerHTML    =
     `<strong style="color:var(--green)">${done} Buchungen</strong> erfolgreich importiert.` +
     (failed ? `<br><span style="color:var(--amber)">${failed} konnten nicht importiert werden.</span>` : '') +
-    '<br><br>Tipp: Prüfe importierte Buchungen und ergänze fehlende Katego
+    '<br><br>Tipp: Prüfe importierte Buchungen und ergänze fehlende Kategorien.';
+}
+
+/* ── Screen 2→3 transition ── */
+const _csvGoToScreen_orig = csvGoToScreen;
+/* Override to run csvBuildParsedRows when going to screen 3 */
+window.csvGoToScreen = function(n) {
+  if (n === 3) csvBuildParsedRows();
+  _csvGoToScreen_orig(n);
+};
+</script>
+</body>
+</html>
