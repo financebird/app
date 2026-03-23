@@ -1402,7 +1402,14 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       </div>
       <div style="margin-top:10px">
         <div style="display:flex;gap:4px">
-          ${Array.from({length:9},(_,i)=>`<div class="quiz-dot" id="quizDot${i}"></div>`).join('')}
+          <div class="quiz-dot" id="quizDot0"></div>
+          <div class="quiz-dot" id="quizDot1"></div>
+          <div class="quiz-dot" id="quizDot2"></div>
+          <div class="quiz-dot" id="quizDot3"></div>
+          <div class="quiz-dot" id="quizDot4"></div>
+          <div class="quiz-dot" id="quizDot5"></div>
+          <div class="quiz-dot" id="quizDot6"></div>
+          <div class="quiz-dot" id="quizDot7"></div>
         </div>
       </div>
     </div>
@@ -2656,6 +2663,8 @@ const Auth = {
         }
       } catch (e) {
         console.warn('DB setup failed:', e.message);
+        showToast('warning', '⚠️', 'Datenbank-Setup fehlgeschlagen',
+          'Die Datenbanken konnten nicht erstellt werden. Bitte prüfe die Notion-Verbindung.');
       }
       hideLoading();
     }
@@ -9120,16 +9129,39 @@ async function onboardFinish() {
   applyQuizConfig();
   document.getElementById('setupScreen').style.display = 'none';
   document.getElementById('mainApp').style.display     = 'block';
-  saveLocal('fb_onboard_complete', true);
   nav('cockpit');
   showLoading('Lade deine Daten…');
   try {
-    await fullSync();
-    renderAll();
-    InboxEngine.updateBadge();
-    setTimeout(() => renderCockpitRecommendations(), 600);
+    // If DBs not yet configured, try discovery/creation one more time
+    if (!dbsConfigured()) {
+      showLoading('Datenbanken einrichten…');
+      const { found, missing } = await discoverDatabases();
+      if (missing.length > 0) {
+        const parentPageId = await findSharedParentPage();
+        if (parentPageId) {
+          showLoading('Erstelle Datenbanken…');
+          await createMissingDatabases(parentPageId, missing);
+        }
+      }
+    }
+    if (dbsConfigured()) {
+      saveLocal('fb_onboard_complete', true);
+      await fullSync();
+      renderAll();
+      InboxEngine.updateBadge();
+      setTimeout(() => renderCockpitRecommendations(), 600);
+    } else {
+      // DBs still not configured — show actionable error
+      saveLocal('fb_onboard_complete', false);
+      showToast('error', '⚠️', 'Datenbanken konnten nicht erstellt werden',
+        'Bitte stelle sicher dass du in Notion mindestens eine Seite mit FinanceBird geteilt hast. Gehe zu Einstellungen → Neu verbinden.');
+      setAppStatus('error', 'Datenbanken fehlen — bitte Notion-Verbindung prüfen');
+    }
   } catch (e) {
+    console.error('onboardFinish error:', e);
     setAppStatus('error', t('app.error'));
+  } finally {
+    hideLoading();
   }
   hideSplashOnce();
 }
@@ -9931,11 +9963,31 @@ function renderEinstellungen() {
     window.addEventListener('online',  () => { setAppStatus('idle', t('app.connected')); flushQueue(); });
 
     if (onboardDone) {
-      // 7. Show cached data immediately
+      // 7. Check if DBs are missing (repair flow)
+      if (!dbsConfigured()) {
+        showLoading('Datenbanken einrichten…');
+        try {
+          const { found, missing } = await discoverDatabases();
+          if (missing.length > 0) {
+            const parentPageId = await findSharedParentPage();
+            if (parentPageId) {
+              await createMissingDatabases(parentPageId, missing);
+            }
+          }
+        } catch (e) {
+          console.warn('DB repair failed:', e.message);
+        }
+        hideLoading();
+        if (!dbsConfigured()) {
+          showToast('error', '⚠️', 'Notion-Datenbanken fehlen',
+            'Gehe zu Einstellungen → Neu verbinden und teile mindestens eine Seite.');
+        }
+      }
+      // 8. Show cached data immediately
       renderAll();
-      // 8. Splash hides after first render
+      // 9. Splash hides after first render
       setTimeout(hideSplashOnce, 800);
-      // 9. Background sync
+      // 10. Background sync
       setTimeout(async () => {
         try {
           await deltaSync();
