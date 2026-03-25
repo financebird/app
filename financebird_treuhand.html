@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinanceBird · Treuhänder-Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Courier+Prime&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf8f5; --paper: #ffffff; --bg2: #f5f2ed; --border: #e8e2d9;
+  --ink: #2c2520; --ink2: #5a4f44; --muted: #8a7a65;
+  --accent: #c4441a; --accent-light: #fdf0ec;
+  --green: #228b22; --amber: #d97706; --red: #dc2626; --sky: #2563eb;
+  --font-head: 'Cormorant Garamond', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-num: 'Libre Baskerville', serif;
+  --font-label: 'Courier Prime', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.5; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.logo { font-family: var(--font-head); font-size: 24px; font-weight: 600; }
+.logo em { color: var(--accent); font-style: italic; }
+.label { font-family: var(--font-label); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* Cards */
+.card { background: var(--paper); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi { background: var(--paper); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+.kpi-val { font-family: var(--font-num); font-size: 28px; font-weight: 700; margin-bottom: 2px; }
+.kpi-label { font-size: 12px; color: var(--muted); }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { text-align: left; padding: 8px 10px; font-size: 11px; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--border); white-space: nowrap; }
+tbody td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+tbody tr:hover { background: var(--bg2); }
+.amt { font-family: var(--font-num); font-weight: 600; text-align: right; white-space: nowrap; }
+.pos { color: var(--green); } .neg { color: var(--red); }
+.tag { font-size: 10px; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+.tag.income { background: #e8f5e9; color: var(--green); }
+.tag.expense { background: #ffebee; color: var(--red); }
+.status-vorgeschlagen { color: var(--muted); } .status-bestaetigt { color: var(--green); }
+.status-flagged { color: var(--amber); } .status-validiert { color: var(--sky); }
+
+/* Buttons */
+.btn { display: inline-block; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: var(--font-body); transition: .15s; }
+.btn-primary { background: var(--accent); color: white; } .btn-primary:hover { opacity: .9; }
+.btn-outline { background: none; border: 1.5px solid var(--border); color: var(--ink2); } .btn-outline:hover { border-color: var(--accent); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-success { background: var(--green); color: white; }
+.btn-sky { background: var(--sky); color: white; }
+
+/* Filter bar */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
+.filter-bar select, .filter-bar input { padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 12px; font-family: var(--font-body); background: var(--paper); }
+
+/* Auth */
+.auth-screen { display: flex; align-items: center; justify-content: center; min-height: 80vh; }
+.auth-card { background: var(--paper); border: 1px solid var(--border); border-radius: 16px; padding: 32px; max-width: 420px; text-align: center; }
+
+/* Score ring */
+.score-wrap { display: flex; align-items: center; gap: 16px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Auth Screen -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="logo" style="margin-bottom:4px">Finance<em>Bird</em></div>
+      <div class="label" style="margin-bottom:24px">TREUHÄNDER-DASHBOARD</div>
+
+      <div id="authPairing">
+        <h2 style="font-family:var(--font-head);font-size:20px;font-weight:600;margin-bottom:8px">Zugang via Kopplungscode</h2>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Gib den 6-stelligen Code ein, den du vom Kunden erhalten hast.</p>
+        <input type="text" id="authCodeInput" placeholder="ABC123" maxlength="6"
+          style="text-align:center;font-family:var(--font-label);font-size:24px;letter-spacing:.15em;text-transform:uppercase;padding:14px;width:100%;border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px"
+          autocomplete="off">
+        <div id="authError" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:12px"></div>
+        <button class="btn btn-primary" style="width:100%;padding:12px" onclick="authClaim()">Verbinden</button>
+      </div>
+
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Oder: Direkter Token-Zugang</div>
+        <input type="password" id="authTokenInput" placeholder="Notion Token (ntn_…)"
+          style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:8px">
+        <input type="text" id="authLicenseInput" placeholder="Lizenz-Key (LK-…)"
+          style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:8px;font-family:var(--font-label);text-transform:uppercase">
+        <button class="btn btn-outline" style="width:100%" onclick="authDirect()">Mit Token verbinden</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard (hidden until auth) -->
+  <div id="dashboard" style="display:none">
+    <div class="header">
+      <div>
+        <div class="logo">Finance<em>Bird</em></div>
+        <div class="label">TREUHÄNDER-DASHBOARD</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-outline btn-sm" onclick="refreshData()">🔄 Aktualisieren</button>
+        <button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 CSV Export</button>
+        <button class="btn btn-outline btn-sm" style="color:var(--muted)" onclick="trLogout()">Abmelden</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <!-- Filters -->
+    <div class="filter-bar" id="filterBar"></div>
+
+    <!-- Bulk Actions -->
+    <div id="bulkBar" style="display:none;margin-bottom:12px;padding:10px 14px;background:var(--accent-light);border-radius:10px;display:flex;align-items:center;gap:10px">
+      <span id="bulkCount" style="font-size:13px;font-weight:600"></span>
+      <button class="btn btn-success btn-sm" onclick="bulkValidate()">✓ Alle validieren</button>
+      <button class="btn btn-outline btn-sm" onclick="bulkClear()">Auswahl aufheben</button>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination / Status -->
+    <div id="statusBar" style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   FinanceBird Treuhänder-Dashboard
+   Standalone — uses Worker A for Notion access
+   ══════════════════════════════════════════════════════ */
+
+const WORKER_A = 'https://financebird-proxy.holy-forest-0174.workers.dev/v1';
+const WORKER_B = 'https://financebird-auth.holy-forest-0174.workers.dev';
+
+const CATEGORIES_20 = [
+  'Umsatzerlöse','Übrige betriebliche Erträge','Zins- & Finanzerträge',
+  'Material & Waren','Fremdleistungen','Löhne & Gehälter','Sozialabgaben (Mitarbeitende)',
+  'Eigene Sozialversicherung','Abschreibungen & GWG','Miete & Pacht',
+  'Nebenkosten & Liegenschaft','Fahrzeug & Transport','Reise & Spesen',
+  'Kommunikation','Büro & IT','Versicherungen','Werbung & Marketing',
+  'Beratung & Recht','Zins- & Bankgebühren','Übriger Betriebsaufwand',
+];
+
+let state = {
+  token: null,
+  licenseKey: null,
+  dbIds: null,
+  buchungen: [],
+  treuhName: localStorage.getItem('fb_tr_name') || 'Treuhänder',
+  filter: { month: '', cat: '', status: '', search: '' },
+  selected: new Set(),
+  sort: { key: 'date', dir: 'desc' },
+};
+
+/* ── Auth ── */
+
+function authClaim() {
+  const code = (document.getElementById('authCodeInput').value || '').trim().toUpperCase();
+  const err = document.getElementById('authError');
+  if (code.length !== 6) { err.textContent = 'Bitte 6-stelligen Code eingeben'; return; }
+  err.textContent = 'Verbinde…';
+  fetch(WORKER_B + '/device/claim', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, role: 'treuhand' })
+  }).then(r => r.json()).then(data => {
+    if (data.success && data.token) {
+      state.token = data.token;
+      state.licenseKey = data.licenseKey || null;
+      localStorage.setItem('fb_tr_token', data.token);
+      if (data.licenseKey) localStorage.setItem('fb_tr_license', data.licenseKey);
+      showDashboard();
+    } else {
+      err.textContent = data.error || 'Code ungültig oder abgelaufen';
+    }
+  }).catch(e => { err.textContent = 'Fehler: ' + e.message; });
+}
+
+function authDirect() {
+  const token = document.getElementById('authTokenInput').value.trim();
+  const lk = document.getElementById('authLicenseInput').value.trim().toUpperCase();
+  if (!token) { alert('Bitte Token eingeben'); return; }
+  state.token = token;
+  state.licenseKey = lk || null;
+  localStorage.setItem('fb_tr_token', token);
+  if (lk) localStorage.setItem('fb_tr_license', lk);
+  showDashboard();
+}
+
+function trLogout() {
+  localStorage.removeItem('fb_tr_token');
+  localStorage.removeItem('fb_tr_license');
+  localStorage.removeItem('fb_tr_db_ids');
+  state.token = null;
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+/* ── Notion API ── */
+
+async function notionFetch(path, method = 'GET', body = null) {
+  const headers = {
+    'Authorization': 'Bearer ' + state.token,
+    'Notion-Version': '2022-06-28',
+    'Content-Type': 'application/json',
+    'X-FB-Key': 'financebird-shared-secret-2025',
+  };
+  if (state.licenseKey) headers['X-FB-License'] = state.licenseKey;
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  const resp = await fetch(WORKER_A + path, opts);
+  if (!resp.ok) throw new Error(`Notion ${resp.status}: ${resp.statusText}`);
+  return resp.json();
+}
+
+async function discoverDatabases() {
+  const resp = await notionFetch('/search', 'POST', {
+    filter: { property: 'object', value: 'database' }
+  });
+  const dbs = {};
+  for (const db of (resp.results || [])) {
+    const title = db.title?.map(t => t.plain_text).join('') || '';
+    if (title.includes('FB · Buchungen')) dbs.BUCHUNGEN = db.id;
+    if (title.includes('FB · Konten'))    dbs.KONTEN = db.id;
+  }
+  state.dbIds = dbs;
+  localStorage.setItem('fb_tr_db_ids', JSON.stringify(dbs));
+  return dbs;
+}
+
+async function fetchAllBuchungen() {
+  if (!state.dbIds?.BUCHUNGEN) return [];
+  let all = [], cursor = undefined;
+  do {
+    const body = { page_size: 100 };
+    if (cursor) body.start_cursor = cursor;
+    const resp = await notionFetch(`/databases/${state.dbIds.BUCHUNGEN}/query`, 'POST', body);
+    all = all.concat(resp.results || []);
+    cursor = resp.has_more ? resp.next_cursor : null;
+  } while (cursor);
+  return all.map(parseBuchung);
+}
+
+function parseBuchung(page) {
+  const p = page.properties;
+  const txt = prop => prop?.rich_text?.[0]?.plain_text || '';
+  const sel = prop => prop?.select?.name || '';
+  const num = prop => prop?.number ?? null;
+  const dat = prop => prop?.date?.start || '';
+  return {
+    _id: page.id, _url: page.url, _edited: page.last_edited_time,
+    date: dat(p['Datum']), desc: txt(p['Beschreibung']), counterpart: txt(p['Gegenpartei']),
+    type: sel(p['Typ']), bereich: sel(p['Bereich']), cat: sel(p['Kategorie']),
+    amount: num(p['Betrag']), account: sel(p['Konto']), paid: p['Bezahlt']?.checkbox || false,
+    note: txt(p['Notiz']), projekt: txt(p['Projekt']),
+    receiptLink: p['Beleg-Link']?.url || null,
+    mwstSatz: num(p['MWST-Satz']), mwstBetrag: num(p['MWST-Betrag']),
+    nettoBetrag: num(p['Nettobetrag']), steuerformular: txt(p['Steuerformular']),
+    categoryStatus: sel(p['Kategorie-Status']), teilabzug: num(p['Teilabzug']),
+    korrekturKat: sel(p['Korrektur-Kategorie']), korrekturVon: txt(p['Korrektur-Von']),
+  };
+}
+
+/* ── Dashboard ── */
+
+async function showDashboard() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('dashboard').style.display = '';
+  document.getElementById('statusBar').textContent = 'Lade Daten…';
+  try {
+    if (!state.dbIds) {
+      const saved = localStorage.getItem('fb_tr_db_ids');
+      state.dbIds = saved ? JSON.parse(saved) : null;
+    }
+    if (!state.dbIds?.BUCHUNGEN) await discoverDatabases();
+    if (!state.dbIds?.BUCHUNGEN) { document.getElementById('statusBar').textContent = '⚠️ Buchungen-DB nicht gefunden'; return; }
+    state.buchungen = await fetchAllBuchungen();
+    render();
+    document.getElementById('statusBar').textContent = `${state.buchungen.length} Buchungen geladen · ${new Date().toLocaleTimeString('de-CH')}`;
+  } catch (e) {
+    document.getElementById('statusBar').textContent = '❌ ' + e.message;
+  }
+}
+
+async function refreshData() {
+  document.getElementById('statusBar').textContent = 'Aktualisiere…';
+  try {
+    state.buchungen = await fetchAllBuchungen();
+    render();
+    document.getElementById('statusBar').textContent = `${state.buchungen.length} Buchungen · ${new Date().toLocaleTimeString('de-CH')}`;
+  } catch (e) {
+    document.getElementById('statusBar').textContent = '❌ ' + e.message;
+  }
+}
+
+function render() {
+  renderKPIs();
+  renderFilters();
+  renderTable();
+}
+
+/* ── KPIs ── */
+
+function renderKPIs() {
+  const b = state.buchungen;
+  const biz = b.filter(x => x.bereich === 'Geschäftlich');
+  const yr = new Date().getFullYear();
+  const thisYear = b.filter(x => x.date?.startsWith(yr));
+  const thisMonth = b.filter(x => x.date?.startsWith(new Date().toISOString().slice(0,7)));
+  const reviewCount = biz.filter(x => x.categoryStatus === 'vorgeschlagen').length;
+  const flaggedCount = biz.filter(x => x.categoryStatus === 'flagged').length;
+
+  // Tax readiness score
+  const total = biz.length || 1;
+  const cat = biz.filter(x => x.categoryStatus === 'bestätigt' || x.categoryStatus === 'validiert').length / total;
+  const doc = biz.filter(x => x.amount < 100 || x.receiptLink).length / total;
+  const score = Math.round(cat * 40 + doc * 30 + 30); // simplified
+
+  const color = score < 50 ? 'var(--red)' : score < 80 ? 'var(--amber)' : 'var(--green)';
+  const r = 36, circ = 2 * Math.PI * r, offset = circ * (1 - score / 100);
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi">
+      <svg width="80" height="80" viewBox="0 0 80 80" style="display:block;margin:0 auto 4px">
+        <circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--border)" stroke-width="5"/>
+        <circle cx="40" cy="40" r="${r}" fill="none" stroke="${color}" stroke-width="5"
+          stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"
+          transform="rotate(-90 40 40)"/>
+        <text x="40" y="42" text-anchor="middle" dominant-baseline="central"
+          style="font-family:var(--font-num);font-size:18px;font-weight:700;fill:var(--ink)">${score}%</text>
+      </svg>
+      <div class="kpi-label">Steuerbereit</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">${b.length}</div>
+      <div class="kpi-label">Buchungen gesamt</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">${thisYear.length}</div>
+      <div class="kpi-label">Dieses Jahr</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">${thisMonth.length}</div>
+      <div class="kpi-label">Dieser Monat</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--amber)">${reviewCount}</div>
+      <div class="kpi-label">Zu prüfen</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--red)">${flaggedCount}</div>
+      <div class="kpi-label">Flagged</div>
+    </div>`;
+}
+
+/* ── Filters ── */
+
+function renderFilters() {
+  const months = [...new Set(state.buchungen.map(b => b.date?.slice(0,7)).filter(Boolean))].sort().reverse();
+  const cats = [...new Set(state.buchungen.map(b => b.cat).filter(Boolean))].sort();
+  const f = state.filter;
+  document.getElementById('filterBar').innerHTML = `
+    <select onchange="state.filter.month=this.value;renderTable()">
+      <option value="">Alle Monate</option>
+      ${months.map(m => `<option value="${m}" ${f.month===m?'selected':''}>${m}</option>`).join('')}
+    </select>
+    <select onchange="state.filter.cat=this.value;renderTable()">
+      <option value="">Alle Kategorien</option>
+      ${cats.map(c => `<option value="${c}" ${f.cat===c?'selected':''}>${c}</option>`).join('')}
+    </select>
+    <select onchange="state.filter.status=this.value;renderTable()">
+      <option value="">Alle Status</option>
+      <option value="vorgeschlagen" ${f.status==='vorgeschlagen'?'selected':''}>Vorgeschlagen</option>
+      <option value="bestätigt" ${f.status==='bestätigt'?'selected':''}>Bestätigt</option>
+      <option value="flagged" ${f.status==='flagged'?'selected':''}>Flagged</option>
+      <option value="validiert" ${f.status==='validiert'?'selected':''}>Validiert</option>
+    </select>
+    <input type="text" placeholder="🔍 Suchen…" value="${f.search}" oninput="state.filter.search=this.value;renderTable()" style="min-width:160px">
+    <button class="btn btn-outline btn-sm" onclick="state.filter={month:'',cat:'',status:'',search:''};renderFilters();renderTable()">✕ Reset</button>`;
+}
+
+/* ── Table ── */
+
+function getFiltered() {
+  const f = state.filter;
+  return state.buchungen.filter(b => {
+    if (f.month  && !b.date?.startsWith(f.month)) return false;
+    if (f.cat    && b.cat !== f.cat) return false;
+    if (f.status && b.categoryStatus !== f.status) return false;
+    if (f.search) {
+      const q = f.search.toLowerCase();
+      if (!(b.desc||'').toLowerCase().includes(q) && !(b.counterpart||'').toLowerCase().includes(q) && !(b.cat||'').toLowerCase().includes(q)) return false;
+    }
+    return true;
+  }).sort((a, b) => {
+    const k = state.sort.key;
+    const dir = state.sort.dir === 'asc' ? 1 : -1;
+    if (k === 'amount') return ((a.amount||0) - (b.amount||0)) * dir;
+    if (k === 'status') return (a.categoryStatus||'').localeCompare(b.categoryStatus||'') * dir;
+    return (a[k]||'').localeCompare(b[k]||'') * dir;
+  });
+}
+
+function renderTable() {
+  const filtered = getFiltered();
+  document.getElementById('tableHead').innerHTML = `<tr>
+    <th><input type="checkbox" onchange="toggleAllSelect(this.checked)"></th>
+    <th style="cursor:pointer" onclick="sortBy('date')">Datum</th>
+    <th>Beschreibung</th><th>Gegenpartei</th><th>Typ</th>
+    <th style="cursor:pointer" onclick="sortBy('cat')">Kategorie</th>
+    <th>Steuerformular</th>
+    <th style="cursor:pointer" onclick="sortBy('status')">Status</th>
+    <th style="cursor:pointer" onclick="sortBy('amount')">Betrag</th>
+    <th>Beleg</th><th>Aktionen</th>
+  </tr>`;
+
+  document.getElementById('tableBody').innerHTML = filtered.map(b => `<tr>
+    <td><input type="checkbox" ${state.selected.has(b._id)?'checked':''} onchange="toggleSelect('${b._id}',this.checked)"></td>
+    <td style="font-size:12px;color:var(--muted);white-space:nowrap">${b.date || '—'}</td>
+    <td><a href="${b._url||'#'}" target="_blank" style="color:inherit;text-decoration:none">${esc(b.desc||'—')}</a></td>
+    <td style="font-size:12px;color:var(--muted)">${esc(b.counterpart||'—')}</td>
+    <td><span class="tag ${b.type==='Einnahme'?'income':'expense'}">${b.type||'—'}</span></td>
+    <td style="font-size:12px">${esc(b.cat||'—')}</td>
+    <td style="font-size:11px;color:var(--muted)">${esc(b.steuerformular||'—')}</td>
+    <td><span class="status-${(b.categoryStatus||'').replace('ä','ae')}">${b.categoryStatus||'—'}</span></td>
+    <td class="amt ${b.type==='Einnahme'?'pos':'neg'}">${b.type==='Einnahme'?'+':'−'}${(b.amount||0).toFixed(2)}</td>
+    <td>${b.receiptLink ? '<a href="'+b.receiptLink+'" target="_blank">📄</a>' : '—'}</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-success btn-sm" onclick="validateOne('${b._id}')" title="Validieren">✓</button>
+      <button class="btn btn-outline btn-sm" onclick="correctOne('${b._id}')" title="Korrigieren">✏️</button>
+      <button class="btn btn-outline btn-sm" onclick="annotateOne('${b._id}')" title="Notiz">💬</button>
+    </td>
+  </tr>`).join('');
+
+  updateBulkBar();
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function sortBy(key) {
+  if (state.sort.key === key) state.sort.dir = state.sort.dir === 'asc' ? 'desc' : 'asc';
+  else { state.sort.key = key; state.sort.dir = 'desc'; }
+  renderTable();
+}
+
+/* ── Selection ── */
+
+function toggleSelect(id, checked) {
+  if (checked) state.selected.add(id); else state.selected.delete(id);
+  updateBulkBar();
+}
+function toggleAllSelect(checked) {
+  const ids = getFiltered().map(b => b._id);
+  ids.forEach(id => checked ? state.selected.add(id) : state.selected.delete(id));
+  renderTable();
+}
+function updateBulkBar() {
+  const bar = document.getElementById('bulkBar');
+  if (state.selected.size > 0) {
+    bar.style.display = 'flex';
+    document.getElementById('bulkCount').textContent = state.selected.size + ' ausgewählt';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+function bulkClear() { state.selected.clear(); renderTable(); }
+
+/* ── Actions ── */
+
+async function validateOne(id) {
+  try {
+    await notionFetch(`/pages/${id}`, 'PATCH', { properties: {
+      'Kategorie-Status': { select: { name: 'validiert' } }
+    }});
+    const b = state.buchungen.find(x => x._id === id);
+    if (b) b.categoryStatus = 'validiert';
+    renderTable(); renderKPIs();
+  } catch (e) { alert('Fehler: ' + e.message); }
+}
+
+async function bulkValidate() {
+  const ids = [...state.selected];
+  for (const id of ids) {
+    try {
+      await notionFetch(`/pages/${id}`, 'PATCH', { properties: {
+        'Kategorie-Status': { select: { name: 'validiert' } }
+      }});
+      const b = state.buchungen.find(x => x._id === id);
+      if (b) b.categoryStatus = 'validiert';
+    } catch (e) { console.warn('Bulk validate failed:', id, e.message); }
+  }
+  state.selected.clear();
+  render();
+}
+
+async function correctOne(id) {
+  const b = state.buchungen.find(x => x._id === id);
+  const cat = prompt('Korrekte Kategorie wählen:\n\n' + CATEGORIES_20.map((c,i) => (i+1)+'. '+c).join('\n') + '\n\nNummer eingeben:', '');
+  if (!cat) return;
+  const idx = parseInt(cat) - 1;
+  if (idx < 0 || idx >= CATEGORIES_20.length) { alert('Ungültige Nummer'); return; }
+  const corrCat = CATEGORIES_20[idx];
+  try {
+    await notionFetch(`/pages/${id}`, 'PATCH', { properties: {
+      'Korrektur-Kategorie': { select: { name: corrCat } },
+      'Korrektur-Von': { rich_text: [{ text: { content: state.treuhName } }] },
+      'Korrektur-Datum': { date: { start: new Date().toISOString().slice(0,10) } },
+    }});
+    if (b) { b.korrekturKat = corrCat; b.korrekturVon = state.treuhName; }
+    renderTable();
+    alert('Korrekturvorschlag gespeichert: ' + corrCat);
+  } catch (e) { alert('Fehler: ' + e.message); }
+}
+
+async function annotateOne(id) {
+  const b = state.buchungen.find(x => x._id === id);
+  const note = prompt('Notiz hinzufügen:', b?.note || '');
+  if (note === null) return;
+  try {
+    await notionFetch(`/pages/${id}`, 'PATCH', { properties: {
+      'Notiz': { rich_text: [{ text: { content: note } }] }
+    }});
+    if (b) b.note = note;
+    alert('Notiz gespeichert');
+  } catch (e) { alert('Fehler: ' + e.message); }
+}
+
+/* ── Export ── */
+
+function exportCSV() {
+  const filtered = getFiltered();
+  const headers = ['Datum','Beschreibung','Gegenpartei','Typ','Bereich','Kategorie','Steuerformular','Betrag','Netto','MWST-Betrag','MWST-Satz','Konto','Status','Beleg','Notiz'];
+  const rows = filtered.map(b => [
+    b.date, b.desc, b.counterpart, b.type, b.bereich, b.cat, b.steuerformular,
+    b.amount, b.nettoBetrag, b.mwstBetrag, b.mwstSatz ? (b.mwstSatz*100).toFixed(1)+'%' : '',
+    b.account, b.categoryStatus, b.receiptLink||'', b.note
+  ].map(v => '"'+(v??'').toString().replace(/"/g,'""')+'"').join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'financebird_buchungen_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+/* ── Init ── */
+
+(function init() {
+  const saved = localStorage.getItem('fb_tr_token');
+  if (saved) {
+    state.token = saved;
+    state.licenseKey = localStorage.getItem('fb_tr_license') || null;
+    showDashboard();
+  }
+  // Ask for treuhänder name on first use
+  if (!localStorage.getItem('fb_tr_name')) {
+    const name = prompt('Dein Name (für Korrektur-Kommentare):', 'Treuhänder');
+    if (name) { state.treuhName = name; localStorage.setItem('fb_tr_name', name); }
+  }
+})();
+</script>
+</body>
+</html>

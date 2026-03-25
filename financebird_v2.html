@@ -1038,28 +1038,40 @@ body.dark .inbox-card.overdue { background: rgba(200,146,42,.07); }
 }
 .worker-step-done-btn:hover { background: var(--green); color: white; }
 
-/* Quiz */
-.quiz-question {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px; font-weight: 600; margin-bottom: 16px; color: var(--ink);
-  line-height: 1.3;
+/* Onboarding (Session 3) */
+.onboard-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.onboard-chip {
+  padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 20px;
+  font-size: 13px; cursor: pointer; transition: all .2s; background: var(--paper);
+  color: var(--ink2); user-select: none;
 }
-.quiz-options { display: flex; flex-direction: column; gap: 8px; }
-.quiz-option {
-  padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border);
-  background: var(--paper); color: var(--ink2); font-size: 14px;
-  cursor: pointer; text-align: left; font-family: inherit;
-  transition: all .12s;
+.onboard-chip:hover { border-color: var(--accent); background: var(--accent-light); }
+.onboard-chip.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
+.onboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.onboard-tile {
+  border: 1.5px solid var(--border); border-radius: 12px; padding: 16px;
+  cursor: pointer; transition: all .2s; text-align: center;
 }
-.quiz-option:hover    { border-color: var(--accent); background: var(--accent-light); }
-.quiz-option.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
-.quiz-dots { display: flex; gap: 6px; justify-content: center; }
-.quiz-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--border); transition: background .2s;
-}
-.quiz-dot.active   { background: var(--accent); }
-.quiz-dot.done     { background: var(--green); }
+.onboard-tile:hover { border-color: var(--accent); }
+.onboard-tile.required { border-color: var(--accent); border-width: 2px; }
+.onboard-tile.connected { border-color: var(--green); background: rgba(34,139,34,.05); }
+.onboard-tile .tile-icon { font-size: 24px; margin-bottom: 6px; }
+.onboard-tile .tile-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+.onboard-tile .tile-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.onboard-dots { display: flex; gap: 6px; justify-content: center; margin-top: 14px; }
+.onboard-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+.onboard-dot.active { background: var(--accent); }
+.onboard-dot.done { background: var(--green); }
+.onboard-summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.onboard-summary-row:last-child { border-bottom: none; }
+.onboard-summary-label { color: var(--muted); }
+.onboard-summary-value { font-weight: 600; color: var(--ink); }
+
+/* Kategorie-Status (Session 3) */
+.cat-status-vorgeschlagen { color: var(--muted); border-left: 2px dashed var(--border); padding-left: 6px; }
+.cat-status-bestaetigt    { color: var(--ink); border-left: 2px solid var(--green); padding-left: 6px; }
+.cat-status-flagged       { color: var(--ink); border-left: 2px solid var(--amber); padding-left: 6px; }
+.cat-status-validiert     { color: var(--ink); border-left: 2px solid var(--sky); padding-left: 6px; }
 
 /* Cockpit recommendations (E5) */
 .cockpit-rec {
@@ -1304,8 +1316,23 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       </div>
 
       <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('welcome','license')">
-        Einrichten →
+        Neu einrichten →
       </button>
+      <div style="margin-top:14px;text-align:center">
+        <button class="btn btn-outline" style="font-size:13px;padding:10px 20px"
+          onclick="document.getElementById('welcomePairingWrap').style.display=document.getElementById('welcomePairingWrap').style.display==='none'?'':'none'">
+          Neues Gerät koppeln
+        </button>
+        <div id="welcomePairingWrap" style="display:none;margin-top:12px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px">6-stelligen Kopplungscode eingeben:</div>
+          <input type="text" id="welcomePairingInput" class="form-input"
+            placeholder="ABC123" maxlength="6"
+            style="text-align:center;font-family:'Courier Prime',monospace;font-size:22px;letter-spacing:.15em;text-transform:uppercase;padding:12px;margin-bottom:8px"
+            autocomplete="off" autocorrect="off" spellcheck="false">
+          <button class="btn btn-primary" style="width:100%;padding:12px" onclick="claimPairingCode()">Verbinden</button>
+          <div id="welcomePairingError" style="color:var(--red);font-size:12px;min-height:18px;margin-top:6px"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1420,52 +1447,138 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
     </div>
   </div>
 
-  <!-- ── PHASE C: Schnell-Quiz (E4) ── -->
-  <div id="onboardQuiz" class="onboard-screen" style="display:none">
-    <div class="onboard-card" style="max-width:520px">
-      <div class="onboard-step-label">Schritt 3 von 3 — Kurze Fragen</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:6px">Kurz einrichten</h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">8 kurze Fragen — FinanceBird passt sich an wie du arbeitest.</p>
+  <!-- ══ SESSION 3: Neues Onboarding (5 Screens) ══ -->
 
-      <div id="quizContent"></div>
-
-      <div style="display:flex;gap:8px;margin-top:20px">
-        <button class="btn btn-outline" style="flex:1" onclick="quizBack()">← Zurück</button>
-        <button class="btn btn-primary" style="flex:1" id="quizNextBtn" onclick="quizNext()">Weiter →</button>
-      </div>
-      <div style="margin-top:10px">
-        <div style="display:flex;gap:4px">
-          <div class="quiz-dot" id="quizDot0"></div>
-          <div class="quiz-dot" id="quizDot1"></div>
-          <div class="quiz-dot" id="quizDot2"></div>
-          <div class="quiz-dot" id="quizDot3"></div>
-          <div class="quiz-dot" id="quizDot4"></div>
-          <div class="quiz-dot" id="quizDot5"></div>
-          <div class="quiz-dot" id="quizDot6"></div>
-          <div class="quiz-dot" id="quizDot7"></div>
-        </div>
+  <!-- ── Screen 0: Sprache ── -->
+  <div id="onboardLang" class="onboard-screen" style="display:none">
+    <div class="onboard-card" style="max-width:440px;text-align:center">
+      <div class="setup-logo" style="font-size:28px;margin-bottom:20px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:280px;margin:0 auto">
+        <button class="btn btn-primary" style="padding:16px;font-size:16px" onclick="obSetLang('de')">🇩🇪 Deutsch</button>
+        <button class="btn btn-outline" style="padding:16px;font-size:16px" onclick="obSetLang('en')">🇬🇧 English</button>
       </div>
     </div>
   </div>
 
-  <!-- ── PHASE D2: Steuer-Mapping bestätigen (Layer 2) ── -->
-  <div id="onboardTaxmap" class="onboard-screen" style="display:none">
-    <div class="onboard-card" style="max-width:520px">
-      <div class="onboard-step-label">Fast geschafft — Steuerkategorien</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:6px">Steuer-Mapping prüfen</h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-        So ordnet FinanceBird deine Ausgaben den Steuerkategorien zu. Jederzeit in Einstellungen anpassbar.
+  <!-- ── Screen 1: Land & Steuern ── -->
+  <div id="onboardCountry" class="onboard-screen" style="display:none">
+    <div class="onboard-card" style="max-width:480px">
+      <button class="onboard-back" onclick="onboardNext('country','lang')">← Zurück</button>
+      <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;text-align:center">
+        Das Setup dauert 2 Minuten. Alles ist nachher anpassbar.
+      </div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px;text-align:center" id="obCountryTitle">
+        In welchem Land ist deine Tätigkeit zu Hause?
+      </h2>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px;max-width:320px;margin-left:auto;margin-right:auto">
+        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obSetCountry('CH','CHF')">🇨🇭 Schweiz (CHF)</button>
+        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obSetCountry('DE','EUR')">🇩🇪 Deutschland (EUR)</button>
+        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obSetCountry('AT','EUR')">🇦🇹 Österreich (EUR)</button>
+        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obShowOtherCountry()">🌍 Anderes Land</button>
+      </div>
+      <div id="obOtherCountryWrap" style="display:none;margin-top:14px;max-width:320px;margin-left:auto;margin-right:auto">
+        <input type="text" id="obOtherCountryInput" class="form-input" placeholder="Land" style="margin-bottom:8px">
+        <select id="obOtherCurrencyInput" class="form-input" style="margin-bottom:8px">
+          <option value="CHF">CHF</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option>
+        </select>
+        <button class="btn btn-primary" style="width:100%;padding:12px" onclick="obSetCountry('OTHER',document.getElementById('obOtherCurrencyInput').value)">Weiter →</button>
+      </div>
+      <div class="onboard-dots"><div class="onboard-dot active"></div><div class="onboard-dot"></div><div class="onboard-dot"></div><div class="onboard-dot"></div></div>
+    </div>
+  </div>
+
+  <!-- ── Screen 2: Konten ── -->
+  <div id="onboardAccounts" class="onboard-screen" style="display:none">
+    <div class="onboard-card" style="max-width:480px">
+      <button class="onboard-back" onclick="onboardNext('accounts','country')">← Zurück</button>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px;text-align:center" id="obAccountsTitle">
+        Welche Konten nutzt du?
+      </h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;text-align:center" id="obAccountsSub">Wähle oder tippe eigene Namen ein.</p>
+      <div class="onboard-chips" id="obAccountChips" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <input type="text" id="obAccountCustom" class="form-input" placeholder="Eigenes Konto…" style="flex:1"
+          onkeydown="if(event.key==='Enter'){obAddCustomAccount();event.preventDefault()}">
+        <button class="btn btn-outline" onclick="obAddCustomAccount()" style="padding:8px 14px;white-space:nowrap">+ Hinzufügen</button>
+      </div>
+      <div id="obSelectedAccounts" style="font-size:12px;color:var(--muted);margin-bottom:14px"></div>
+      <button class="btn btn-primary" id="obAccountsNextBtn" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('accounts','integrations')" disabled>
+        Weiter →
+      </button>
+      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div><div class="onboard-dot"></div></div>
+    </div>
+  </div>
+
+  <!-- ── Screen 3: Verknüpfungen & Integrationen ── -->
+  <div id="onboardIntegrations" class="onboard-screen" style="display:none">
+    <div class="onboard-card" style="max-width:480px">
+      <button class="onboard-back" onclick="onboardNext('integrations','accounts')">← Zurück</button>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:4px;text-align:center" id="obIntTitle">
+        Verknüpfungen & Integrationen
+      </h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;text-align:center" id="obIntSub">
+        FinanceBird wird stärker mit jeder Verbindung. Du kannst alles auch später einrichten.
       </p>
-      <div id="taxMapConfirmRows" style="margin-bottom:20px"></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-outline" style="flex:1" onclick="onboardNext('taxmap','quiz')">← Zurück</button>
-        <button class="btn btn-primary" style="flex:1;padding:13px" onclick="onboardNext('taxmap','done')">
-          Sieht gut aus →
-        </button>
+      <div class="onboard-grid" id="obIntGrid">
+        <div class="onboard-tile required" id="obTileNotion" onclick="obConnectNotion()">
+          <div class="tile-icon">📊</div>
+          <div class="tile-label">Datenbank</div>
+          <div class="tile-sub">Notion (Pflicht)</div>
+        </div>
+        <div class="onboard-tile" id="obTileDrive" onclick="obConnectDrive()">
+          <div class="tile-icon">📎</div>
+          <div class="tile-label">Belege</div>
+          <div class="tile-sub">Google Drive</div>
+        </div>
+        <div class="onboard-tile" id="obTileClock" onclick="obConnectClockify()">
+          <div class="tile-icon">⏱</div>
+          <div class="tile-label">Zeit</div>
+          <div class="tile-sub">Clockify</div>
+        </div>
+        <div class="onboard-tile" id="obTileKi" onclick="obConnectKi()">
+          <div class="tile-icon">🤖</div>
+          <div class="tile-label">KI</div>
+          <div class="tile-sub">Beleg-Scan</div>
+        </div>
       </div>
-      <div style="margin-top:10px;text-align:center;font-size:11px;color:var(--muted)">
-        Kannst du jederzeit unter Einstellungen → Abschlüsse anpassen
+      <!-- Inline input areas (hidden by default) -->
+      <div id="obIntClockifyWrap" style="display:none;margin-top:12px">
+        <label class="form-label" style="font-size:12px">Clockify API Key</label>
+        <input type="password" id="obClockifyKey" class="form-input" placeholder="API Key aus Profile Settings" style="margin-bottom:6px">
+        <button class="btn btn-primary btn-sm" onclick="obSaveClockify()" style="width:100%">Speichern</button>
       </div>
+      <div id="obIntKiWrap" style="display:none;margin-top:12px">
+        <label class="form-label" style="font-size:12px">Claude API Key</label>
+        <input type="password" id="obKiKey" class="form-input" placeholder="sk-ant-…" style="margin-bottom:6px">
+        <button class="btn btn-primary btn-sm" onclick="obSaveKi()" style="width:100%">Speichern</button>
+      </div>
+      <button class="btn btn-primary" id="obIntNextBtn" style="width:100%;padding:14px;font-size:15px;margin-top:18px" onclick="obIntNext()">
+        Notion verbinden
+      </button>
+      <!-- Polling status (shown after OAuth) -->
+      <div id="obIntPolling" style="display:none;margin-top:14px;text-align:center;font-size:12px;color:var(--muted)">
+        <span id="obIntPollingStatus">Warte auf Notion-Verbindung…</span>
+      </div>
+      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div></div>
+    </div>
+  </div>
+
+  <!-- ── Screen 4: Übersicht ── -->
+  <div id="onboardSummary" class="onboard-screen" style="display:none">
+    <div class="onboard-card" style="max-width:480px">
+      <button class="onboard-back" onclick="onboardNext('summary','integrations')">← Zurück</button>
+      <div style="font-size:40px;margin-bottom:8px;text-align:center">🎉</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:16px;text-align:center" id="obSummaryTitle">
+        Dein FinanceBird ist bereit!
+      </h2>
+      <div id="obSummaryTable" style="background:var(--bg2);border-radius:12px;padding:14px 18px;margin-bottom:16px"></div>
+      <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:18px">
+        All das kannst du jederzeit in den Einstellungen anpassen.
+      </div>
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardFinish()">
+        Los geht's →
+      </button>
+      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot active"></div></div>
     </div>
   </div>
 
@@ -1858,28 +1971,24 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <button onclick="closeErfassen()" style="background:var(--border);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--ink)">×</button>
     </div>
 
-    <!-- SCREEN 0: Mode selector (4 cards) -->
+    <!-- SCREEN 0: Mode selector (Session 3: 2 options + camera shortcut) -->
     <div id="erfScreen0" style="padding:16px 20px 28px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
-        <button class="erf-card" onclick="erfSetMode('buchung')">
-          <span class="erf-card-icon">💰</span>
-          <span class="erf-card-label">Buchung</span>
-          <span class="erf-card-sub">Einnahme oder Ausgabe</span>
-        </button>
-        <button class="erf-card" onclick="erfSetMode('beleg')">
-          <span class="erf-card-icon">📎</span>
-          <span class="erf-card-label">Beleg</span>
-          <span class="erf-card-sub">Foto oder PDF scannen</span>
-        </button>
-        <button class="erf-card" onclick="erfSetMode('transfer')">
-          <span class="erf-card-icon">↔️</span>
-          <span class="erf-card-label">Transfer</span>
-          <span class="erf-card-sub">Zwischen Konten</span>
-        </button>
-        <button class="erf-card" onclick="erfSetMode('rechnung')">
-          <span class="erf-card-icon">🧾</span>
-          <span class="erf-card-label">Rechnung</span>
-          <span class="erf-card-sub">Ausgangsrechnung</span>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <div style="display:flex;align-items:stretch;gap:0;border:1.5px solid var(--border);border-radius:14px;overflow:hidden">
+          <button style="flex:1;padding:18px 16px;background:var(--paper);border:none;cursor:pointer;text-align:left;font-family:inherit"
+            onclick="erfSetMode('buchung')">
+            <div style="font-size:20px;margin-bottom:4px">📝</div>
+            <div style="font-size:14px;font-weight:600;color:var(--ink)">Buchung erfassen</div>
+            <div style="font-size:11px;color:var(--muted)">Einnahme, Ausgabe oder Transfer</div>
+          </button>
+          <button style="width:60px;background:var(--bg2);border:none;border-left:1.5px solid var(--border);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center"
+            onclick="openErfassenScan()" title="Beleg scannen">
+            📷
+          </button>
+        </div>
+        <button class="erf-card" onclick="erfSetMode('rechnung')" style="padding:14px 16px;text-align:left">
+          <span class="erf-card-icon" style="font-size:18px;margin-right:8px">📬</span>
+          <span class="erf-card-label" style="font-size:14px">Rechnung erstellen</span>
         </button>
       </div>
     </div>
@@ -1913,10 +2022,20 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       🌐 Fremdwährung umrechnen
     </button>
 
-    <!-- Type toggle -->
-      <div style="display:flex;background:#f3f2f0;border-radius:11px;padding:4px;gap:4px;margin-bottom:16px">
-        <button class="erf-type-btn erf-income active" id="erfBtnIncome" onclick="erfSetType('income')">💰 Einnahme</button>
-        <button class="erf-type-btn erf-expense"       id="erfBtnExpense" onclick="erfSetType('expense')">💸 Ausgabe</button>
+    <!-- Segmented Control (Session 3) -->
+      <div style="display:flex;background:var(--bg2);border-radius:11px;padding:3px;gap:0;margin-bottom:16px">
+        <button class="erf-type-btn erf-expense active" id="erfBtnExpense" onclick="erfSetType('expense')" style="flex:1">Ausgabe</button>
+        <button class="erf-type-btn erf-income"         id="erfBtnIncome"  onclick="erfSetType('income')"  style="flex:1">Einnahme</button>
+        <button class="erf-type-btn"                     id="erfBtnTransfer" onclick="erfSetType('transfer')" style="flex:1">Transfer</button>
+      </div>
+      <!-- Beleg scannen Button (Session 3) -->
+      <div id="erfScanBtnWrap" style="margin-bottom:14px">
+        <button class="btn btn-outline" style="width:100%;padding:10px;font-size:13px" id="erfInlineScanBtn" onclick="erfInlineScan()">
+          📷 Beleg scannen
+        </button>
+        <div id="erfScanDisabledHint" style="display:none;font-size:11px;color:var(--muted);margin-top:4px;text-align:center">
+          Aktiviere die KI-Beleganalyse in <a href="#" onclick="nav('einstellungen');closeErfassen();return false" style="color:var(--accent)">Einstellungen → Verknüpfungen</a>
+        </div>
       </div>
       <!-- Bereich toggle -->
       <div style="display:flex;gap:8px;margin-bottom:14px" id="erfBereichWrap">
@@ -1926,10 +2045,10 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <!-- Amount + Date -->
       <div class="grid-2">
         <div class="form-group">
-          <label class="form-label">Betrag (CHF)</label>
+          <label class="form-label" id="erfAmtLabel">Betrag</label>
           <input type="number" id="erfAmt" class="form-input" placeholder="0.00" step="0.05"
             style="font-size:22px;font-family:'Libre Baskerville',serif;font-weight:500"
-            oninput="erfCheckDuplicate()">
+            oninput="erfCheckDuplicate();erfCalcMwstPreview()">
         </div>
         <div class="form-group">
           <label class="form-label">Datum</label>
@@ -1940,13 +2059,13 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <div class="form-group">
         <label class="form-label">Beschreibung</label>
         <input type="text" id="erfDesc" class="form-input" placeholder="Was war das?"
-          oninput="erfCheckDuplicate()" maxlength="300">
+          oninput="erfCheckDuplicate()" onblur="erfSuggestFromMerchant()" maxlength="300">
       </div>
       <div class="form-group">
         <label class="form-label">Gegenpartei / Kunde</label>
         <input type="text" id="erfCounterpart" class="form-input"
           placeholder="Person oder Organisation"
-          oninput="erfCheckDuplicate()" list="erfCounterpartList">
+          oninput="erfCheckDuplicate()" onblur="erfSuggestFromMerchant()" list="erfCounterpartList">
         <datalist id="erfCounterpartList"></datalist>
       </div>
       <!-- Invoice ref (income only) -->
@@ -1976,6 +2095,19 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
           </select>
         </div>
       </div>
+      <!-- Transfer accounts (Session 3 — shown when type=transfer) -->
+      <div id="erfTransferAccountsWrap" style="display:none">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Von Konto</label>
+            <select id="erfTransferFrom" class="form-input"><option value="">— wählen —</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nach Konto</label>
+            <select id="erfTransferTo" class="form-input"><option value="">— wählen —</option></select>
+          </div>
+        </div>
+      </div>
       <!-- Paid toggle -->
       <div class="form-group">
         <label class="form-label">Status</label>
@@ -1988,6 +2120,15 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <div class="form-group">
         <label class="form-label">Notiz</label>
         <input type="text" id="erfNote" class="form-input" placeholder="Optional">
+      </div>
+      <!-- MWST (Session 3 — hidden if not MWST-pflichtig) -->
+      <div class="form-group" id="erfMwstWrap" style="display:none">
+        <label class="form-label">MWST-Satz (%)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="erfMwstSatz" class="form-input" placeholder="8.1" step="0.1" style="width:100px"
+            oninput="erfCalcMwstPreview()">
+          <span id="erfMwstPreview" style="font-size:12px;color:var(--muted)"></span>
+        </div>
       </div>
       <!-- Beleg (scan zone stub — AI in D1) -->
       <div class="form-group">
@@ -2360,9 +2501,11 @@ const AppState = {
 
   /* App */
   lang:          'de',
+  country:       'CH',
   currency:      'CHF',
   currentTab:    'cockpit',
   darkMode:      false,
+  mwstPflichtig: false,
 
   /* Sync */
   syncState:     'idle',  // 'idle' | 'syncing' | 'error' | 'offline'
@@ -2395,8 +2538,10 @@ function loadAppState() {
     authMode:     saved.authMode     || 'oauth',
     workerUrl:    saved.workerUrl    || loadLocal('fb_worker_url', null) || null,
     lang:         saved.lang         || 'de',
+    country:      saved.country      || 'CH',
     currency:     saved.currency     || 'CHF',
     darkMode:     saved.darkMode     || false,
+    mwstPflichtig: saved.mwstPflichtig || false,
     lastSyncTime: saved.lastSyncTime || null,
   });
 }
@@ -2407,8 +2552,10 @@ function saveAppState() {
     authMode:     AppState.authMode,
     workerUrl:    AppState.workerUrl,
     lang:         AppState.lang,
+    country:      AppState.country,
     currency:     AppState.currency,
     darkMode:     AppState.darkMode,
+    mwstPflichtig: AppState.mwstPflichtig,
     lastSyncTime: AppState.lastSyncTime,
   });
 }
@@ -3037,9 +3184,9 @@ async function createMissingDatabases(parentPageId, missingKeys) {
       'Datum': { date: {} },
       'Typ': { select: { options: [{ name: 'Einnahme', color: 'green' }, { name: 'Ausgabe', color: 'red' }] } },
       'Bereich': { select: { options: [{ name: 'Geschäftlich', color: 'blue' }, { name: 'Privat', color: 'purple' }] } },
-      'Kategorie': { select: { options: [] } },
+      'Kategorie': { select: { options: CATEGORIES_20.concat(CATS_PRIVATE).map(c => ({ name: c })) } },
       'Steuerkategorie': { select: { options: [] } },
-      'Einnahmequelle': { select: { options: [] } },
+      'Einnahmequelle': { select: { options: CATS_INCOME.map(c => ({ name: c })) } },
       'Betrag': { number: { format: 'number' } },
       'Konto': { select: { options: [] } },
       'Gegenpartei': { rich_text: {} },
@@ -3049,6 +3196,22 @@ async function createMissingDatabases(parentPageId, missingKeys) {
       'Beleg-Link': { url: {} },
       'Projekt': { rich_text: {} },
       'Notiz': { rich_text: {} },
+      // ── Session 3: neue Properties ──
+      'MWST-Satz': { number: { format: 'percent' } },
+      'MWST-Betrag': { number: { format: 'number' } },
+      'Nettobetrag': { number: { format: 'number' } },
+      'Steuerformular': { rich_text: {} },
+      'Kategorie-Status': { select: { options: [
+        { name: 'vorgeschlagen', color: 'gray' },
+        { name: 'bestätigt', color: 'green' },
+        { name: 'flagged', color: 'orange' },
+        { name: 'validiert', color: 'blue' },
+      ]}},
+      'Teilabzug': { number: { format: 'percent' } },
+      // ── Session 3: Treuhänder-Korrektur Properties ──
+      'Korrektur-Kategorie': { select: { options: CATEGORIES_20.map(c => ({ name: c })) } },
+      'Korrektur-Von': { rich_text: {} },
+      'Korrektur-Datum': { date: {} },
     },
     RECHNUNGEN: {
       'Rechnungs-Nr': { title: {} },
@@ -3142,6 +3305,36 @@ async function createMissingDatabases(parentPageId, missingKeys) {
   }
   saveLocal('fb_db_ids', DB);
   return created;
+}
+
+/**
+ * Ensure existing Buchungen DB has all Session-3 properties.
+ * Safe to call multiple times — Notion ignores already-existing properties.
+ */
+async function ensureBuchungenSchema() {
+  if (!DB.BUCHUNGEN) return;
+  const newProps = {
+    'MWST-Satz':          { number: { format: 'percent' } },
+    'MWST-Betrag':        { number: { format: 'number' } },
+    'Nettobetrag':        { number: { format: 'number' } },
+    'Steuerformular':     { rich_text: {} },
+    'Kategorie-Status':   { select: { options: [
+      { name: 'vorgeschlagen', color: 'gray' },
+      { name: 'bestätigt', color: 'green' },
+      { name: 'flagged', color: 'orange' },
+      { name: 'validiert', color: 'blue' },
+    ]}},
+    'Teilabzug':          { number: { format: 'percent' } },
+    'Korrektur-Kategorie':{ select: { options: CATEGORIES_20.map(c => ({ name: c })) } },
+    'Korrektur-Von':      { rich_text: {} },
+    'Korrektur-Datum':    { date: {} },
+  };
+  try {
+    await notionFetch(`/databases/${DB.BUCHUNGEN}`, 'PATCH', { properties: newProps });
+    console.log('ensureBuchungenSchema: properties updated');
+  } catch (e) {
+    console.warn('ensureBuchungenSchema: failed (non-critical):', e.message);
+  }
 }
 
 /**
@@ -3317,6 +3510,16 @@ function parseBuchung(page) {
     receiptFile: N.txt(p['Beleg-Dateiname']),
     receiptLink: N.url(p['Beleg-Link']),
     receipt:   null, // thumbnail loaded separately from localStorage
+    // ── Session 3: neue Felder ──
+    mwstSatz:       N.num(p['MWST-Satz']),
+    mwstBetrag:     N.num(p['MWST-Betrag']),
+    nettoBetrag:    N.num(p['Nettobetrag']),
+    steuerformular: N.txt(p['Steuerformular']),
+    categoryStatus: N.sel(p['Kategorie-Status']),
+    teilabzug:      N.num(p['Teilabzug']),
+    korrekturKat:   N.sel(p['Korrektur-Kategorie']),
+    korrekturVon:   N.txt(p['Korrektur-Von']),
+    korrekturDatum: N.dat(p['Korrektur-Datum']),
   };
 }
 
@@ -3576,6 +3779,11 @@ NotionAdapter.deleteZiel = async function(id) { throw new Error('Ziele DB not ye
 /* ── Notion property builders ── */
 
 function bookingToProps(d) {
+  // Auto-calculate MWST if category is set
+  const mwstSatz = d.mwstSatz ?? (d.cat ? getMwstRate(d.cat) : 0);
+  const { mwstBetrag, nettoBetrag } = calcMwst(d.amount || 0, mwstSatz);
+  const steuerformular = d.steuerformular || (d.cat ? getSteuerformular(d.cat) : '');
+
   const props = {
     'Beschreibung': { title: [{ text: { content: d.desc || '' } }] },
     'Datum':        { date: { start: d.date || toDay() } },
@@ -3588,12 +3796,25 @@ function bookingToProps(d) {
     'Rechnungs-Nr': { rich_text: [{ text: { content: d.invRef || '' } }] },
     'Beleg-Dateiname': { rich_text: [{ text: { content: d.receiptFile || '' } }] },
     'Beleg-Link':   { url: d.receiptLink || null },
+    // ── Session 3: berechnete Felder ──
+    'MWST-Satz':       { number: mwstSatz / 100 },  // Notion percent = decimal
+    'MWST-Betrag':     { number: mwstBetrag },
+    'Nettobetrag':     { number: nettoBetrag },
+    'Steuerformular':  { rich_text: [{ text: { content: steuerformular } }] },
   };
   if (d.cat)       props['Kategorie']       = { select: { name: d.cat } };
   if (d.taxCat)    props['Steuerkategorie'] = { select: { name: d.taxCat } };
   if (d.source)    props['Einnahmequelle']  = { select: { name: d.source } };
   if (d.account)   props['Konto']           = { select: { name: d.account } };
   if (d.projekt)   props['Projekt']         = { rich_text: [{ text: { content: d.projekt } }] };
+  // Kategorie-Status
+  if (d.categoryStatus) {
+    props['Kategorie-Status'] = { select: { name: d.categoryStatus } };
+  }
+  // Teilabzug (only if explicitly set)
+  if (d.teilabzug != null) {
+    props['Teilabzug'] = { number: d.teilabzug / 100 };  // Notion percent = decimal
+  }
   return props;
 }
 
@@ -4697,14 +4918,21 @@ const InboxEngine = {
         Math.round((new Date(today) - new Date(b.date)) / 86400000) > 7)
       .slice(0, 3); // max 3 to avoid inbox flood
 
-    const total = overdueInv.length + recurStacked.length + staleUnconfirmed.length;
+    // Session 3: Unreviewed bookings reminder
+    const unreviewedCount = Store.buchungen.filter(b =>
+      b.bereich === 'Geschäftlich' && b.categoryStatus === 'vorgeschlagen'
+    ).length;
+    const showReviewReminder = unreviewedCount >= 5; // Only nag if 5+
+
+    const total = overdueInv.length + recurStacked.length + staleUnconfirmed.length + (showReviewReminder ? 1 : 0);
 
     return {
       invoices:         overdueInv,
       recurrings:       recurStacked,
-      staleUnconfirmed, // shown as soft reminders
+      staleUnconfirmed,
+      unreviewedCount,
+      showReviewReminder,
       total,
-      // Summary for badge: only hard items (inv + recur)
       badgeCount: overdueInv.length + recurStacked.length,
     };
   },
@@ -5292,6 +5520,9 @@ function nav(tabId) {
     history.pushState({ tab: tabId }, '', '#' + tabId);
   }
 
+  // Session 3: Reset review filter when leaving buchhaltung
+  if (tabId !== 'buchhaltung') BuchFilter.review = false;
+
   // Tab-specific render
   switch (tabId) {
     case 'cockpit':       renderCockpit();       break;
@@ -5363,62 +5594,334 @@ async function getFXRate(from, to = 'CHF', date = null) {
 
 
 /* ══════════════════════════════════════════════════════
-   COMPACT CATEGORY MODE (Quiz: kategorien=5)
+   CATEGORIES — 20 Business + Private + Einnahmen (Session 3)
    ══════════════════════════════════════════════════════ */
 
-const CATS_BIZ_COMPACT = [
-  'Betriebskosten',        // Abos, Material, Miete
-  'Reise & Repräsentation',// Transport, Verpflegung, Netzwerk
-  'Personal & Weiterbildung',// AHV, Weiterbildung, Supervision
-  'Mitarbeit',             // Mitarbeit Dritter
-  'Übriges Geschäftlich',
-];
-const CATS_PRIV_COMPACT = [
-  'Lebenshaltung',         // Einkauf, Essen, Kleider
-  'Wohnen & Versicherungen',
-  'Gesundheit & Sport',
-  'Vorsorge & Schulden',   // 3.Säule, Schuldenrückzahlung
-  'Übriges Privat',
+// ── Einnahmen-Kategorien (3) ──
+const CATS_INCOME = [
+  'Umsatzerlöse',
+  'Übrige betriebliche Erträge',
+  'Zins- & Finanzerträge',
 ];
 
-function getActiveCatsBiz() {
-  return loadLocal('fb_cat_mode', '10') === '5' ? CATS_BIZ_COMPACT : CATS_BIZ;
-}
-function getActiveCatsPriv() {
-  return loadLocal('fb_cat_mode', '10') === '5' ? CATS_PRIV_COMPACT : CATS_PRIV;
-}
-
-const CATS_BIZ = [
-  'Abos & Software', 'Transport & Reisen', 'Weiterbildung & Supervision',
-  'Mitarbeit Dritter', 'Material & Workshop', 'Repräsentation & Netzwerk',
-  'Verpflegung (geschäftl.)', 'Miete & Arbeitszimmer', 'AHV', 'Übriges Geschäftlich'
+// ── Ausgaben-Kategorien (17) ──
+const CATS_EXPENSE = [
+  'Material & Waren',
+  'Fremdleistungen',
+  'Löhne & Gehälter',
+  'Sozialabgaben (Mitarbeitende)',
+  'Eigene Sozialversicherung',
+  'Abschreibungen & GWG',
+  'Miete & Pacht',
+  'Nebenkosten & Liegenschaft',
+  'Fahrzeug & Transport',
+  'Reise & Spesen',
+  'Kommunikation',
+  'Büro & IT',
+  'Versicherungen',
+  'Werbung & Marketing',
+  'Beratung & Recht',
+  'Zins- & Bankgebühren',
+  'Übriger Betriebsaufwand',
 ];
-const CATS_PRIV = [
+
+// ── Alle 20 Business-Kategorien (für DB-Schema, Dropdowns etc.) ──
+const CATEGORIES_20 = [...CATS_INCOME, ...CATS_EXPENSE];
+
+// ── Private Kategorien (bestehend + Catch-All + Freitext-Option) ──
+const CATS_PRIVATE = [
   'Einkauf & Lebensmittel', 'Essen auswärts', 'Kleider', 'Reisen',
   'Gesundheit', 'Sport', 'Versicherungen', 'Schuldenrückzahlung',
-  '3. Säule', 'Baby', 'Wohnen', 'Übriges Privat'
+  '3. Säule', 'Baby', 'Wohnen', 'Übriges Privat',
 ];
-const INCOME_SOURCES = [
-  'Beratung / Prozessbegleitung', 'Workshop & Facilitation', 'Coaching',
-  'Raumvermietung', 'Spesen-Rückerstattung', 'Sonstiges'
-];
-const TAX_CATS = [
-  'Direkter Aufwand (Material)', 'AHV/IV/EO-Beiträge', 'Miete Büro/Arbeitszimmer',
-  'Büromaterial/EDV/IT', 'Reisespesen', 'Repräsentation', 'Weiterbildung',
-  'Alle übrigen Geschäftsaufwände'
-];
-const DEFAULT_TAX_MAPPING = {
-  'Abos & Software':             'Büromaterial/EDV/IT',
-  'Transport & Reisen':          'Reisespesen',
-  'Weiterbildung & Supervision': 'Weiterbildung',
-  'Mitarbeit Dritter':           'Direkter Aufwand (Material)',
-  'Material & Workshop':         'Direkter Aufwand (Material)',
-  'Repräsentation & Netzwerk':   'Repräsentation',
-  'Verpflegung (geschäftl.)':    'Repräsentation',
-  'Miete & Arbeitszimmer':       'Miete Büro/Arbeitszimmer',
-  'AHV':                         'AHV/IV/EO-Beiträge',
-  'Übriges Geschäftlich':        'Alle übrigen Geschäftsaufwände',
+
+// ── Legacy aliases for backward compat ──
+const CATS_BIZ = CATS_EXPENSE;
+const CATS_PRIV = CATS_PRIVATE;
+const INCOME_SOURCES = CATS_INCOME;
+function getActiveCatsBiz()  { return CATS_EXPENSE; }
+function getActiveCatsPriv() { return CATS_PRIVATE; }
+
+// ── Steuerformular-Mapping (ersetzt TAX_CATS + DEFAULT_TAX_MAPPING) ──
+const TAX_MAPPING = {
+  CH: {
+    'Umsatzerlöse':                 'Umsatz / Ertrag',
+    'Übrige betriebliche Erträge':  'Übrige Erträge',
+    'Zins- & Finanzerträge':        'Finanzerträge',
+    'Material & Waren':             'Direkter Aufwand',
+    'Fremdleistungen':              'Direkter Aufwand',
+    'Löhne & Gehälter':            'Personalaufwand',
+    'Sozialabgaben (Mitarbeitende)':'Personalaufwand',
+    'Eigene Sozialversicherung':    'AHV/IV/EO-Beiträge',
+    'Abschreibungen & GWG':        'Abschreibungen',
+    'Miete & Pacht':                'Raumaufwand',
+    'Nebenkosten & Liegenschaft':   'Raumaufwand',
+    'Fahrzeug & Transport':         'Fahrzeugaufwand',
+    'Reise & Spesen':               'Reisespesen',
+    'Kommunikation':                'Verwaltungsaufwand',
+    'Büro & IT':                    'Verwaltungsaufwand',
+    'Versicherungen':               'Versicherungen',
+    'Werbung & Marketing':          'Werbeaufwand',
+    'Beratung & Recht':             'Verwaltungsaufwand',
+    'Zins- & Bankgebühren':         'Finanzaufwand',
+    'Übriger Betriebsaufwand':      'Übriger Betriebsaufwand',
+  },
+  DE: {
+    'Umsatzerlöse':                 'EÜR Z.14 Betriebseinnahmen',
+    'Übrige betriebliche Erträge':  'EÜR Z.14 Betriebseinnahmen',
+    'Zins- & Finanzerträge':        'EÜR Z.19 Zinsen/Finanzierung',
+    'Material & Waren':             'EÜR Z.26 Wareneinkauf',
+    'Fremdleistungen':              'EÜR Z.27 Fremdleistungen',
+    'Löhne & Gehälter':            'EÜR Z.28 Löhne',
+    'Sozialabgaben (Mitarbeitende)':'EÜR Z.29 Sozialabgaben',
+    'Eigene Sozialversicherung':    'EÜR Z.44 Vorsorgeaufwand',
+    'Abschreibungen & GWG':        'EÜR Z.33 AfA',
+    'Miete & Pacht':                'EÜR Z.36 Miete',
+    'Nebenkosten & Liegenschaft':   'EÜR Z.36 Miete',
+    'Fahrzeug & Transport':         'EÜR Z.57 Fahrtkosten',
+    'Reise & Spesen':               'EÜR Z.60 Reisekosten',
+    'Kommunikation':                'EÜR Z.46 Übrige Betriebsausgaben',
+    'Büro & IT':                    'EÜR Z.46 Übrige Betriebsausgaben',
+    'Versicherungen':               'EÜR Z.43 Versicherungen',
+    'Werbung & Marketing':          'EÜR Z.46 Übrige Betriebsausgaben',
+    'Beratung & Recht':             'EÜR Z.46 Übrige Betriebsausgaben',
+    'Zins- & Bankgebühren':         'EÜR Z.48 Schuldzinsen',
+    'Übriger Betriebsaufwand':      'EÜR Z.46 Übrige Betriebsausgaben',
+  },
+  AT: {
+    'Umsatzerlöse':                 'E1a KZ 9040',
+    'Übrige betriebliche Erträge':  'E1a KZ 9040',
+    'Zins- & Finanzerträge':        'E1a KZ 9060',
+    'Material & Waren':             'E1a KZ 9110',
+    'Fremdleistungen':              'E1a KZ 9120',
+    'Löhne & Gehälter':            'E1a KZ 9130',
+    'Sozialabgaben (Mitarbeitende)':'E1a KZ 9130',
+    'Eigene Sozialversicherung':    'E1a KZ 9225',
+    'Abschreibungen & GWG':        'E1a KZ 9140',
+    'Miete & Pacht':                'E1a KZ 9165',
+    'Nebenkosten & Liegenschaft':   'E1a KZ 9165',
+    'Fahrzeug & Transport':         'E1a KZ 9170',
+    'Reise & Spesen':               'E1a KZ 9180',
+    'Kommunikation':                'E1a KZ 9230',
+    'Büro & IT':                    'E1a KZ 9230',
+    'Versicherungen':               'E1a KZ 9200',
+    'Werbung & Marketing':          'E1a KZ 9190',
+    'Beratung & Recht':             'E1a KZ 9230',
+    'Zins- & Bankgebühren':         'E1a KZ 9210',
+    'Übriger Betriebsaufwand':      'E1a KZ 9230',
+  },
 };
+
+// Legacy compat: TAX_CATS and DEFAULT_TAX_MAPPING derived from new system
+const TAX_CATS = [...new Set(Object.values(TAX_MAPPING.CH))];
+const DEFAULT_TAX_MAPPING = Object.fromEntries(
+  CATS_EXPENSE.map(c => [c, TAX_MAPPING.CH[c] || 'Übriger Betriebsaufwand'])
+);
+
+// ── 1c: MWST-Lookup-Tabelle ──
+const MWST_DEFAULTS = {
+  CH: {
+    standard: 8.1, reduziert: 2.6, beherbergung: 3.8, befreit: 0,
+    categoryRates: {
+      'Umsatzerlöse': 8.1,
+      'Übrige betriebliche Erträge': 8.1,
+      'Zins- & Finanzerträge': 0,
+      'Material & Waren': 8.1,
+      'Fremdleistungen': 8.1,
+      'Löhne & Gehälter': 0,
+      'Sozialabgaben (Mitarbeitende)': 0,
+      'Eigene Sozialversicherung': 0,
+      'Abschreibungen & GWG': 0,
+      'Miete & Pacht': 0,
+      'Nebenkosten & Liegenschaft': 8.1,
+      'Fahrzeug & Transport': 8.1,
+      'Reise & Spesen': 3.8,
+      'Kommunikation': 8.1,
+      'Büro & IT': 8.1,
+      'Versicherungen': 0,
+      'Werbung & Marketing': 8.1,
+      'Beratung & Recht': 8.1,
+      'Zins- & Bankgebühren': 0,
+      'Übriger Betriebsaufwand': 8.1,
+    }
+  },
+  DE: {
+    standard: 19, reduziert: 7,
+    categoryRates: {
+      'Umsatzerlöse': 19,
+      'Übrige betriebliche Erträge': 19,
+      'Zins- & Finanzerträge': 0,
+      'Material & Waren': 19,
+      'Fremdleistungen': 19,
+      'Löhne & Gehälter': 0,
+      'Sozialabgaben (Mitarbeitende)': 0,
+      'Eigene Sozialversicherung': 0,
+      'Abschreibungen & GWG': 19,
+      'Miete & Pacht': 19,
+      'Nebenkosten & Liegenschaft': 19,
+      'Fahrzeug & Transport': 19,
+      'Reise & Spesen': 19,
+      'Kommunikation': 19,
+      'Büro & IT': 19,
+      'Versicherungen': 19,
+      'Werbung & Marketing': 19,
+      'Beratung & Recht': 19,
+      'Zins- & Bankgebühren': 0,
+      'Übriger Betriebsaufwand': 19,
+    }
+  },
+  AT: {
+    standard: 20, reduziert: 10, sonder: 13,
+    categoryRates: {
+      'Umsatzerlöse': 20,
+      'Übrige betriebliche Erträge': 20,
+      'Zins- & Finanzerträge': 0,
+      'Material & Waren': 20,
+      'Fremdleistungen': 20,
+      'Löhne & Gehälter': 0,
+      'Sozialabgaben (Mitarbeitende)': 0,
+      'Eigene Sozialversicherung': 0,
+      'Abschreibungen & GWG': 20,
+      'Miete & Pacht': 20,
+      'Nebenkosten & Liegenschaft': 20,
+      'Fahrzeug & Transport': 20,
+      'Reise & Spesen': 20,
+      'Kommunikation': 20,
+      'Büro & IT': 20,
+      'Versicherungen': 20,
+      'Werbung & Marketing': 20,
+      'Beratung & Recht': 20,
+      'Zins- & Bankgebühren': 0,
+      'Übriger Betriebsaufwand': 20,
+    }
+  },
+};
+
+/** Get MWST rate for a category in the user's country */
+function getMwstRate(category) {
+  const country = AppState.country || 'CH';
+  const rates = MWST_DEFAULTS[country]?.categoryRates || MWST_DEFAULTS.CH.categoryRates;
+  return rates[category] ?? MWST_DEFAULTS[country]?.standard ?? 8.1;
+}
+
+/** Calculate MWST breakdown from a gross amount + rate */
+function calcMwst(grossAmount, mwstRate) {
+  if (!mwstRate || mwstRate === 0) return { mwstBetrag: 0, nettoBetrag: grossAmount };
+  const mwstBetrag = Math.round((grossAmount * mwstRate / (100 + mwstRate)) * 100) / 100;
+  const nettoBetrag = Math.round((grossAmount - mwstBetrag) * 100) / 100;
+  return { mwstBetrag, nettoBetrag };
+}
+
+/** Get Steuerformular line for a category in the user's country */
+function getSteuerformular(category) {
+  const country = AppState.country || 'CH';
+  return TAX_MAPPING[country]?.[category] || TAX_MAPPING.CH?.[category] || '';
+}
+
+// ── 1e: Default Merchant Rules per country ──
+const DEFAULT_MERCHANT_RULES = {
+  CH: {
+    'sbb':               { suggestions: [{ category: 'Reise & Spesen', count: 1, source: 'default' }] },
+    'swisscom':          { suggestions: [{ category: 'Kommunikation', count: 1, source: 'default' }] },
+    'sunrise':           { suggestions: [{ category: 'Kommunikation', count: 1, source: 'default' }] },
+    'coop':              { suggestions: [{ category: 'Material & Waren', count: 1, source: 'default' }] },
+    'migros':            { suggestions: [{ category: 'Material & Waren', count: 1, source: 'default' }] },
+    'digitec':           { suggestions: [{ category: 'Büro & IT', count: 1, source: 'default' }] },
+    'google workspace':  { suggestions: [{ category: 'Büro & IT', count: 1, source: 'default' }] },
+    'adobe':             { suggestions: [{ category: 'Büro & IT', count: 1, source: 'default' }] },
+  },
+  DE: {
+    'deutsche bahn':     { suggestions: [{ category: 'Reise & Spesen', count: 1, source: 'default' }] },
+    'telekom':           { suggestions: [{ category: 'Kommunikation', count: 1, source: 'default' }] },
+    'vodafone':          { suggestions: [{ category: 'Kommunikation', count: 1, source: 'default' }] },
+    'amazon':            { suggestions: [{ category: 'Büro & IT', count: 1, source: 'default' }] },
+    'google workspace':  { suggestions: [{ category: 'Büro & IT', count: 1, source: 'default' }] },
+    'adobe':             { suggestions: [{ category: 'Büro & IT', count: 1, source: 'default' }] },
+  },
+  AT: {
+    'öbb':               { suggestions: [{ category: 'Reise & Spesen', count: 1, source: 'default' }] },
+    'a1':                { suggestions: [{ category: 'Kommunikation', count: 1, source: 'default' }] },
+    'drei':              { suggestions: [{ category: 'Kommunikation', count: 1, source: 'default' }] },
+    'google workspace':  { suggestions: [{ category: 'Büro & IT', count: 1, source: 'default' }] },
+    'adobe':             { suggestions: [{ category: 'Büro & IT', count: 1, source: 'default' }] },
+  },
+};
+
+/** Get default merchant rules for a country */
+function getDefaultRules(country) {
+  return JSON.parse(JSON.stringify(DEFAULT_MERCHANT_RULES[country] || DEFAULT_MERCHANT_RULES.CH));
+}
+
+// Merchant rules loaded from Notion Einstellungen or defaults
+let merchantRules = {};
+
+/** Load merchant rules (called in init) */
+async function loadMerchantRules() {
+  try {
+    const settingsPages = Store.einstellungen || [];
+    const rulesPage = settingsPages.find(s => s.key === 'merchant_rules');
+    if (rulesPage?.value) {
+      merchantRules = JSON.parse(rulesPage.value);
+    } else {
+      merchantRules = getDefaultRules(AppState.country || 'CH');
+    }
+  } catch (e) {
+    console.warn('loadMerchantRules: parse error, using defaults', e);
+    merchantRules = getDefaultRules(AppState.country || 'CH');
+  }
+}
+
+/** Suggest category based on description/merchant */
+function suggestCategory(description) {
+  if (!description) return null;
+  const key = description.toLowerCase().trim();
+  // Exact match
+  if (merchantRules[key]) return merchantRules[key].suggestions;
+  // Partial match
+  for (const [merchant, rule] of Object.entries(merchantRules)) {
+    if (key.includes(merchant)) return rule.suggestions;
+  }
+  return null;
+}
+
+/** Update merchant rule after user saves a booking */
+async function updateMerchantRule(description, category) {
+  if (!description || !category) return;
+  const key = description.toLowerCase().trim();
+  if (!merchantRules[key]) {
+    merchantRules[key] = { suggestions: [] };
+  }
+  const existing = merchantRules[key].suggestions.find(s => s.category === category);
+  if (existing) {
+    existing.count++;
+    existing.source = 'user';
+  } else {
+    merchantRules[key].suggestions.push({ category, count: 1, source: 'user' });
+  }
+  merchantRules[key].suggestions.sort((a, b) => b.count - a.count);
+  await saveMerchantRules();
+}
+
+/** Persist merchant rules to Notion Einstellungen */
+async function saveMerchantRules() {
+  try {
+    const settingsPages = Store.einstellungen || [];
+    const rulesPage = settingsPages.find(s => s.key === 'merchant_rules');
+    const value = JSON.stringify(merchantRules);
+    if (rulesPage?._id) {
+      await updateWithQueue(rulesPage._id, {
+        'Value': { rich_text: [{ text: { content: value } }] }
+      }, { desc: 'merchant_rules', type: 'einstellungen' });
+    } else if (DB.EINSTELLUNGEN) {
+      await writeWithQueue(DB.EINSTELLUNGEN, {
+        'Key': { title: [{ text: { content: 'merchant_rules' } }] },
+        'Value': { rich_text: [{ text: { content: value } }] },
+      }, { desc: 'merchant_rules', type: 'einstellungen' });
+    }
+  } catch (e) {
+    console.warn('saveMerchantRules failed:', e.message);
+  }
+}
 
 /* ── Erfassen state ── */
 const Erf = {
@@ -5429,6 +5932,7 @@ const Erf = {
   source:   '',
   receipt:  null,       // { thumb, original, filename, isPDF }
   editId:   null,       // null = new, string = editing existing
+  categoryStatus: null, // 'vorgeschlagen' | 'bestätigt' | null
 };
 
 /* ── Open / Close ── */
@@ -5440,9 +5944,13 @@ function openErfassen(mode = null) {
   // Reset state
   Erf.editId  = null;
   Erf.receipt = null;
+  Erf.categoryStatus = null;
   erfResetForms();
   erfPopulateDropdowns();
   erfBuildCounterpartList();
+  // Session 3: Dynamic currency label
+  const amtLabel = document.getElementById('erfAmtLabel');
+  if (amtLabel) amtLabel.textContent = 'Betrag (' + (AppState.currency || 'CHF') + ')';
 
   if (mode) {
     erfSetMode(mode);
@@ -5486,7 +5994,7 @@ function erfSetMode(mode) {
   document.getElementById('erfassenTitle').textContent = titles[mode] || 'Erfassen';
   const screens = { buchung:1, beleg:2, transfer:3, rechnung:4 };
   erfShowScreen(screens[mode] || 0);
-  if (mode === 'buchung')  { erfSetType('income'); erfSetBereich('business'); erfRenderCatChips(); }
+  if (mode === 'buchung')  { erfSetType('expense'); erfSetBereich('business'); erfRenderCatChips(); erfUpdateMwstField(); }
   if (mode === 'transfer') { erfPopulateAccountSelects(); }
   if (mode === 'rechnung') { erfPrefillInvNr(); }
 }
@@ -5498,13 +6006,47 @@ function erfSetType(type) {
   Erf.source = '';
   const btnI = document.getElementById('erfBtnIncome');
   const btnE = document.getElementById('erfBtnExpense');
+  const btnT = document.getElementById('erfBtnTransfer');
   btnI.classList.toggle('active', type === 'income');
   btnE.classList.toggle('active', type === 'expense');
+  if (btnT) btnT.classList.toggle('active', type === 'transfer');
   // Invoice ref only for income
   const invWrap = document.getElementById('erfInvRefWrap');
   if (invWrap) invWrap.style.display = type === 'income' ? '' : 'none';
-  // Bereich selector hidden for income (always Geschäftlich default)
+  // Transfer accounts
+  const transWrap = document.getElementById('erfTransferAccountsWrap');
+  if (transWrap) transWrap.style.display = type === 'transfer' ? '' : 'none';
+  // Regular account/projekt hidden for transfer
+  const accGrid = document.getElementById('erfAccount')?.closest('.grid-2');
+  if (accGrid) accGrid.style.display = type === 'transfer' ? 'none' : '';
+  // Bereich hidden for transfer
+  const bereichWrap = document.getElementById('erfBereichWrap');
+  if (bereichWrap) bereichWrap.style.display = type === 'transfer' ? 'none' : '';
+  // Category hidden for transfer
+  const catWrap = document.getElementById('erfCatWrap');
+  if (catWrap) catWrap.style.display = type === 'transfer' ? 'none' : '';
+  // Populate transfer selects
+  if (type === 'transfer') erfPopulateTransferSelects();
+  // MWST field visibility
+  const mwstWrap = document.getElementById('erfMwstWrap');
+  if (mwstWrap) mwstWrap.style.display = (AppState.mwstPflichtig && type !== 'transfer') ? '' : 'none';
+  // Scan button
+  const scanWrap = document.getElementById('erfScanBtnWrap');
+  if (scanWrap) scanWrap.style.display = type === 'transfer' ? 'none' : '';
   erfRenderCatChips();
+}
+
+/** Populate transfer account selects */
+function erfPopulateTransferSelects() {
+  const accounts = (Store.konten || []).filter(k => k.active !== false);
+  ['erfTransferFrom', 'erfTransferTo'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— wählen —</option>' +
+      accounts.map(a => `<option value="${esc(a.name)}">${esc(a.name)}</option>`).join('');
+    if (prev) sel.value = prev;
+  });
 }
 
 function erfSetBereich(bereich) {
@@ -5536,21 +6078,35 @@ function erfRenderCatChips() {
     if (label) label.textContent = 'Kategorie';
     const cats = Erf.bereich === 'business' ? getActiveCatsBiz() : getActiveCatsPriv();
     const isPrv = Erf.bereich === 'private';
-    chips.innerHTML = cats.map(c => `
+    let chipsHtml = cats.map(c => `
       <div class="chip ${Erf.cat === c ? 'active' + (isPrv ? ' priv' : '') : ''}"
         onclick="erfSelectCat('${c.replace(/'/g,"\\'")}')">
         ${c}
       </div>`).join('');
-    // Tax hint for business expense
+    // Freitext option for private categories
+    if (isPrv) {
+      chipsHtml += `<div class="chip ${Erf.cat && !cats.includes(Erf.cat) ? 'active priv' : ''}"
+        onclick="document.getElementById('erfCatCustom').style.display='';document.getElementById('erfCatCustomInput').focus()">
+        ✏️ Eigene
+      </div>
+      <div id="erfCatCustom" style="display:${Erf.cat && !cats.includes(Erf.cat) ? '' : 'none'};width:100%;margin-top:6px">
+        <input type="text" id="erfCatCustomInput" class="form-input" placeholder="Eigene Kategorie…"
+          value="${esc(Erf.cat && !cats.includes(Erf.cat) ? Erf.cat : '')}"
+          onchange="erfSelectCat(this.value.trim())" style="font-size:13px">
+      </div>`;
+    }
+    chips.innerHTML = chipsHtml;
+    // Tax hint from new TAX_MAPPING system (Session 3)
     if (taxHint && Erf.cat && Erf.bereich === 'business') {
-      const tm  = loadLocal('fb_tax_mapping', DEFAULT_TAX_MAPPING);
-      const mapped = tm[Erf.cat];
+      const mapped = getSteuerformular(Erf.cat);
       if (mapped) {
-        taxHint.textContent = '→ Steuerkategorie: ' + mapped;
+        taxHint.textContent = '→ ' + mapped;
         taxHint.style.display = '';
       } else {
         taxHint.style.display = 'none';
       }
+      // Auto-fill MWST from category
+      erfUpdateMwstField();
     } else if (taxHint) {
       taxHint.style.display = 'none';
     }
@@ -5559,11 +6115,89 @@ function erfRenderCatChips() {
 
 function erfSelectCat(cat) {
   Erf.cat = cat;
+  Erf.categoryStatus = 'bestätigt'; // User explicitly chose
   erfRenderCatChips();
 }
 function erfSelectSource(src) {
   Erf.source = src;
   erfRenderCatChips();
+}
+
+/** Session 3: Suggest category from merchant rules */
+function erfSuggestFromMerchant() {
+  if (Erf.type !== 'expense' || Erf.cat) return; // Only for expenses without a category
+  const desc = document.getElementById('erfDesc')?.value || '';
+  const counter = document.getElementById('erfCounterpart')?.value || '';
+  const query = counter || desc;
+  if (!query) return;
+  const suggestions = suggestCategory(query);
+  if (suggestions && suggestions.length > 0) {
+    const top = suggestions[0];
+    Erf.cat = top.category;
+    Erf.categoryStatus = 'vorgeschlagen';
+    erfRenderCatChips();
+    showToast('info', '💡', 'Kategorie vorgeschlagen', `${top.category} (${top.count}× verwendet)`);
+  }
+}
+
+/** Session 3: Update MWST field when category changes */
+function erfUpdateMwstField() {
+  const mwstWrap = document.getElementById('erfMwstWrap');
+  if (!mwstWrap) return;
+  // Show only if MWST-pflichtig and not transfer
+  mwstWrap.style.display = (AppState.mwstPflichtig && Erf.type !== 'transfer') ? '' : 'none';
+  // Auto-fill MWST rate from category
+  if (Erf.cat) {
+    const rate = getMwstRate(Erf.cat);
+    const inp = document.getElementById('erfMwstSatz');
+    if (inp) inp.value = rate;
+    erfCalcMwstPreview();
+  }
+  // Scan button state
+  const scanBtn = document.getElementById('erfInlineScanBtn');
+  const scanHint = document.getElementById('erfScanDisabledHint');
+  const hasKi = !!loadLocal('fb_claude_key', '');
+  if (scanBtn) scanBtn.style.display = hasKi ? '' : 'none';
+  if (scanHint) scanHint.style.display = hasKi ? 'none' : '';
+}
+
+/** Session 3: Preview MWST breakdown */
+function erfCalcMwstPreview() {
+  const amt = parseFloat(document.getElementById('erfAmt')?.value) || 0;
+  const rate = parseFloat(document.getElementById('erfMwstSatz')?.value) || 0;
+  const el = document.getElementById('erfMwstPreview');
+  if (!el) return;
+  if (amt > 0 && rate > 0) {
+    const { mwstBetrag, nettoBetrag } = calcMwst(amt, rate);
+    el.textContent = `Netto: ${nettoBetrag.toFixed(2)} · MWST: ${mwstBetrag.toFixed(2)}`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+/** Session 3: Scan shortcut (FAB camera button) */
+function openErfassenScan() {
+  const hasKi = !!loadLocal('fb_claude_key', '');
+  if (!hasKi) {
+    showToast('info', '🤖', 'KI nicht konfiguriert',
+      'Aktiviere die KI-Beleganalyse in Einstellungen → Verknüpfungen');
+    openErfassen('buchung');
+    return;
+  }
+  openErfassen('buchung');
+  // Directly trigger camera
+  setTimeout(() => {
+    const input = document.getElementById('erfFileInput');
+    if (input) { input.setAttribute('capture', 'environment'); input.click(); }
+  }, 300);
+}
+
+/** Session 3: Inline scan button in buchung form */
+function erfInlineScan() {
+  const hasKi = !!loadLocal('fb_claude_key', '');
+  if (!hasKi) return;
+  const input = document.getElementById('erfFileInput');
+  if (input) { input.setAttribute('capture', 'environment'); input.click(); }
 }
 
 /* ── Duplicate detection (adapted from v1) ── */
@@ -5642,6 +6276,37 @@ async function erfSaveBuchung() {
   const srcNotionMap = { 'Beratung / Prozessbegleitung': 'Honorar / Prozessbegleitung' };
   const sourceNotion = srcNotionMap[Erf.source] || Erf.source;
 
+  // Session 3: Handle transfer via segmented control
+  if (Erf.type === 'transfer') {
+    // Delegate to transfer save
+    const transferFrom = document.getElementById('erfTransferFrom')?.value || '';
+    const transferTo   = document.getElementById('erfTransferTo')?.value || '';
+    if (!transferFrom || !transferTo) { if (fbEl) fbEl.textContent = 'Bitte beide Konten wählen'; btn.disabled = false; btn.textContent = '✓ Speichern'; return; }
+    if (transferFrom === transferTo) { if (fbEl) fbEl.textContent = 'Konten müssen unterschiedlich sein'; btn.disabled = false; btn.textContent = '✓ Speichern'; return; }
+    // Save as transfer
+    const { success, error } = await writeWithQueue(DB.TRANSFERS, {
+      'Beschreibung': { title: [{ text: { content: desc || 'Transfer' } }] },
+      'Datum': { date: { start: date } },
+      'Typ': { select: { name: 'Interner Transfer' } },
+      'Von Konto': { select: { name: transferFrom } },
+      'Nach Konto': { select: { name: transferTo } },
+      'Betrag': { number: amt },
+      'Status': { select: { name: 'Ausgeführt' } },
+    }, { desc: desc || 'Transfer', amt: fmt(amt), type: 'transfer' });
+    if (success) {
+      showToast('success', '↔️', 'Transfer gespeichert', fmt(amt) + ' ' + (AppState.currency || 'CHF'));
+      closeErfassen();
+      deltaSync().then(() => { renderAll(); InboxEngine.updateBadge(); });
+    } else {
+      btn.disabled = false; btn.textContent = '✓ Speichern';
+      if (fbEl) fbEl.textContent = '❌ ' + (error || 'Fehler');
+    }
+    return;
+  }
+
+  // Session 3: MWST from form
+  const erfMwstSatz = parseFloat(document.getElementById('erfMwstSatz')?.value) || (Erf.cat ? getMwstRate(Erf.cat) : 0);
+
   const data = {
     desc:        desc || (Erf.type === 'income' ? 'Einnahme' : 'Ausgabe'),
     date,
@@ -5659,6 +6324,8 @@ async function erfSaveBuchung() {
     projekt:     document.getElementById('erfProjekt')?.value || '',
     receiptFile: receiptFile || '',
     receiptLink: receiptLink || null,
+    mwstSatz:    erfMwstSatz,
+    categoryStatus: Erf.cat ? (Erf.categoryStatus || 'bestätigt') : null,
   };
 
   // Edit-Mode: Update statt Create (Audit-Fix R1)
@@ -5701,8 +6368,12 @@ async function erfSaveBuchung() {
     if (receiptLink)  links.push({ label: 'Beleg', url: receiptLink });
     showToast('success', isInc ? '💰' : '💸',
       isInc ? 'Einnahme gespeichert' : 'Ausgabe gespeichert',
-      (isInc ? '+' : '−') + fmt(amt) + ' CHF' + (desc ? ' · ' + desc : ''),
+      (isInc ? '+' : '−') + fmt(amt) + ' ' + (AppState.currency || 'CHF') + (desc ? ' · ' + desc : ''),
       links);
+    // Session 3: Update merchant learning rule
+    if (data.cat && (data.counterpart || desc)) {
+      updateMerchantRule(data.counterpart || desc, data.cat).catch(() => {});
+    }
     closeErfassen();
     // Refresh store + UI in background
     deltaSync().then(() => { renderAll(); InboxEngine.updateBadge(); });
@@ -6252,26 +6923,9 @@ function erfHandleSharedFile(dataUrl, filename, isPDF) {
   if (hasKey) setTimeout(() => analyseBeleg(dataUrl, !!isPDF), 300);
 }
 
-/** Kategorie-5 compact mapping — remap existing Buchungen display */
+/** Display category name (legacy compact mapping removed — Session 3) */
 function getCatDisplay(cat, bereich) {
-  if (loadLocal('fb_cat_mode', '10') !== '5') return cat || '—';
-  const MAP_BIZ = {
-    'Abos & Software': 'Betriebskosten', 'Material & Workshop': 'Betriebskosten',
-    'Miete & Arbeitszimmer': 'Betriebskosten',
-    'Transport & Reisen': 'Reise & Repräsentation', 'Repräsentation & Netzwerk': 'Reise & Repräsentation',
-    'Verpflegung (geschäftl.)': 'Reise & Repräsentation',
-    'Weiterbildung & Supervision': 'Personal & Weiterbildung', 'AHV': 'Personal & Weiterbildung',
-    'Mitarbeit Dritter': 'Mitarbeit',
-  };
-  const MAP_PRIV = {
-    'Einkauf & Lebensmittel': 'Lebenshaltung', 'Essen auswärts': 'Lebenshaltung',
-    'Kleider': 'Lebenshaltung', 'Reisen': 'Lebenshaltung',
-    'Wohnen': 'Wohnen & Versicherungen', 'Versicherungen': 'Wohnen & Versicherungen',
-    'Gesundheit': 'Gesundheit & Sport', 'Sport': 'Gesundheit & Sport',
-    '3. Säule': 'Vorsorge & Schulden', 'Schuldenrückzahlung': 'Vorsorge & Schulden',
-  };
-  const map = bereich === 'Geschäftlich' ? MAP_BIZ : MAP_PRIV;
-  return map[cat] || cat || '—';
+  return cat || '—';
 }
 async function confirmBuchung(id) {
   try {
@@ -6605,6 +7259,36 @@ function renderAll() {
 
 let _liqHorizon = 60; // active liquidity horizon in days
 
+/** Session 3: Steuerbereit-Score (0–100%) */
+function calculateTaxReadiness() {
+  const buchungen = Store.buchungen.filter(b => b.bereich === 'Geschäftlich');
+  if (buchungen.length === 0) return { score: 100, categorized: 1, documented: 1, mwstOk: 1, flagsOk: 1, reviewCount: 0 };
+
+  const total = buchungen.length;
+
+  const categorizedCount = buchungen.filter(b =>
+    b.categoryStatus === 'bestätigt' || b.categoryStatus === 'validiert'
+  ).length;
+  const categorized = categorizedCount / total;
+
+  const documentedCount = buchungen.filter(b =>
+    b.amount < 100 || b.receiptLink || b.receiptFile
+  ).length;
+  const documented = documentedCount / total;
+
+  const mwstOk = AppState.mwstPflichtig
+    ? buchungen.filter(b => b.mwstSatz != null && b.mwstSatz > 0).length / total
+    : 1;
+
+  const flaggedCount = buchungen.filter(b => b.categoryStatus === 'flagged').length;
+  const flagsOk = flaggedCount === 0 ? 1 : Math.max(0, 1 - flaggedCount / total);
+
+  const score = Math.round(categorized * 40 + documented * 30 + mwstOk * 20 + flagsOk * 10);
+  const reviewCount = buchungen.filter(b => b.categoryStatus === 'vorgeschlagen').length;
+
+  return { score, categorized, documented, mwstOk, flagsOk, reviewCount };
+}
+
 function renderCockpit() {
   const el = document.getElementById('cockpitContent');
   if (!el) return;
@@ -6631,6 +7315,7 @@ function renderCockpit() {
   const C = Computed.cockpitSummary();
 
   el.innerHTML =
+    cockpitTaxReadinessHTML() +
     cockpitHeroHTML(C) +
     cockpitKPIsHTML(C) +
     cockpitCashflowHTML(C) +
@@ -6639,6 +7324,51 @@ function renderCockpit() {
     cockpitNextMovementsHTML(C) +
     cockpitZeitKPIsHTML(C) +
     cockpitRecentHTML();
+}
+
+/** Session 3: Steuerbereit-Score Progress-Ring */
+function cockpitTaxReadinessHTML() {
+  const tr = calculateTaxReadiness();
+  if (Store.buchungen.filter(b => b.bereich === 'Geschäftlich').length === 0) return '';
+
+  const score = tr.score;
+  const color = score < 50 ? 'var(--red)' : score < 80 ? 'var(--amber)' : 'var(--green)';
+  const r = 42, circ = 2 * Math.PI * r;
+  const offset = circ * (1 - score / 100);
+
+  return `
+    <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="nav('buchhaltung');setTimeout(()=>activateReviewQueue(),100)">
+      <div style="display:flex;align-items:center;gap:16px">
+        <svg width="96" height="96" viewBox="0 0 96 96" style="flex-shrink:0">
+          <circle cx="48" cy="48" r="${r}" fill="none" stroke="var(--border)" stroke-width="6"/>
+          <circle cx="48" cy="48" r="${r}" fill="none" stroke="${color}" stroke-width="6"
+            stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
+            stroke-linecap="round" transform="rotate(-90 48 48)"
+            style="transition:stroke-dashoffset .8s ease"/>
+          <text x="48" y="48" text-anchor="middle" dominant-baseline="central"
+            style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;fill:var(--ink)">
+            ${score}
+          </text>
+          <text x="48" y="65" text-anchor="middle"
+            style="font-size:9px;fill:var(--muted);font-family:'Courier Prime',monospace;letter-spacing:.05em">
+            %
+          </text>
+        </svg>
+        <div>
+          <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">
+            STEUERBEREIT
+          </div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px">
+            ${score >= 80 ? 'Sehr gut' : score >= 50 ? 'In Ordnung' : 'Handlungsbedarf'}
+          </div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5">
+            ${tr.reviewCount > 0 ? `${tr.reviewCount} Buchung${tr.reviewCount > 1 ? 'en' : ''} zu prüfen` : 'Alles bestätigt'}
+            ${Math.round(tr.categorized * 100) < 100 ? ` · ${Math.round(tr.categorized * 100)}% kategorisiert` : ''}
+            ${Math.round(tr.documented * 100) < 100 ? ` · ${Math.round(tr.documented * 100)}% belegt` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
 }
 
 /* ── Hero: Vermögen + Puffer ── */
@@ -7207,6 +7937,25 @@ function renderBuchungenHTML() {
     </div>`;
 }
 
+/** Session 3: Category status CSS class */
+function catStatusClass(b) {
+  const s = b.categoryStatus;
+  if (s === 'vorgeschlagen') return 'cat-status-vorgeschlagen';
+  if (s === 'bestätigt')     return 'cat-status-bestaetigt';
+  if (s === 'flagged')       return 'cat-status-flagged';
+  if (s === 'validiert')     return 'cat-status-validiert';
+  return '';
+}
+
+/** Session 3: Category status icon */
+function catStatusIcon(b) {
+  const s = b.categoryStatus;
+  if (s === 'vorgeschlagen') return ' <span title="Vorgeschlagen" style="font-size:10px;opacity:.6">💡</span>';
+  if (s === 'flagged')       return ' <span title="Flagged" style="font-size:10px">🚩</span>';
+  if (s === 'validiert')     return ' <span title="Validiert" style="font-size:10px">✓</span>';
+  return '';
+}
+
 function buchungenFiltered() {
   const tm = loadLocal('fb_tax_mapping', DEFAULT_TAX_MAPPING);
   return Store.buchungen.filter(b => {
@@ -7239,8 +7988,8 @@ function buchungRowHTML(b) {
       </td>
       <td style="font-size:12px;color:var(--muted)">${b.counterpart || '—'}</td>
       <td><span class="tag ${b.type==='Einnahme'?'income':'expense'}">${b.type}</span></td>
-      <td style="font-size:12px">${getCatDisplay(b.cat, b.bereich)}</td>
-      <td style="font-size:11px;color:var(--muted)">${taxCat || '—'}</td>
+      <td style="font-size:12px"><span class="${catStatusClass(b)}">${getCatDisplay(b.cat, b.bereich)}${catStatusIcon(b)}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${b.steuerformular || taxCat || '—'}</td>
       <td style="font-size:12px;color:var(--muted)">${b.account || '—'}</td>
       <td class="amt ${b.type==='Einnahme'?'pos':'neg'}">${b.type==='Einnahme'?'+':'−'}${fmt(b.amount)}</td>
       <td style="text-align:center">${b.paid ? '✅' : '⬜'}</td>
@@ -7250,10 +7999,61 @@ function buchungRowHTML(b) {
           ? `<a href="${b.receiptLink}" target="_blank" style="font-size:14px">📄</a>`
           : b.receiptFile ? `<span style="font-size:14px" title="${b.receiptFile}">📎</span>` : '—'}</td>
       <td style="white-space:nowrap">
+        ${b.categoryStatus === 'vorgeschlagen' ? `<button class="btn btn-outline btn-sm" onclick="confirmBuchungCategory('${b._id}')" title="Kategorie bestätigen" style="color:var(--green)">✓</button>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="toggleBuchungDetail('${b._id}')" title="Details">…</button>
         <button class="btn btn-outline btn-sm" onclick="openErfassenEdit('${b._id}')" title="Bearbeiten">✏️</button>
         <button class="btn btn-danger btn-sm" onclick="deleteBuchung('${b._id}')" title="Löschen">✕</button>
       </td>
+    </tr>
+    <tr id="buchDetail_${b._id}" style="display:none">
+      <td colspan="11" style="padding:12px 16px;background:var(--bg2);font-size:12px;line-height:1.8">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 24px">
+          ${b.mwstSatz ? `<div><span style="color:var(--muted)">Brutto:</span> ${fmtS(b.amount)}</div>` : ''}
+          ${b.nettoBetrag ? `<div><span style="color:var(--muted)">Netto:</span> ${fmtS(b.nettoBetrag)}</div>` : ''}
+          ${b.mwstBetrag ? `<div><span style="color:var(--muted)">MWST (${((b.mwstSatz||0)*100).toFixed(1)}%):</span> ${fmtS(b.mwstBetrag)}</div>` : ''}
+          ${b.steuerformular ? `<div><span style="color:var(--muted)">Steuerformular:</span> ${esc(b.steuerformular)}</div>` : ''}
+          ${b.categoryStatus ? `<div><span style="color:var(--muted)">Status:</span> ${esc(b.categoryStatus)}</div>` : ''}
+          ${b.teilabzug ? `<div><span style="color:var(--muted)">Teilabzug:</span> ${(b.teilabzug*100).toFixed(0)}%</div>` : ''}
+          ${b.korrekturKat ? `<div style="color:var(--amber)"><span style="color:var(--muted)">Korrektur:</span> ${esc(b.korrekturKat)} (${esc(b.korrekturVon||'?')})</div>` : ''}
+          ${b.receiptLink ? `<div><span style="color:var(--muted)">Beleg:</span> <a href="${b.receiptLink}" target="_blank" style="color:var(--accent)">Öffnen ↗</a></div>` : ''}
+          <div><span style="color:var(--muted)">Geändert:</span> ${b._edited ? new Date(b._edited).toLocaleDateString('de-CH') : '—'}</div>
+        </div>
+      </td>
     </tr>`;
+}
+
+/** Session 3: Toggle buchung detail row */
+function toggleBuchungDetail(id) {
+  const row = document.getElementById('buchDetail_' + id);
+  if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+}
+
+/** Session 3: Toggle review queue filter */
+function toggleReviewQueue() {
+  BuchFilter.review = !BuchFilter.review;
+  renderBuchSubtab();
+}
+
+/** Session 3: Activate review queue (from cockpit tap) */
+function activateReviewQueue() {
+  BuchFilter.review = true;
+  renderBuchSubtab();
+}
+
+/** Session 3: Confirm a booking's category (quick action) */
+async function confirmBuchungCategory(id) {
+  try {
+    await updateWithQueue(id, {
+      'Kategorie-Status': { select: { name: 'bestätigt' } }
+    }, { desc: 'confirm-category', type: 'buchung' });
+    const b = Store.buchungen.find(x => x._id === id);
+    if (b) { b.categoryStatus = 'bestätigt'; saveCache('buchungen'); }
+    renderBuchSubtab();
+    renderCockpit();
+    showToast('success', '✅', 'Kategorie bestätigt', b?.cat || '');
+  } catch (e) {
+    showToast('error', '❌', 'Fehler', e.message);
+  }
 }
 
 async function deleteBuchung(id) {
@@ -8280,15 +9080,65 @@ function renderEinstellungen() {
         </div>
         <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">Kategorie-Modus</div>
-            <div style="font-size:12px;color:var(--muted)">5 = kompakt · 10 = detailliert (Standard)</div>
+            <div style="font-weight:600;font-size:14px">Kategorien</div>
+            <div style="font-size:12px;color:var(--muted)">20 Standard-Kategorien · Steuerformular-Mapping automatisch</div>
           </div>
-          <select class="form-input" style="width:auto;padding:7px 10px"
-            onchange="saveLocal('fb_cat_mode',this.value);renderBuchhaltung()">
-            <option value="10" ${loadLocal('fb_cat_mode','10')==='10'?'selected':''}>10 — Detailliert</option>
-            <option value="5"  ${loadLocal('fb_cat_mode','10')==='5' ?'selected':''}>5 — Kompakt</option>
+          <span style="font-size:13px;color:var(--muted);font-family:var(--font-label)">STANDARD</span>
+        </div>
+        <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border)">
+          <div>
+            <div style="font-weight:600;font-size:14px">MWST-pflichtig</div>
+            <div style="font-size:12px;color:var(--muted)">MWST-Felder beim Erfassen ${AppState.mwstPflichtig ? 'sichtbar' : 'ausgeblendet'}</div>
+          </div>
+          <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+            <input type="checkbox" ${AppState.mwstPflichtig ? 'checked' : ''}
+              onchange="AppState.mwstPflichtig=this.checked;saveAppState();renderEinstellungen()"
+              style="opacity:0;width:0;height:0">
+            <span style="position:absolute;inset:0;background:${AppState.mwstPflichtig ? 'var(--accent)' : 'var(--border)'};border-radius:12px;transition:.3s"></span>
+            <span style="position:absolute;top:2px;left:${AppState.mwstPflichtig ? '22px' : '2px'};width:20px;height:20px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Session 3: Land/Region -->
+      <div class="section-head"><h3>Land & Steuern</h3></div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:600;font-size:14px">Land</div>
+            <div style="font-size:12px;color:var(--muted)">Bestimmt MWST-Sätze und Steuerformular-Mapping</div>
+          </div>
+          <select class="form-input" style="width:auto;padding:7px 10px" onchange="setCountry(this.value)">
+            <option value="CH" ${AppState.country==='CH'?'selected':''}>🇨🇭 Schweiz</option>
+            <option value="DE" ${AppState.country==='DE'?'selected':''}>🇩🇪 Deutschland</option>
+            <option value="AT" ${AppState.country==='AT'?'selected':''}>🇦🇹 Österreich</option>
+            <option value="OTHER" ${AppState.country==='OTHER'?'selected':''}>🌍 Anderes</option>
           </select>
         </div>
+        ${AppState.mwstPflichtig ? `
+        <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:600;font-size:14px">MWST-Methode</div>
+            <div style="font-size:12px;color:var(--muted)">${AppState.country === 'CH' ? 'Effektiv oder Saldosteuersatz' : 'Standardmethode'}</div>
+          </div>
+          ${AppState.country === 'CH' ? `
+          <select class="form-input" style="width:auto;padding:7px 10px" onchange="saveLocal('fb_mwst_method',this.value)">
+            <option value="effektiv" ${loadLocal('fb_mwst_method','effektiv')==='effektiv'?'selected':''}>Effektiv</option>
+            <option value="saldo" ${loadLocal('fb_mwst_method','effektiv')==='saldo'?'selected':''}>Saldosteuersatz</option>
+          </select>` : `<span style="font-size:13px;color:var(--muted)">Standard</span>`}
+        </div>` : ''}
+      </div>
+
+      <!-- Session 3: Zusammenarbeit -->
+      <div class="section-head"><h3>Zusammenarbeit</h3></div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.5">
+          Arbeite mit Treuhänder:innen oder Buchhalter:innen zusammen. Sie können Buchungen prüfen und Korrekturen vorschlagen.
+        </div>
+        <div id="settingsCollabList"></div>
+        <button class="btn btn-outline btn-sm" onclick="addCollaborator()" style="width:100%;margin-top:8px">
+          + Person hinzufügen
+        </button>
       </div>
 
       <!-- Lizenz & Weiteres Gerät -->
@@ -8337,6 +9187,11 @@ function renderEinstellungen() {
             onclick="settingsGeneratePairing()" style="width:100%">
             Kopplungscode generieren
           </button>
+        </div>
+        <div style="padding:12px 0;border-top:1px solid var(--border);text-align:center">
+          <a href="#" onclick="logoutWithConfirm();return false" style="font-size:12px;color:var(--muted);text-decoration:none">
+            Abmelden
+          </a>
         </div>
       </div>
 
@@ -8661,7 +9516,7 @@ async function analyseBeleg(imageDataUrl, isPDF = false) {
   if (statusEl) statusEl.textContent = '⚡ KI liest Beleg…';
   showAiAnalysis();
 
-  const allCats = [...CATS_BIZ, ...CATS_PRIV];
+  const allCats = [...CATEGORIES_20, ...CATS_PRIVATE];
   const today   = toDay();
   const msgContent = [];
 
@@ -8736,6 +9591,33 @@ Antworte nur mit dem JSON.` });
   }
 }
 
+/** Session 3: Merge KI suggestion with merchant rules */
+function mergeKiWithRules(kiResult) {
+  const merchant = kiResult.gegenpartei || kiResult.beschreibung || '';
+  const ruleSuggestions = suggestCategory(merchant);
+
+  if (!ruleSuggestions || ruleSuggestions.length === 0) {
+    // No user rule → use KI suggestion
+    return { category: kiResult.kategorie, source: 'ki', categoryStatus: 'vorgeschlagen' };
+  }
+
+  const topRule = ruleSuggestions[0];
+  if (topRule.category === kiResult.kategorie) {
+    // Agreement → high confidence
+    return { category: kiResult.kategorie, source: 'both', categoryStatus: 'vorgeschlagen', confidence: 'high' };
+  }
+
+  // Conflict → return both options
+  return {
+    options: [
+      { category: kiResult.kategorie, label: 'KI-Vorschlag (basierend auf Beleg)' },
+      { category: topRule.category, label: `Häufigste Kategorie (${topRule.count}×)` },
+    ],
+    source: 'conflict',
+    categoryStatus: 'vorgeschlagen',
+  };
+}
+
 /** Apply AI result to Erfassen form fields */
 async function applyAiBelegResult(data) {
   const k = data.konfidenz || {};
@@ -8804,7 +9686,28 @@ function erfApplyAiFields(data) {
   }
   if (data.typ) erfSetType(data.typ === 'Einnahme' ? 'income' : 'expense');
   if (data.bereich) erfSetBereich(data.bereich === 'Privat' ? 'private' : 'business');
-  if (data.kategorie) { Erf.cat = data.kategorie; erfRenderCatChips(); }
+
+  // Session 3: Merge KI with merchant rules
+  if (data.kategorie) {
+    const merged = mergeKiWithRules(data);
+    if (merged.options) {
+      // Conflict: show both options as chips, highlight top
+      Erf.cat = merged.options[0].category;
+      Erf.categoryStatus = 'vorgeschlagen';
+      erfRenderCatChips();
+      showToast('info', '💡', 'Kategorie-Konflikt',
+        `KI: ${merged.options[0].category} vs. Historie: ${merged.options[1].category} — bitte wählen`);
+    } else {
+      Erf.cat = merged.category;
+      Erf.categoryStatus = 'vorgeschlagen';
+      erfRenderCatChips();
+      if (merged.confidence === 'high') {
+        showToast('success', '✨', 'Hohe Übereinstimmung', `${merged.category} (KI + Historie)`);
+      }
+    }
+    // Set MWST from merged category
+    erfUpdateMwstField();
+  }
 
   showToast('success', '✨', 'Felder übernommen', 'Bitte prüfen bevor speichern');
   document.getElementById('erfAmt')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -8844,8 +9747,11 @@ function onboardNext(from, to) {
     'welcome':        'onboardWelcome',
     'license':        'onboardLicense',
     'connect':        'onboardConnect',
-    'quiz':           'onboardQuiz',
-    'taxmap':         'onboardTaxmap',
+    'lang':           'onboardLang',
+    'country':        'onboardCountry',
+    'accounts':       'onboardAccounts',
+    'integrations':   'onboardIntegrations',
+    'summary':        'onboardSummary',
     'done':           'onboardDone',
     'mobile-install': 'onboardMobileInstall',
     'mobile-pairing': 'onboardMobilePairing',
@@ -8859,7 +9765,9 @@ function onboardNext(from, to) {
     const el = document.getElementById(targetId);
     if (el) el.style.display = '';
   }
-  if (to === 'quiz') { quizStep = 0; quizAnswers = {}; renderQuizStep(); }
+  if (to === 'accounts') { obRenderAccountChips(); }
+  if (to === 'integrations') { OB.notionConnected = Auth.isAuthenticated; obUpdateIntTiles(); }
+  if (to === 'summary') { obRenderSummary(); }
   if (to === 'license') {
     // Lizenz-Key vorausfüllen falls bereits gespeichert
     const existing = loadLocal('fb_license_key', '');
@@ -8906,7 +9814,8 @@ function showQuizAfterAuth() {
   const mainEl  = document.getElementById('mainApp');
   if (setupEl) setupEl.style.display = 'block';
   if (mainEl)  mainEl.style.display  = 'none';
-  onboardNext(null, 'quiz');
+  // Session 3: Route to new onboarding lang screen instead of quiz
+  onboardNext(null, 'lang');
 }
 
 /* ── Lizenz-Key (E2) ── */
@@ -9248,7 +10157,11 @@ async function settingsGeneratePairing() {
 /* ── onboardFinish ── */
 
 async function onboardFinish() {
-  applyQuizConfig();
+  // Session 3: Apply onboarding config
+  AppState.lang = OB.lang;
+  AppState.country = OB.country;
+  AppState.currency = OB.currency;
+  saveAppState();
   document.getElementById('setupScreen').style.display = 'none';
   document.getElementById('mainApp').style.display     = 'block';
   nav('cockpit');
@@ -9267,7 +10180,25 @@ async function onboardFinish() {
       }
     }
     if (dbsConfigured()) {
+      // Session 3: Create accounts from onboarding
+      if (OB.accounts.length > 0 && DB.KONTEN) {
+        showLoading('Konten anlegen…');
+        for (const name of OB.accounts) {
+          try {
+            await writeWithQueue(DB.KONTEN, {
+              'Name': { title: [{ text: { content: name } }] },
+              'Aktiv': { checkbox: true },
+              'Typ': { select: { name: name === 'Bargeld' ? 'Bargeld' : name === 'Kreditkarte' ? 'Kreditkarte' : 'Girokonto' } },
+            }, { desc: name, type: 'konto' });
+          } catch (e) { console.warn('Account creation failed:', name, e.message); }
+        }
+      }
+      // Session 3: Save merchant rules defaults
+      merchantRules = getDefaultRules(OB.country);
+      await saveMerchantRules();
       saveLocal('fb_onboard_complete', true);
+      await ensureBuchungenSchema();
+      await loadMerchantRules();
       await fullSync();
       renderAll();
       InboxEngine.updateBadge();
@@ -9288,202 +10219,208 @@ async function onboardFinish() {
   hideSplashOnce();
 }
 
-/* ── E4: Schnell-Quiz ── */
+/* ══ SESSION 3: Neues Onboarding (5 Screens) ══ */
 
-let quizStep    = 0;
-let quizAnswers = {};
+const OB = {
+  lang: 'de',
+  country: 'CH',
+  currency: 'CHF',
+  accounts: [],
+  notionConnected: false,
+  driveConnected: false,
+  clockifyConnected: false,
+  kiConnected: false,
+};
 
-const QUIZ_QUESTIONS = [
-  {
-    id:'land', q:'In welchem Land bist du tätig?',
-    opts:[{val:'CH',label:'🇨🇭 Schweiz'},{val:'DE',label:'🇩🇪 Deutschland'},{val:'AT',label:'🇦🇹 Österreich'},{val:'other',label:'Anderes Land'}],
-  },
-  {
-    id:'waehrung', q:'Welche Währung verwendest du?',
-    opts:[{val:'CHF',label:'CHF — Schweizer Franken'},{val:'EUR',label:'EUR — Euro'}],
-  },
-  {
-    id:'sprache', q:'Sprache / Language?',
-    opts:[{val:'de',label:'🇩🇪 Deutsch'},{val:'en',label:'🇬🇧 English'}],
-  },
-  {
-    id:'arbeit', q:'Wie arbeitest du hauptsächlich?',
-    opts:[{val:'multi',label:'Mehrere Rollen & Projekte'},{val:'single',label:'Ein Standbein'},{val:'growing',label:'Gerade am Aufbauen'},{val:'part',label:'Nebenerwerb'}],
-  },
-  {
-    id:'zeiterfassung', q:'Verwendest du ein Zeiterfassungstool?',
-    opts:[{val:'clockify',label:'Clockify'},{val:'other',label:'Anderes Tool'},{val:'manual',label:'Manuell'},{val:'none',label:'Noch keines'}],
-    hint: 'Toggl und Harvest folgen in Kürze.',
-  },
-  {
-    id:'kategorien', q:'Wie detailliert möchtest du deine Ausgaben aufschlüsseln?',
-    hint: 'Jederzeit in den Einstellungen anpassbar.',
-    tiles: true,
-    opts:[
-      {
-        val:'5', label:'Kompakt',
-        sub:'5 Kategorien',
-        cats:['Büro & Infrastruktur','Marketing & Akquise','Reise & Spesen','Externe Leistungen','Sonstiges'],
-      },
-      {
-        val:'10', label:'Detailliert',
-        sub:'10+ Kategorien (empfohlen)',
-        cats:['Büro & Infrastruktur','Software & Tools','Marketing','Reise & Spesen','Bildung & Weiterbildung','Externe Leistungen','Kommunikation','Beratung & Recht','Versicherung','Sonstiges'],
-      },
-    ],
-  },
-  {
-    id:'ki', q:'Belege per KI analysieren lassen?',
-    opts:[{val:'yes',label:'Ja — API Key einrichten'},{val:'no',label:'Später'}],
-    kiHint: 'Einmalig einrichten. Ab dann scannt FinanceBird deine Belege automatisch. Kosten: ca. CHF 0.01–0.03 pro Beleg.',
-  },
-  {
-    id:'belegspeicher', q:'Wo sollen Belegfotos gespeichert werden?',
-    opts:[{val:'drive',label:'Google Drive'}],
-    hint: 'OneDrive und Dropbox folgen in Kürze.',
-    singleOption: true,
-  },
-];
+const OB_ACCOUNT_PRESETS = ['Bankkonto', 'PostFinance', 'Revolut', 'Bargeld', 'Kreditkarte'];
 
-function renderQuizStep() {
-  const total = QUIZ_QUESTIONS.length;
-  const q     = QUIZ_QUESTIONS[quizStep];
-  if (!q) return;
-
-  QUIZ_QUESTIONS.forEach((_, i) => {
-    const dot = document.getElementById('quizDot' + i);
-    if (dot) dot.className = 'quiz-dot' + (i < quizStep ? ' done' : i === quizStep ? ' active' : '');
-  });
-
-  const nextBtn = document.getElementById('quizNextBtn');
-  if (nextBtn) nextBtn.textContent = quizStep >= total - 1 ? 'Fertig ✓' : 'Weiter →';
-
-  const selected = quizAnswers[q.id];
-  document.getElementById('quizContent').innerHTML = `
-    <div class="quiz-question">${q.q}</div>
-    ${q.hint && !q.tiles ? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;text-align:center">${q.hint}</div>` : ''}
-    ${q.kiHint && selected === 'yes' ? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;text-align:center">${q.kiHint}</div>` : ''}
-    ${q.tiles ? `
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
-        ${q.opts.map(opt => `
-          <button class="quiz-option ${selected === opt.val ? 'selected' : ''}"
-            onclick="quizSelect('${q.id}','${opt.val}')"
-            style="text-align:left;padding:14px 16px;height:auto">
-            <div style="font-weight:700;font-size:14px;margin-bottom:4px">${opt.label}</div>
-            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${opt.sub}</div>
-            <div style="font-size:10px;color:var(--muted);opacity:.8;line-height:1.5">
-              ${opt.cats ? opt.cats.join(' · ') : ''}
-            </div>
-          </button>`).join('')}
-      </div>
-      ${q.hint ? `<div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center">${q.hint}</div>` : ''}
-    ` : `
-      <div class="quiz-options">
-        ${q.opts.map(opt => `
-          <button class="quiz-option ${selected === opt.val ? 'selected' : ''}"
-            onclick="quizSelect('${q.id}','${opt.val}')">
-            ${opt.label}
-          </button>`).join('')}
-      </div>
-    `}
-    ${q.id === 'ki' && selected === 'yes' ? `
-      <div class="form-group" style="margin-top:12px">
-        <label class="form-label">Claude API Key</label>
-        <input type="password" class="form-input" placeholder="sk-ant-…"
-          value="${loadLocal('fb_claude_key','')}"
-          oninput="saveLocal('fb_claude_key', this.value.trim())">
-        <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6">
-          <strong>Wo finde ich den Key?</strong><br>
-          console.anthropic.com → API Keys → Create Key.
-        </div>
-      </div>
-      <div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:9px;font-size:11px;color:var(--ink2);line-height:1.6">
-        <strong>Was die KI macht:</strong> Beleg fotografieren → Betrag, Datum, Kategorie werden automatisch erkannt. Kosten: ca. CHF 0.01–0.03 pro Scan. Läuft direkt in deinem Browser — deine Daten verlassen FinanceBird nicht.
-      </div>` : ''}
-    ${q.id === 'zeiterfassung' && selected === 'clockify' ? `
-      <div class="form-group" style="margin-top:12px">
-        <label class="form-label">Clockify API Key</label>
-        <input type="password" class="form-input" placeholder="API Key aus Profile Settings"
-          value="${loadLocal('fb_clockify_key','')}"
-          oninput="saveLocal('fb_clockify_key', this.value.trim())">
-        <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6">
-          <strong>Wo finde ich den Key?</strong><br>
-          clockify.me → Profilbild → Profile Settings → API → API Key kopieren.
-        </div>
-      </div>
-      <div style="margin-top:10px;padding:10px 12px;background:var(--bg2);border-radius:9px;font-size:11px;color:var(--ink2);line-height:1.6">
-        <strong>Was du gewinnst:</strong> Echter Stundensatz pro Projekt, Deckungsbeitrag, und die Antwort auf "Wofür geht meine Zeit wirklich?"
-      </div>` : ''}
-    ${q.id === 'zeiterfassung' && selected === 'other' ? `
-      <div class="form-group" style="margin-top:12px">
-        <label class="form-label">Welches Tool?</label>
-        <input type="text" class="form-input" placeholder="z.B. Toggl, Harvest, Timely…"
-          value="${loadLocal('fb_zeiterfassung_other','')}"
-          oninput="saveLocal('fb_zeiterfassung_other', this.value.trim())"
-          autocomplete="off">
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">Hilft uns, Integrationen zu priorisieren. Danke!</div>
-      </div>` : ''}
-    <div style="margin-top:14px;font-size:11px;color:var(--muted);text-align:center">
-      Frage ${quizStep + 1} von ${total}
-    </div>`;
+function obSetLang(lang) {
+  OB.lang = lang;
+  AppState.lang = lang;
+  saveAppState();
+  onboardNext('lang', 'country');
 }
 
-function quizSelect(id, val) {
-  quizAnswers[id] = val;
-  renderQuizStep();
+function obSetCountry(country, currency) {
+  OB.country = country;
+  OB.currency = currency;
+  AppState.country = country;
+  AppState.currency = currency;
+  saveAppState();
+  onboardNext('country', 'accounts');
+  obRenderAccountChips();
 }
 
-function quizNext() {
-  const q = QUIZ_QUESTIONS[quizStep];
-  if (q && !quizAnswers[q.id]) quizAnswers[q.id] = q.opts[0].val;
-  if (quizStep >= QUIZ_QUESTIONS.length - 1) {
-    // Layer 2: Show tax mapping confirmation before done
-    // Apply category mode now so mapping screen shows correct cats
-    if (quizAnswers.kategorien === '5') saveLocal('fb_cat_mode', '5');
-    else saveLocal('fb_cat_mode', '10');
-    showTaxMappingConfirm();
-  } else {
-    quizStep++;
-    renderQuizStep();
+function obShowOtherCountry() {
+  document.getElementById('obOtherCountryWrap').style.display = '';
+}
+
+function obRenderAccountChips() {
+  const el = document.getElementById('obAccountChips');
+  if (!el) return;
+  el.innerHTML = OB_ACCOUNT_PRESETS.map(name => {
+    const sel = OB.accounts.includes(name);
+    return `<button class="onboard-chip ${sel ? 'selected' : ''}" onclick="obToggleAccount('${name}')">${name}</button>`;
+  }).join('');
+  obUpdateAccountsUI();
+}
+
+function obToggleAccount(name) {
+  const idx = OB.accounts.indexOf(name);
+  if (idx >= 0) OB.accounts.splice(idx, 1);
+  else OB.accounts.push(name);
+  obRenderAccountChips();
+}
+
+function obAddCustomAccount() {
+  const inp = document.getElementById('obAccountCustom');
+  const name = (inp?.value || '').trim();
+  if (!name || OB.accounts.includes(name)) return;
+  OB.accounts.push(name);
+  inp.value = '';
+  obRenderAccountChips();
+}
+
+function obUpdateAccountsUI() {
+  const el = document.getElementById('obSelectedAccounts');
+  if (el) el.textContent = OB.accounts.length ? `${OB.accounts.length} Konto${OB.accounts.length > 1 ? 'n' : ''}: ${OB.accounts.join(', ')}` : '';
+  const btn = document.getElementById('obAccountsNextBtn');
+  if (btn) btn.disabled = OB.accounts.length === 0;
+}
+
+/* ── Integrationen ── */
+
+function obUpdateIntTiles() {
+  const notion = document.getElementById('obTileNotion');
+  const drive  = document.getElementById('obTileDrive');
+  const clock  = document.getElementById('obTileClock');
+  const ki     = document.getElementById('obTileKi');
+  if (notion) { notion.className = 'onboard-tile' + (OB.notionConnected ? ' connected' : ' required'); }
+  if (drive)  { drive.className  = 'onboard-tile' + (OB.driveConnected  ? ' connected' : ''); }
+  if (clock)  { clock.className  = 'onboard-tile' + (OB.clockifyConnected ? ' connected' : ''); }
+  if (ki)     { ki.className     = 'onboard-tile' + (OB.kiConnected     ? ' connected' : ''); }
+  // Button label
+  const btn = document.getElementById('obIntNextBtn');
+  if (btn) btn.textContent = OB.notionConnected ? 'Weiter →' : 'Notion verbinden';
+}
+
+function obConnectNotion() {
+  startOAuth();
+  const pollEl = document.getElementById('obIntPolling');
+  if (pollEl) pollEl.style.display = '';
+}
+
+function obConnectDrive() {
+  // Existing GDrive auth logic
+  if (typeof gdriveAuth === 'function') gdriveAuth();
+  else showToast('info', '📎', 'Google Drive', 'Wird in den Einstellungen eingerichtet.');
+}
+
+function obConnectClockify() {
+  const wrap = document.getElementById('obIntClockifyWrap');
+  if (wrap) wrap.style.display = wrap.style.display === 'none' ? '' : 'none';
+}
+
+function obSaveClockify() {
+  const key = document.getElementById('obClockifyKey')?.value?.trim();
+  if (key) {
+    saveLocal('fb_clockify_key', key);
+    OB.clockifyConnected = true;
+    document.getElementById('obIntClockifyWrap').style.display = 'none';
+    obUpdateIntTiles();
+    showToast('success', '⏱', 'Clockify verbunden', '');
   }
 }
 
-function quizBack() {
-  if (quizStep > 0) { quizStep--; renderQuizStep(); }
-  else onboardNext('quiz', 'connect');
+function obConnectKi() {
+  const wrap = document.getElementById('obIntKiWrap');
+  if (wrap) wrap.style.display = wrap.style.display === 'none' ? '' : 'none';
 }
 
-/** Layer 2 — Tax Mapping Confirmation Screen */
-function showTaxMappingConfirm() {
-  const tm   = loadLocal('fb_tax_mapping', DEFAULT_TAX_MAPPING);
-  const cats = getActiveCatsBiz();
-  const rows = cats.map(c => {
-    const mapped = tm[c] || DEFAULT_TAX_MAPPING[c] || 'Alle übrigen Geschäftsaufwände';
-    return `
-      <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">
-        <div style="flex:1;font-weight:500;color:var(--ink)">${c}</div>
-        <span style="color:var(--muted);font-size:11px">→</span>
-        <select style="padding:4px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:11.5px;
-          font-family:inherit;color:var(--ink2);background:var(--paper);max-width:180px"
-          onchange="updateTaxMapping('${c.replace(/'/g,"\\'")}',this.value)">
-          ${TAX_CATS.map(tc =>
-            `<option value="${tc}" ${mapped===tc?'selected':''}>${tc}</option>`
-          ).join('')}
-        </select>
-      </div>`;
-  }).join('');
-  const el = document.getElementById('taxMapConfirmRows');
-  if (el) el.innerHTML = rows;
-  onboardNext('quiz', 'taxmap');
+function obSaveKi() {
+  const key = document.getElementById('obKiKey')?.value?.trim();
+  if (key) {
+    saveLocal('fb_claude_key', key);
+    OB.kiConnected = true;
+    document.getElementById('obIntKiWrap').style.display = 'none';
+    obUpdateIntTiles();
+    showToast('success', '🤖', 'KI verbunden', '');
+  }
 }
 
-function applyQuizConfig() {
-  if (quizAnswers.sprache)  { AppState.lang     = quizAnswers.sprache;  }
-  if (quizAnswers.waehrung) { AppState.currency = quizAnswers.waehrung; }
-  saveAppState();
-  if (quizAnswers.kategorien === '5') saveLocal('fb_cat_mode', '5');
-  else saveLocal('fb_cat_mode', '10');
-  saveLocal('fb_quiz_answers', quizAnswers);
+function obIntNext() {
+  if (!OB.notionConnected) {
+    obConnectNotion();
+    return;
+  }
+  // Render summary
+  obRenderSummary();
+  onboardNext('integrations', 'summary');
+}
+
+/* ── Übersicht / Summary ── */
+
+function obRenderSummary() {
+  const integrations = [OB.notionConnected, OB.driveConnected, OB.clockifyConnected, OB.kiConnected].filter(Boolean).length;
+  const el = document.getElementById('obSummaryTable');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="onboard-summary-row"><span class="onboard-summary-label">Kategorien</span><span class="onboard-summary-value">Standard (20 Kategorien)</span></div>
+    <div class="onboard-summary-row"><span class="onboard-summary-label">Steuer-Mapping</span><span class="onboard-summary-value">Automatisch (${OB.country})</span></div>
+    <div class="onboard-summary-row"><span class="onboard-summary-label">Konten</span><span class="onboard-summary-value">${OB.accounts.length} definiert</span></div>
+    <div class="onboard-summary-row"><span class="onboard-summary-label">Währung</span><span class="onboard-summary-value">${OB.currency}</span></div>
+    <div class="onboard-summary-row"><span class="onboard-summary-label">Integrationen</span><span class="onboard-summary-value">${integrations}/4 verbunden</span></div>
+    <div class="onboard-summary-row"><span class="onboard-summary-label">Sprache</span><span class="onboard-summary-value">${OB.lang === 'de' ? 'Deutsch' : 'English'}</span></div>
+  `;
+}
+
+/* ── Notion OAuth Callback für Onboarding ── */
+
+function obNotionConnected() {
+  OB.notionConnected = true;
+  const pollEl = document.getElementById('obIntPolling');
+  if (pollEl) pollEl.style.display = 'none';
+  obUpdateIntTiles();
+}
+
+/* ── claimPairingCode (Welcome screen) ── */
+async function claimPairingCode() {
+  const code = (document.getElementById('welcomePairingInput')?.value || '').trim().toUpperCase();
+  const errEl = document.getElementById('welcomePairingError');
+  if (code.length !== 6) { if (errEl) errEl.textContent = 'Bitte 6-stelligen Code eingeben'; return; }
+  try {
+    const resp = await fetch(Auth.FB_WORKER_AUTH + '/device/claim', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    const data = await resp.json();
+    if (data.success && data.token) {
+      AppState.notionToken = data.token;
+      AppState.authMode = 'oauth';
+      if (data.licenseKey) saveLocal('fb_license_key', data.licenseKey);
+      saveAppState();
+      saveLocal('fb_onboard_complete', true);
+      showApp();
+      showLoading('Synchronisiere…');
+      if (!dbsConfigured()) {
+        const { found, missing } = await discoverDatabases();
+        if (missing.length > 0) {
+          const pid = await findSharedParentPage();
+          if (pid) await createMissingDatabases(pid, missing);
+        }
+      }
+      await fullSync();
+      hideLoading();
+      renderAll();
+      nav('cockpit');
+      showToast('success', '📱', 'Gerät gekoppelt', 'Willkommen!');
+    } else {
+      if (errEl) errEl.textContent = data.error || 'Code ungültig oder abgelaufen';
+    }
+  } catch (e) {
+    if (errEl) errEl.textContent = 'Verbindungsfehler: ' + e.message;
+  }
 }
 
 
@@ -9747,6 +10684,88 @@ function clearAllLocal() {
   Object.keys(localStorage).filter(k => !keep.includes(k)).forEach(k => localStorage.removeItem(k));
   alert('Lokale Daten gelöscht. Seite wird neu geladen…');
   location.reload();
+}
+
+/** Session 3: Set country and update MWST defaults */
+function setCountry(country) {
+  AppState.country = country;
+  if (country === 'CH') AppState.currency = 'CHF';
+  else if (country === 'DE' || country === 'AT') AppState.currency = 'EUR';
+  saveAppState();
+  // Reload merchant rules for new country
+  merchantRules = getDefaultRules(country);
+  saveMerchantRules().catch(() => {});
+  renderEinstellungen();
+  showToast('success', '✅', 'Land geändert', country);
+}
+
+/** Session 3: Logout with confirmation */
+function logoutWithConfirm() {
+  if (!confirm('Wirklich abmelden? Lokale Daten bleiben erhalten, du kannst dich jederzeit wieder verbinden.')) return;
+  logout();
+}
+
+/** Session 3: Collaboration management */
+let collaborators = [];
+
+function loadCollaborators() {
+  collaborators = loadLocal('fb_collaborators', []);
+}
+
+function saveCollaborators() {
+  saveLocal('fb_collaborators', collaborators);
+}
+
+function addCollaborator() {
+  const name = prompt('Name der Person:');
+  if (!name) return;
+  const email = prompt('E-Mail-Adresse:');
+  const role = 'Treuhänder:in';
+  collaborators.push({ id: Date.now().toString(), name, email: email || '', role, active: true });
+  saveCollaborators();
+  renderEinstellungen();
+}
+
+function toggleCollaborator(id) {
+  const c = collaborators.find(x => x.id === id);
+  if (c) { c.active = !c.active; saveCollaborators(); renderEinstellungen(); }
+}
+
+function removeCollaborator(id) {
+  if (!confirm('Person entfernen?')) return;
+  collaborators = collaborators.filter(x => x.id !== id);
+  saveCollaborators();
+  renderEinstellungen();
+}
+
+/** Render collaborator list in settings */
+function renderCollabList() {
+  const el = document.getElementById('settingsCollabList');
+  if (!el) return;
+  loadCollaborators();
+  if (collaborators.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px">Noch keine Zusammenarbeit eingerichtet</div>';
+    return;
+  }
+  el.innerHTML = collaborators.map(c => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:13px;color:var(--ink)">${esc(c.name)}</div>
+        <div style="font-size:11px;color:var(--muted)">${esc(c.email || '—')} · ${esc(c.role)}</div>
+      </div>
+      <label style="position:relative;display:inline-block;width:36px;height:20px;cursor:pointer">
+        <input type="checkbox" ${c.active ? 'checked' : ''} onchange="toggleCollaborator('${c.id}')" style="opacity:0;width:0;height:0">
+        <span style="position:absolute;inset:0;background:${c.active ? 'var(--green)' : 'var(--border)'};border-radius:10px;transition:.3s"></span>
+        <span style="position:absolute;top:2px;left:${c.active ? '18px' : '2px'};width:16px;height:16px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 2px rgba(0,0,0,.2)"></span>
+      </label>
+      <button class="btn btn-danger btn-sm" onclick="removeCollaborator('${c.id}')" style="padding:4px 8px">✕</button>
+    </div>`).join('');
+}
+
+/** Check if any active collaboration exists (for flagged status visibility) */
+function hasActiveCollaboration() {
+  loadCollaborators();
+  return collaborators.some(c => c.active);
 }
 
 
@@ -10042,6 +11061,8 @@ function renderEinstellungen() {
   _origRenderEinstellungen();
   const el = document.getElementById('einstellungenContent');
   if (!el) return;
+  // Session 3: Render collaborator list
+  renderCollabList();
   // Insert after Schwellenwerte card (before Diagnose)
   const diagSection = el.querySelector('.section-head h3');
   if (diagSection && diagSection.textContent === 'Diagnose & Daten') {
@@ -10151,7 +11172,10 @@ function migrateLocalStorage() {
             'Gehe zu Einstellungen → Neu verbinden und teile mindestens eine Seite.');
         }
       }
-      // 8. Show cached data immediately
+      // 8. Session 3: Ensure new DB properties exist + load merchant rules
+      await ensureBuchungenSchema();
+      await loadMerchantRules();
+      // 9. Show cached data immediately
       renderAll();
       // 9. Splash hides after first render
       setTimeout(hideSplashOnce, 800);
