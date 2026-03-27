@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.4b.2026-03-26">
+<meta name="fb-version" content="2.5a.2026-03-27">
   <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FinanceBird">
@@ -3155,10 +3155,13 @@ async function discoverDatabases() {
     let found = 0;
     const missing = [];
     for (const [key, schema] of Object.entries(DB_SCHEMAS)) {
-      const match = resp.results.find(r =>
+      // PATCH B9: handle duplicates — take first match, warn if multiple found
+      const matches = resp.results.filter(r =>
         r.title?.[0]?.plain_text === schema.title ||
         r.title?.[0]?.plain_text?.startsWith(schema.title)
       );
+      if (matches.length > 1) console.warn(`DB discovery: ${matches.length} duplicates found for ${schema.title} — using first`);
+      const match = matches[0];
       if (match) {
         DB[key] = match.id;
         found++;
@@ -3315,9 +3318,21 @@ async function createMissingDatabases(parentPageId, missingKeys) {
   saveLocal('fb_db_ids', DB);
   // PATCH B4: User feedback if some DBs failed
   if (failed.length > 0) {
+    // PATCH B9: targeted retry instead of full page reload
     showToast('error', '⚠️', `${failed.length} Datenbank(en) nicht erstellt`,
       failed.join(', '),
-      [], { label: 'Erneut versuchen →', fn: () => location.reload() }, 0);
+      [], { label: 'Erneut versuchen →', fn: async () => {
+        const pid = await findSharedParentPage();
+        if (!pid) { showToast('error', '⚠️', 'Keine Notion-Seite gefunden', 'Bitte Notion neu verbinden.', [], { label: 'Notion neu verbinden →', fn: () => Auth.startOAuth() }, 8000); return; }
+        // Re-discover to get IDs of already-created DBs
+        await discoverDatabases();
+        const { missing } = await discoverDatabases();
+        if (missing.length === 0) {
+          showToast('success', '✅', 'Alle Datenbanken bereit', 'Deine Notion-Datenbanken sind vollständig eingerichtet.', [], null, 4000);
+          return;
+        }
+        await createMissingDatabases(pid, missing);
+      }}, 0);
   }
   return created;
 }
@@ -3344,8 +3359,14 @@ async function ensureBuchungenSchema() {
     'Korrektur-Von':      { rich_text: {} },
     'Korrektur-Datum':    { date: {} },
   };
+  // PATCH B9: also update Kategorie options to include CATS_PRIVATE
+  // (Notion API limit prevents setting all options during DB creation)
+  const kategorieUpdate = {
+    'Kategorie': { select: { options: CATEGORIES_20.concat(CATS_PRIVATE).map(c => ({ name: c })) } },
+    'Korrektur-Kategorie': { select: { options: CATEGORIES_20.map(c => ({ name: c })) } },
+  };
   try {
-    await notionFetch(`/databases/${DB.BUCHUNGEN}`, 'PATCH', { properties: newProps });
+    await notionFetch(`/databases/${DB.BUCHUNGEN}`, 'PATCH', { properties: { ...newProps, ...kategorieUpdate } });
     console.log('ensureBuchungenSchema: properties updated');
   } catch (e) {
     console.warn('ensureBuchungenSchema: failed (non-critical):', e.message);
@@ -4213,7 +4234,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.4b.2026-03-26';
+const APP_VERSION = '2.5a.2026-03-27';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -10262,7 +10283,7 @@ const OB = {
   lang: 'de',
   country: 'CH',
   currency: 'CHF',
-  accounts: [],
+  accounts: loadLocal('fb_ob_accounts', []), // PATCH B10: restore after OAuth redirect
   notionConnected: false,
   driveConnected: false,
   clockifyConnected: false,
@@ -10306,6 +10327,7 @@ function obToggleAccount(name) {
   const idx = OB.accounts.indexOf(name);
   if (idx >= 0) OB.accounts.splice(idx, 1);
   else OB.accounts.push(name);
+  saveLocal('fb_ob_accounts', OB.accounts); // PATCH B10: persist across OAuth redirect
   obRenderAccountChips();
 }
 
@@ -10314,6 +10336,7 @@ function obAddCustomAccount() {
   const name = (inp?.value || '').trim();
   if (!name || OB.accounts.includes(name)) return;
   OB.accounts.push(name);
+  saveLocal('fb_ob_accounts', OB.accounts); // PATCH B10: persist across OAuth redirect
   inp.value = '';
   obRenderAccountChips();
 }
