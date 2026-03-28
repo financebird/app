@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.5d.2026-03-27">
+<meta name="fb-version" content="2.6a.2026-03-28">
   <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FinanceBird">
@@ -43,10 +43,19 @@ if ('serviceWorker' in navigator) {
           }
         });
       });
-      // Reload wenn neuer SW übernimmt
+      // Reload wenn neuer SW übernimmt — zeige kurzen Toast
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) { refreshing = true; window.location.reload(); }
+        if (!refreshing) {
+          refreshing = true;
+          // Brief "Wird aktualisiert…" before reload
+          if (typeof showToast === 'function') {
+            showToast('info', '🔄', 'Wird aktualisiert…', 'Neue Version wird geladen.', [], null, 1500);
+            setTimeout(() => window.location.reload(), 1200);
+          } else {
+            window.location.reload();
+          }
+        }
       });
     }).catch(() => {});
   });
@@ -1066,6 +1075,11 @@ body.dark .inbox-card.overdue { background: rgba(200,146,42,.07); }
 .onboard-summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .onboard-summary-row:last-child { border-bottom: none; }
 .onboard-summary-label { color: var(--muted); }
+.field-help-btn { display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--border);color:var(--muted);font-size:9px;font-weight:700;cursor:pointer;border:none;margin-left:5px;vertical-align:middle;line-height:1;flex-shrink:0;font-family:sans-serif }
+.field-help-btn:hover { background:var(--accent);color:white }
+.field-help-popup { position:fixed;z-index:9999;background:var(--ink);color:var(--bg);border-radius:10px;padding:12px 14px;max-width:260px;font-size:12.5px;line-height:1.55;box-shadow:0 4px 20px rgba(0,0,0,.25);pointer-events:none;opacity:0;transition:opacity .15s }
+.field-help-popup.visible { opacity:1;pointer-events:auto }
+.field-help-popup strong { display:block;margin-bottom:5px;font-size:13px }
 .onboard-summary-value { font-weight: 600; color: var(--ink); }
 
 /* Kategorie-Status (Session 3) */
@@ -1550,6 +1564,14 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
         </div>
       </div>
       <!-- Inline input areas (hidden by default) -->
+      <div id="obDriveWrap" style="display:none;margin-top:12px;padding:12px 14px;background:var(--bg2);border-radius:10px;font-size:12.5px;line-height:1.6">
+        <div style="font-weight:600;margin-bottom:8px;font-size:13px">📁 Ordnerstruktur in Google Drive:</div>
+        <div style="font-family:'Courier Prime',monospace;font-size:12px;color:var(--ink2);white-space:pre;margin-bottom:10px">📁 FinanceBird
+   📁 Business
+      📁 Income / ${new Date().getFullYear()}
+      📁 Expenses / ${new Date().getFullYear()}</div>
+        <div style="color:var(--muted);font-size:12px">FinanceBird erstellt einen Ordner in deinem Google Drive. Du kannst ihn danach frei verschieben oder umbenennen — die App findet ihn über die Folder-ID trotzdem.</div>
+      </div>
       <div id="obIntClockifyWrap" style="display:none;margin-top:12px">
         <label class="form-label" style="font-size:12px">Clockify API Key</label>
         <input type="password" id="obClockifyKey" class="form-input" placeholder="API Key aus Profile Settings" style="margin-bottom:6px">
@@ -3124,15 +3146,127 @@ async function getOrCreateFolderInParent(token, name, parentId) {
 }
 
 /** Upload file to GDrive folder structure: bereich/direction/year/ */
+/** Load gdrive folder config from localStorage (with defaults) */
+function getGDriveConfig() {
+  return loadLocal('fb_gdrive_config', {
+    rootName: 'FinanceBird',
+    folders: {
+      business_in:  { name: 'Income',   id: null },
+      business_out: { name: 'Expenses', id: null },
+      private_in:   { name: 'Income',   id: null },
+      private_out:  { name: 'Expenses', id: null },
+    }
+  });
+}
+
+/** Update gdrive config key (supports dot notation: 'folders.business_in.name') */
+function gdriveUpdateConfig(keyPath, value) {
+  const cfg = getGDriveConfig();
+  const parts = keyPath.split('.');
+  let obj = cfg;
+  for (let i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
+  obj[parts[parts.length - 1]] = value;
+  // Clear cached tier/folder IDs when names change (force re-creation next upload)
+  if (keyPath === 'rootName') {
+    saveLocal('fb_gdrive_parent', null);
+    saveLocal('fb_gdrive_tier_business_tier', null);
+    saveLocal('fb_gdrive_tier_private_tier', null);
+  }
+  saveLocal('fb_gdrive_config', cfg);
+  renderEinstellungen(); // live preview update
+}
+
+/** Render Belege-Ablage card content for Einstellungen */
+function renderGDriveEinstellungenCard() {
+  const cfg = getGDriveConfig();
+  const yr = new Date().getFullYear();
+  const gdriveToken = sessionStorage.getItem('fb_gdrive_token');
+  const fields = [
+    { key: 'rootName',               label: 'Root-Ordnername',     val: cfg.rootName || 'FinanceBird', flat: true, help: 'gdrive-root' },
+    { key: 'folders.business_in.name',  label: 'Business · Einnahmen', val: cfg.folders.business_in?.name || 'Income',   help: 'gdrive-income' },
+    { key: 'folders.business_out.name', label: 'Business · Ausgaben',  val: cfg.folders.business_out?.name || 'Expenses', help: 'gdrive-expenses' },
+    { key: 'folders.private_in.name',   label: 'Private · Einnahmen',  val: cfg.folders.private_in?.name || 'Income',    help: 'gdrive-income' },
+    { key: 'folders.private_out.name',  label: 'Private · Ausgaben',   val: cfg.folders.private_out?.name || 'Expenses', help: 'gdrive-expenses' },
+  ];
+  return `
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.5">
+      FinanceBird speichert Belege in deinem Google Drive. Du kannst Ordnernamen anpassen — die App merkt sich die Folder-IDs, nicht die Namen.
+    </div>
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:600;font-size:14px">Google Drive</div>
+      <div>
+        ${gdriveToken
+          ? '<span style="font-size:12px;color:var(--green)">✅ Verbunden</span>'
+          : '<button class="btn btn-primary btn-sm" onclick="settingsConnectGDrive()">Verbinden</button>'}
+      </div>
+    </div>
+    <div style="padding:14px 0;border-bottom:1px solid var(--border)">
+      ${fields.map(f => `
+      <div style="display:grid;grid-template-columns:1fr 140px;gap:8px;align-items:center;margin-bottom:8px">
+        <label style="font-size:13px;color:var(--ink2)">${esc(f.label)}${f.help ? helpBtn(f.help) : ''}</label>
+        <input class="form-input" style="padding:7px 10px;font-size:13px" value="${esc(f.val)}"
+          onchange="gdriveUpdateConfig('${f.key}', this.value)">
+      </div>`).join('')}
+    </div>
+    <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600">Vorschau:</div>
+      <div style="font-family:'Courier Prime',monospace;font-size:11.5px;color:var(--ink2);line-height:1.8">
+        📁 ${esc(cfg.rootName || 'FinanceBird')}<br>
+        &nbsp;&nbsp;&nbsp;📁 Business<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📁 ${esc(cfg.folders.business_in?.name || 'Income')} / ${yr}<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📁 ${esc(cfg.folders.business_out?.name || 'Expenses')} / ${yr}<br>
+        &nbsp;&nbsp;&nbsp;📁 Private <span style="color:var(--muted)">(bei Bedarf)</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📁 ${esc(cfg.folders.private_in?.name || 'Income')} / ${yr}<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📁 ${esc(cfg.folders.private_out?.name || 'Expenses')} / ${yr}
+      </div>
+    </div>
+    <div style="padding:10px 0;font-size:11.5px;color:var(--muted);line-height:1.6">
+      ℹ️ Jahresordner werden automatisch erstellt.<br>
+      ℹ️ Du kannst Ordner in Google Drive frei verschieben oder umbenennen — die App findet sie über die Folder-ID trotzdem.<br>
+      ℹ️ Bestehende Ordner werden nicht umbenannt, wenn du den Namen hier änderst.
+    </div>`;
+}
+
+/** Connect GDrive from Einstellungen */
+async function settingsConnectGDrive() {
+  try {
+    await getGDriveToken();
+    showToast('success', '📎', 'Google Drive verbunden', 'Belege werden automatisch abgelegt.');
+    renderEinstellungen();
+  } catch(e) {
+    showToast('error', '📎', 'Verbindung fehlgeschlagen', 'Versuche es nochmal.');
+  }
+}
+
+/** Save folder ID after first creation (Folder Targets Architecture) */
+function saveGDriveFolderId(key, id) {
+  const cfg = getGDriveConfig();
+  cfg.folders[key].id = id;
+  saveLocal('fb_gdrive_config', cfg);
+}
+
 async function uploadToGDrive(dataURL, filename, isPDF) {
   const token  = await getGDriveToken();
   const year   = (document.getElementById('erfDate')?.value || toDay()).slice(0, 4);
-  const dir    = Erf.type === 'income' ? 'IN' : 'OUT';
-  const bereich= Erf.bereich === 'business' ? 'Geschaeftlich' : 'Privat';
-  // Build folder hierarchy
-  const bereichId = await getOrCreateFolderInParent(token, bereich, await getGDriveParent());
-  const dirId     = await getOrCreateFolderInParent(token, dir,    bereichId);
-  const yearId    = await getOrCreateFolderInParent(token, year,   dirId);
+  const cfg    = getGDriveConfig();
+  const isPrivate = Erf.bereich === 'private';
+  const isIncome  = Erf.type === 'income';
+  const fKey   = (isPrivate ? 'private' : 'business') + '_' + (isIncome ? 'in' : 'out');
+  // Build folder hierarchy — Folder Targets: use cached IDs where available
+  const rootId    = await getGDriveParent();
+  // Business/Private tier (lazy: Private only when needed)
+  const tierName  = isPrivate ? 'Private' : 'Business';
+  const tierKey   = isPrivate ? 'private_tier' : 'business_tier';
+  let tierId = loadLocal('fb_gdrive_tier_' + tierKey, null);
+  if (!tierId) {
+    tierId = await getOrCreateFolderInParent(token, tierName, rootId);
+    saveLocal('fb_gdrive_tier_' + tierKey, tierId);
+  }
+  // Income/Expenses tier
+  const folderName = isIncome ? cfg.folders[fKey].name || (isIncome ? 'Income' : 'Expenses') : cfg.folders[fKey].name || 'Expenses';
+  const dirId      = await getOrCreateFolderInParent(token, folderName, tierId);
+  // Year tier
+  const yearId     = await getOrCreateFolderInParent(token, year, dirId);
   // Upload file
   const res  = await fetch(dataURL); const blob = await res.blob();
   const mime = isPDF ? 'application/pdf'
@@ -4293,7 +4427,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.5d.2026-03-27';
+const APP_VERSION = '2.6a.2026-03-28';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -7931,6 +8065,74 @@ function renderRecentBookingsHTML() {
 /* ── Sub-tab state ── */
 let _buchSubtab = 'buchungen'; // active sub-tab
 
+/** BL-038: Export filtered Belege as ZIP */
+async function exportBelegeZip() {
+  const filtered = buchungenFiltered().filter(b => b.receiptLink);
+  if (!filtered.length) {
+    showToast('info', '📦', 'Keine Belege', 'Die aktuelle Auswahl enthält keine Belege.');
+    return;
+  }
+  // Load JSZip dynamically
+  if (typeof JSZip === 'undefined') {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+      s.onload = res; s.onerror = () => rej(new Error('JSZip laden fehlgeschlagen'));
+      document.head.appendChild(s);
+    });
+  }
+  const token = sessionStorage.getItem('fb_gdrive_token');
+  if (!token) {
+    showToast('error', '📦', 'Nicht verbunden', 'Verbinde zuerst Google Drive in den Einstellungen.');
+    return;
+  }
+  const prog = document.getElementById('belegeZipProgress');
+  const progBar = document.getElementById('belegeZipProgressBar');
+  const progLabel = document.getElementById('belegeZipProgressLabel');
+  if (prog) prog.style.display = '';
+  const btn = document.getElementById('belegeZipBtn');
+  if (btn) btn.disabled = true;
+
+  try {
+    const zip = new JSZip();
+    let done = 0;
+    for (const b of filtered) {
+      if (progLabel) progLabel.textContent = `Lade ${done + 1} von ${filtered.length}…`;
+      if (progBar) progBar.style.width = (done / filtered.length * 100) + '%';
+      // Extract file ID from GDrive link
+      const m = b.receiptLink.match(/\/d\/([a-zA-Z0-9_-]+)/) || b.receiptLink.match(/id=([a-zA-Z0-9_-]+)/);
+      if (!m) { done++; continue; }
+      const fileId = m[1];
+      try {
+        const resp = await fetch(
+          `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+          { headers: { Authorization: 'Bearer ' + token } }
+        );
+        if (!resp.ok) { done++; continue; }
+        const blob = await resp.blob();
+        const ext  = blob.type.includes('pdf') ? '.pdf' : blob.type.includes('png') ? '.png' : '.jpg';
+        const safeName = (b.date || 'nodate') + '_' + (b.description || 'beleg').slice(0, 40).replace(/[^a-zA-Z0-9_\-äöüÄÖÜ ]/g, '_') + ext;
+        zip.file(safeName, blob);
+      } catch(e) { /* skip single failed file */ }
+      done++;
+    }
+    if (progBar) progBar.style.width = '100%';
+    if (progLabel) progLabel.textContent = 'Erstelle ZIP…';
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'FinanceBird_Belege_' + new Date().toISOString().slice(0,10) + '.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('success', '📦', `${done} Belege exportiert`, 'ZIP wurde heruntergeladen.');
+  } catch(e) {
+    showToast('error', '📦', 'Export fehlgeschlagen', e.message || 'Versuche es nochmal.');
+  } finally {
+    if (prog) setTimeout(() => { prog.style.display = 'none'; if(progBar) progBar.style.width = '0%'; }, 2000);
+    if (btn) btn.disabled = false;
+  }
+}
+
 function renderBuchhaltung() {
   const el = document.getElementById('buchhaltungContent');
   if (!el) return;
@@ -8027,8 +8229,15 @@ function renderBuchungenHTML() {
         value="${BuchFilter.search}"
         oninput="BuchFilter.search=this.value;renderBuchSubtab()">
       <button class="btn btn-outline btn-sm" onclick="exportBuchungenCSV()">📥 CSV</button>
+      ${buchungenFiltered().some(b => b.receiptLink) ? '<button class="btn btn-outline btn-sm" onclick="exportBelegeZip()" id="belegeZipBtn">📦 Belege ZIP</button>' : ''}
       <button class="btn btn-outline btn-sm" onclick="openCSVImport()">📤 CSV importieren</button>
       <button class="btn btn-primary btn-sm" onclick="openErfassen('buchung')">+ Buchung</button>
+    </div>
+    <div id="belegeZipProgress" style="display:none;padding:8px 0">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px" id="belegeZipProgressLabel">Belege werden geladen…</div>
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+        <div id="belegeZipProgressBar" style="height:100%;width:0%;background:var(--accent);transition:width .3s"></div>
+      </div>
     </div>
     <!-- Table -->
     <div class="card table-scroll-wrap" style="margin-top:12px">
@@ -9092,6 +9301,77 @@ function renderKompass() {
     </div>`;
 }
 
+/** BL-030: Kontextuelle Hilfe für konfigurierbare Felder */
+const FIELD_HELP = {
+  'gdrive-root': {
+    title: 'Root-Ordner',
+    body: 'Dieser Ordner wird in deinem Google Drive erstellt und enthält alle Belege. Du kannst ihn nach der Verbindung frei verschieben oder umbenennen — die App merkt sich die ID.'
+  },
+  'gdrive-income': {
+    title: 'Einnahmen-Ordner',
+    body: 'Belege für Einnahmen (z.B. Rechnungskopien) landen hier. Jahresordner (2025, 2026…) werden automatisch erstellt.'
+  },
+  'gdrive-expenses': {
+    title: 'Ausgaben-Ordner',
+    body: 'Belege für Ausgaben (Quittungen, Rechnungen) landen hier. Jahresordner werden automatisch erstellt.'
+  },
+  'clockify-key': {
+    title: 'Clockify API Key',
+    body: 'Den Key findest du unter: clockify.me → Profil-Icon → Profile Settings → API → Generieren. Wird nur lokal gespeichert.'
+  },
+  'claude-key': {
+    title: 'Claude API Key',
+    body: 'Den Key findest du unter: console.anthropic.com → API Keys → Create Key. Wird nur lokal gespeichert und nie an unsere Server gesendet.'
+  },
+  'mwst-pflichtig': {
+    title: 'MWST-Pflicht',
+    body: 'In der Schweiz gilt MWST-Pflicht ab CHF 100’000 Jahresumsatz. Wenn du nicht pflichtig bist, werden MWST-Felder ausgeblendet.'
+  },
+  'ob-accounts': {
+    title: 'Bankkonten',
+    body: 'Gib deine Geschäftskonten an (z.B. UBS Geschäftskonto, PostFinance). Sie erscheinen beim Erfassen als Auswahlfeld. Mindestens 1 Konto empfohlen.'
+  },
+  'ob-country': {
+    title: 'Land & Steuern',
+    body: 'Das Land bestimmt die MWST-Sätze und das Steuerformular-Mapping deiner Buchungen. Wählbar: Schweiz (CH), Deutschland (DE), Österreich (AT).'
+  },
+};
+
+function showFieldHelp(key, anchorEl) {
+  const info = FIELD_HELP[key];
+  if (!info) return;
+  let popup = document.getElementById('fieldHelpPopup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'fieldHelpPopup';
+    popup.className = 'field-help-popup';
+    popup.innerHTML = '<strong id="fhTitle"></strong><span id="fhBody"></span>';
+    popup.addEventListener('click', hideFieldHelp);
+    document.body.appendChild(popup);
+  }
+  document.getElementById('fhTitle').textContent = info.title;
+  document.getElementById('fhBody').textContent = info.body;
+  const rect = anchorEl.getBoundingClientRect();
+  const left = Math.min(rect.left, window.innerWidth - 280);
+  const top  = rect.bottom + 6;
+  popup.style.left = Math.max(8, left) + 'px';
+  popup.style.top  = top + 'px';
+  popup.classList.add('visible');
+  // Auto-hide after 6s or on outside click
+  clearTimeout(popup._timer);
+  popup._timer = setTimeout(hideFieldHelp, 6000);
+  setTimeout(() => document.addEventListener('click', hideFieldHelp, { once: true }), 50);
+}
+
+function hideFieldHelp() {
+  const popup = document.getElementById('fieldHelpPopup');
+  if (popup) popup.classList.remove('visible');
+}
+
+function helpBtn(key) {
+  return `<button class="field-help-btn" onclick="event.stopPropagation();showFieldHelp('${key}',this)" title="Info">?</button>`;
+}
+
 function renderEinstellungen() {
   const el = document.getElementById('einstellungenContent');
   if (!el) return;
@@ -9126,7 +9406,7 @@ function renderEinstellungen() {
         </div>
         <div style="padding:12px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)">
           <div>
-            <div style="font-weight:600;font-size:14px">Clockify</div>
+            <div style="font-weight:600;font-size:14px">Clockify ${helpBtn('clockify-key')}</div>
             <div style="font-size:12px;color:var(--muted)">
               ${cfKey ? '✅ Verbunden' + (cfLastSync ? ' · Sync: '+cfLastSync : ' · noch nie sync') : '❌ Nicht verbunden'}
             </div>
@@ -9139,7 +9419,7 @@ function renderEinstellungen() {
         </div>
         <div style="padding:12px 0;display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">Claude AI (Beleganalyse)</div>
+            <div style="font-weight:600;font-size:14px">Claude AI (Beleganalyse) ${helpBtn('claude-key')}</div>
             <div style="font-size:12px;color:var(--muted)">${claudeKey ? '✅ API Key gesetzt' : '❌ Nicht gesetzt'}</div>
           </div>
           <div style="display:flex;gap:8px">
@@ -9208,7 +9488,7 @@ function renderEinstellungen() {
         </div>
         <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border)">
           <div>
-            <div style="font-weight:600;font-size:14px">MWST-pflichtig</div>
+            <div style="font-weight:600;font-size:14px">MWST-pflichtig ${helpBtn('mwst-pflichtig')}</div>
             <div style="font-size:12px;color:var(--muted)">MWST-Felder beim Erfassen ${AppState.mwstPflichtig ? 'sichtbar' : 'ausgeblendet'}</div>
           </div>
           <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
@@ -9248,6 +9528,12 @@ function renderEinstellungen() {
             <option value="saldo" ${loadLocal('fb_mwst_method','effektiv')==='saldo'?'selected':''}>Saldosteuersatz</option>
           </select>` : `<span style="font-size:13px;color:var(--muted)">Standard</span>`}
         </div>` : ''}
+      </div>
+
+      <!-- BL-029: Belege-Ablage -->
+      <div class="section-head"><h3>Belege-Ablage</h3></div>
+      <div class="card" style="margin-bottom:14px" id="settingsGDriveCard">
+        ${renderGDriveEinstellungenCard()}
       </div>
 
       <!-- Session 3: Zusammenarbeit -->
@@ -10471,10 +10757,27 @@ function obConnectNotion() {
   if (pollEl) pollEl.style.display = '';
 }
 
-function obConnectDrive() {
-  // PATCH C4: Belege — Konfiguration direkt anbieten
-  if (typeof gdriveAuth === 'function') gdriveAuth();
-  else showToast('info', '📎', 'Belege-Ablage', 'Belege werden auf der Ablage deiner Wahl gespeichert. Konfigurierbar in den Einstellungen.');
+async function obConnectDrive() {
+  // BL-029: Aktiver GDrive Connect-Flow
+  const tile = document.getElementById('obTileDrive');
+  const wrap = document.getElementById('obDriveWrap');
+  // Toggle info panel if already connected
+  if (OB.driveConnected) {
+    if (wrap) wrap.style.display = wrap.style.display === 'none' ? '' : 'none';
+    return;
+  }
+  if (tile) tile.style.opacity = '0.6';
+  try {
+    await getGDriveToken(); // triggers Google Consent Screen
+    OB.driveConnected = true;
+    obUpdateIntTiles();
+    if (wrap) wrap.style.display = '';
+    showToast('success', '📎', 'Google Drive verbunden', 'Belege werden automatisch abgelegt.');
+  } catch(e) {
+    showToast('error', '📎', 'Verbindung fehlgeschlagen', 'Versuche es nochmal oder überspringe diesen Schritt.');
+  } finally {
+    if (tile) tile.style.opacity = '';
+  }
 }
 
 function obConnectClockify() {
@@ -10522,16 +10825,42 @@ function obIntNext() {
 /* ── Übersicht / Summary ── */
 
 function obRenderSummary() {
-  const integrations = [OB.notionConnected, OB.driveConnected, OB.clockifyConnected, OB.kiConnected].filter(Boolean).length;
   const el = document.getElementById('obSummaryTable');
   if (!el) return;
+
+  // Zone 1: Heute eingerichtet (confirmed items)
+  const configured = [];
+  configured.push({ label: 'Sprache', value: OB.lang === 'de' ? 'Deutsch' : 'English' });
+  configured.push({ label: 'Land & Steuern', value: { CH: '🇨🇭 Schweiz', DE: '🇩🇪 Deutschland', AT: '🇦🇹 Österreich' }[OB.country] || OB.country });
+  configured.push({ label: 'Währung', value: OB.currency });
+  if (OB.accounts.length > 0) configured.push({ label: 'Konten', value: OB.accounts.length + ' definiert' });
+  configured.push({ label: 'Kategorien & Steuer-Mapping', value: 'Standard automatisch' });
+  if (OB.notionConnected) configured.push({ label: 'Notion', value: '✅ Verbunden' });
+  if (OB.driveConnected)  configured.push({ label: 'Google Drive', value: '✅ Verbunden' });
+  if (OB.clockifyConnected) configured.push({ label: 'Clockify', value: '✅ Verbunden' });
+  if (OB.kiConnected)     configured.push({ label: 'KI (Claude)', value: '✅ Verbunden' });
+
+  // Zone 2: Noch konfigurierbar (optional/skipped)
+  const optional = [];
+  if (!OB.driveConnected)    optional.push({ label: 'Belege-Ablage', hint: 'Google Drive — in Einstellungen nachholen' });
+  if (!OB.clockifyConnected) optional.push({ label: 'Zeit & Projekte', hint: 'Clockify — in Einstellungen nachholen' });
+  if (!OB.kiConnected)       optional.push({ label: 'KI-Beleganalyse', hint: 'Claude API Key — in Einstellungen nachholen' });
+  if (OB.accounts.length === 0) optional.push({ label: 'Konten', hint: 'Bankkonten — in Einstellungen ergänzen' });
+
   el.innerHTML = `
-    <div class="onboard-summary-row"><span class="onboard-summary-label">Kategorien</span><span class="onboard-summary-value">Standard (20 Kategorien)</span></div>
-    <div class="onboard-summary-row"><span class="onboard-summary-label">Steuer-Mapping</span><span class="onboard-summary-value">Automatisch (${OB.country})</span></div>
-    <div class="onboard-summary-row"><span class="onboard-summary-label">Konten</span><span class="onboard-summary-value">${OB.accounts.length} definiert</span></div>
-    <div class="onboard-summary-row"><span class="onboard-summary-label">Währung</span><span class="onboard-summary-value">${OB.currency}</span></div>
-    <div class="onboard-summary-row"><span class="onboard-summary-label">Integrationen</span><span class="onboard-summary-value">${integrations}/4 verbunden</span></div>
-    <div class="onboard-summary-row"><span class="onboard-summary-label">Sprache</span><span class="onboard-summary-value">${OB.lang === 'de' ? 'Deutsch' : 'English'}</span></div>
+    <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Heute eingerichtet</div>
+    ${configured.map(r => `
+      <div class="onboard-summary-row">
+        <span class="onboard-summary-label">${r.label}</span>
+        <span class="onboard-summary-value">${r.value}</span>
+      </div>`).join('')}
+    ${optional.length > 0 ? `
+    <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:16px;margin-bottom:8px;padding-top:12px;border-top:1px solid var(--border)">Jederzeit nachholen</div>
+    ${optional.map(r => `
+      <div class="onboard-summary-row" style="opacity:.7">
+        <span class="onboard-summary-label">${r.label}</span>
+        <span class="onboard-summary-value" style="font-size:12px;color:var(--muted);font-weight:400">${r.hint}</span>
+      </div>`).join('')}` : ''}
   `;
 }
 
