@@ -2,7 +2,7 @@
 // Share-Target-Handler + Offline-Cache Shell
 // Fängt Share-Target-POSTs ab und cached die App-Shell für Offline
 
-const CACHE_NAME   = 'financebird-v2';
+const CACHE_NAME   = 'financebird-v2.5d-20260327';
 const APP_SHELL    = [
   './financebird_v2.html',
   // Fonts werden von Google geladen — kein Cache nötig (Fallback: System-Font)
