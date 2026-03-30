@@ -11839,6 +11839,14 @@ function migrateLocalStorage() {
   // 2. Restore dark mode immediately (before anything renders)
   restoreDarkMode();
 
+  // 2b. Splash progress — zeige Aktivität während Init
+  (function() {
+    const bar = document.getElementById('splash-progress');
+    if (!bar) return;
+    bar.style.width = '30%';
+    setTimeout(() => { if (bar) bar.style.width = '70%'; }, 400);
+  })();
+
   // 3. Load caches into Store (instant — no network)
   loadCaches();
 
@@ -11953,23 +11961,18 @@ function migrateLocalStorage() {
       // Installierte PWA ohne Setup — Kopplungscode-Screen
       saveLocal('fb_onboard_seen', true);
       onboardNext(null, 'mobile-pairing');
-    } else if (!seen) {
-      // Erster Besuch im Browser — Welcome Screen
-      saveLocal('fb_onboard_seen', true);
+    } else if (!seen || !hasLicense) {
+      // Erster Besuch ODER: seen=true aber kein Key (z.B. nach SW-Update-Reload,
+      // Website-Daten gelöscht, oder unvollständiger Reset) → immer Welcome
+      // BUG-020: Flag erst beim Klick auf "Neu einrichten" setzen
       onboardNext(null, 'welcome');
     } else if (hasLicense) {
-      // PATCH B1: Lizenz bekannt, Token fehlt — gespeicherten Step oder lang
+      // Returning user: Lizenz bekannt, Token fehlt — gespeicherten Step oder lang
       const savedStep = loadLocal('fb_onboard_step', null);
       onboardNext(null, savedStep || 'lang');
     } else {
-      // PATCH B2: Gespeicherten Onboarding-Step wiederherstellen
-      const savedStep = loadLocal('fb_onboard_step', null);
-      if (savedStep) {
-        onboardNext(null, savedStep);
-      } else {
-        // Lizenz-Key fehlt noch
-        onboardNext(null, 'license');
-      }
+      // Fallback (sollte durch obigen Branch abgedeckt sein)
+      onboardNext(null, 'license');
     }
   }
 })();
