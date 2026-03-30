@@ -18,16 +18,18 @@
 <script>
 // BUG-017: Ensure manifest has correct start_url for PWA install
 (function() {
+  const _base = window.location.origin + '/';
   const manifestData = {
     name: 'FinanceBird',
     short_name: 'FinanceBird',
-    start_url: '/financebird_v2.html',
+    start_url: window.location.origin + '/financebird_v2.html',
+    scope: window.location.origin + '/',
     display: 'standalone',
     background_color: '#faf8f4',
     theme_color: '#c4441a',
     icons: [
-      { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
-      { src: 'icon-512.png', sizes: '512x512', type: 'image/png' }
+      { src: _base + 'icon-192.png', sizes: '192x192', type: 'image/png' },
+      { src: _base + 'icon-512.png', sizes: '512x512', type: 'image/png' }
     ]
   };
   const blob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
@@ -1425,9 +1427,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
 
       <div style="margin-top:16px;font-size:12px;color:var(--muted);line-height:1.7">
         Noch keinen Key?
-        <a href="/cdn-cgi/l/email-protection#a6cec3cacac9e6c9d5d1c7cac2cdc9c3c8cfc188c5ce" style="color:var(--accent);text-decoration:none">
-          <span class="__cf_email__" data-cfemail="48202d24242708273b3f29242c23272d26212f662b20">[email&#160;protected]</span>
-        </a><br>
+        <a href="mailto:hello@oswaldkoenig.ch" style="color:var(--accent);text-decoration:none">hello@oswaldkoenig.ch</a><br>
         <span style="font-size:11px">Jederzeit in den Einstellungen änderbar.</span>
       </div>
     </div>
