@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://lh3.googleusercontent.com; connect-src 'self' https://financebird-proxy.holy-forest-0174.workers.dev https://financebird-auth.holy-forest-0174.workers.dev https://api.frankfurter.app https://www.googleapis.com https://accounts.google.com; frame-src 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://lh3.googleusercontent.com; connect-src 'self' https://financebird-proxy.holy-forest-0174.workers.dev https://financebird-auth.holy-forest-0174.workers.dev https://api.frankfurter.app https://www.googleapis.com https://accounts.google.com; manifest-src 'self' blob:; frame-src 'none'; object-src 'none';">
 <title>FinanceBird</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.6b.2026-03-28">
+<meta name="fb-version" content="2.7a.2026-03-30">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FinanceBird">
 <meta name="theme-color" content="#2c1f0e">
@@ -1084,8 +1085,8 @@ body.dark .inbox-card.overdue { background: rgba(200,146,42,.07); }
   cursor: pointer; transition: all .2s; text-align: center;
 }
 .onboard-tile:hover { border-color: var(--accent); }
-.onboard-tile.required { border-color: var(--accent); border-width: 2px; }
-.onboard-tile.connected { border-color: var(--green); background: rgba(34,139,34,.05); }
+.onboard-tile.required { border-color: #5a7a4a; border-width: 2px; background: rgba(74,122,82,.06); }
+.onboard-tile.connected { border-color: var(--green); background: rgba(74,122,82,.1); }
 .onboard-tile .tile-icon { font-size: 24px; margin-bottom: 6px; }
 .onboard-tile .tile-label { font-size: 13px; font-weight: 600; color: var(--ink); }
 .onboard-tile .tile-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
@@ -1322,7 +1323,17 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
 
   <!-- ── PHASE A: Willkommen ── -->
   <div id="onboardWelcome" class="onboard-screen">
-    <div class="onboard-card" style="max-width:480px">
+    <div class="onboard-card" style="max-width:480px;position:relative">
+
+      <!-- Sprach-Switcher oben rechts -->
+      <div style="position:absolute;top:0;right:0;display:flex;gap:6px">
+        <button onclick="obSetLangOnly('de')" id="welcomeLangDe"
+          style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:4px 8px;font-size:13px;cursor:pointer;transition:border-color .15s"
+          title="Deutsch">🇨🇭</button>
+        <button onclick="obSetLangOnly('en')" id="welcomeLangEn"
+          style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:4px 8px;font-size:13px;cursor:pointer;transition:border-color .15s"
+          title="English">🇬🇧</button>
+      </div>
 
       <!-- Logo -->
       <div class="setup-logo" style="margin-bottom:6px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
@@ -1360,7 +1371,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
         <strong style="color:var(--ink2)">Deine Daten gehören dir, leben bei dir, und wir sehen sie nie.</strong></div>
       </div>
 
-      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('welcome','license')">
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="saveLocal('fb_onboard_seen',true);onboardNext('welcome','lang')">
         Neu einrichten →
       </button>
       <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px;margin-bottom:4px">
@@ -4498,7 +4509,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.6b.2026-03-28';
+const APP_VERSION = '2.7a.2026-03-30';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -10311,17 +10322,22 @@ function onboardNext(from, to) {
     if (desktopEl) desktopEl.style.display = (!isIOS && !isAndroid) ? '' : 'none';
   }
   if (to === 'done') { initDoneScreen(); }
+  if (to === 'welcome') { setTimeout(renderWelcomeLang, 50); }
 }
 
 function showSetup() {
   document.getElementById('setupScreen').style.display = 'block';
   document.getElementById('mainApp').style.display     = 'none';
-  const seen = loadLocal('fb_onboard_seen', false);
-  if (!seen) {
-    saveLocal('fb_onboard_seen', true);
+  const seen       = loadLocal('fb_onboard_seen', false);
+  const hasLicense = !!Auth.licenseKey;
+  const hasToken   = !!AppState.notionToken;
+
+  if (!seen || (!hasLicense && !hasToken)) {
+    // Erster Besuch ODER: seen=true aber alles gelöscht → Welcome zeigen
+    // BUG-020: Flag erst beim Klick auf "Neu einrichten" setzen
     onboardNext(null, 'welcome');
   } else {
-    // PATCH B1: Returning user — gespeicherten Step oder license
+    // Returning user mit gültigem State — gespeicherten Step oder license
     const savedStep = loadLocal('fb_onboard_step', null);
     onboardNext(null, savedStep || 'license');
   }
@@ -10338,9 +10354,22 @@ function showQuizAfterAuth() {
   const mainEl  = document.getElementById('mainApp');
   if (setupEl) setupEl.style.display = 'block';
   if (mainEl)  mainEl.style.display  = 'none';
+  // BUG-025: Gepaartes Gerät hat keinen Setup-Durchlauf — licenseKey vorhanden aber kein savedStep
+  // → direkt in die App, Setup als abgeschlossen markieren
+  const savedStep = loadLocal('fb_onboard_step', null);
+  const hasLicense = !!Auth.licenseKey;
+  if (!savedStep && hasLicense) {
+    // Pairing-Flow: Setup überspringen, Standard-Werte übernehmen falls nicht gesetzt
+    if (!AppState.lang)    { AppState.lang = 'de'; }
+    if (!AppState.country) { AppState.country = 'CH'; AppState.currency = 'CHF'; }
+    saveAppState();
+    saveLocal('fb_onboard_complete', true);
+    showApp();
+    restoreTab();
+    return;
+  }
   // PATCH B1: Context-aware routing after OAuth
   // If user was on integrations screen, stay there (OAuth just connected Notion)
-  const savedStep = loadLocal('fb_onboard_step', null);
   if (savedStep === 'integrations') {
     OB.notionConnected = true;
     onboardNext(null, 'integrations');
@@ -10466,7 +10495,8 @@ async function refreshPairingCode() {
 function renderDoneQrCode() {
   const container = document.getElementById('doneQrCode');
   if (!container) return;
-  const url = window.location.origin + window.location.pathname;
+  // BUG-024: ?pair=1 → Mobile landet direkt auf Pairing-Screen, nicht License
+  const url = window.location.origin + window.location.pathname + '?pair=1';
   // QR via qrcode.js falls geladen, sonst Link-Fallback
   if (window.QRCode) {
     container.innerHTML = '';
@@ -10538,8 +10568,14 @@ async function submitPairingCode() {
 
   if (result.licenseKey) {
     saveLocal('fb_license_key', result.licenseKey);
-    // PATCH B1: Weiter zu Sprachauswahl (neuer Onboarding-Flow)
-    onboardNext('mobile-pairing', 'lang');
+    // BUG-025: Gepaartes Gerät braucht kein neues Setup — nur Notion-OAuth
+    // Direkt OAuth starten; _applyToken leitet danach in die App
+    if (errEl) { errEl.style.color = 'var(--green)'; errEl.textContent = '✅ Code korrekt — verbinde jetzt Notion…'; }
+    if (btn) btn.textContent = '✅ Weiter';
+    setTimeout(() => {
+      showToast('success', '📱', 'Gerät erkannt', 'Notion kurz verbinden — dann bist du drin.');
+      Auth.startOAuth();
+    }, 900);
   } else if (result.error === 'expired') {
     errEl.textContent = 'Code abgelaufen. Generiere einen neuen Code am anderen Gerät, oder gib deinen Lizenz-Key direkt ein.';
   } else {
@@ -10778,6 +10814,23 @@ function obSetLang(lang) {
   onboardNext('lang', 'country');
 }
 
+function renderWelcomeLang() {
+  // Highlight aktive Sprache im Welcome-Screen
+  const lang = AppState.lang || 'de';
+  const de = document.getElementById('welcomeLangDe');
+  const en = document.getElementById('welcomeLangEn');
+  if (de) de.style.borderColor = lang === 'de' ? 'var(--accent)' : 'var(--border)';
+  if (en) en.style.borderColor = lang === 'en' ? 'var(--accent)' : 'var(--border)';
+}
+
+function obSetLangOnly(lang) {
+  // Sprache setzen ohne weiterzunavigieren (nur für Welcome-Screen Flag-Switcher)
+  OB.lang = lang;
+  AppState.lang = lang;
+  saveAppState();
+  renderWelcomeLang();
+}
+
 function obSetCountry(country, currency) {
   OB.country = country;
   OB.currency = currency;
@@ -10865,7 +10918,19 @@ function obUpdateIntTiles() {
 function obConnectNotion() {
   startOAuth();
   const pollEl = document.getElementById('obIntPolling');
-  if (pollEl) pollEl.style.display = '';
+  if (pollEl) {
+    pollEl.style.display = '';
+    // BUG-022: Progress-Bar via JS steuern — CSS-Animation startet nicht zuverlässig nach display:none→''
+    const bar = document.getElementById('obIntPollingBar');
+    if (bar) {
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      setTimeout(() => {
+        bar.style.transition = 'width 28s ease-out';
+        bar.style.width = '92%';
+      }, 80);
+    }
+  }
 }
 
 async function obConnectDrive() {
@@ -10882,7 +10947,8 @@ async function obConnectDrive() {
     await getGDriveToken(); // triggers Google Consent Screen
     OB.driveConnected = true;
     obUpdateIntTiles();
-    if (wrap) wrap.style.display = '';
+    // BUG-023: Nach erfolgreichem Connect Dialog schliessen — Clockify-Info soll prominent sichtbar sein
+    if (wrap) wrap.style.display = 'none';
     showToast('success', '📎', 'Google Drive verbunden', 'Belege werden automatisch abgelegt.');
   } catch(e) {
     showToast('error', '📎', 'Verbindung fehlgeschlagen', 'Versuche es nochmal oder überspringe diesen Schritt.');
@@ -11001,16 +11067,14 @@ async function claimPairingCode() {
     });
     const data = await resp.json();
     if (data.licenseKey) {
-      // Step 1: Save license key
+      // BUG-025: Save license key, dann direkt OAuth — kein Setup-Neustart
       saveLocal('fb_license_key', data.licenseKey);
-      // Step 2: Show "now connect Notion" screen
-      if (errEl) { errEl.style.color = 'var(--green)'; errEl.textContent = '✅ Code korrekt! Verbinde jetzt Notion.'; }
+      if (errEl) { errEl.style.color = 'var(--green)'; errEl.textContent = '✅ Code korrekt — verbinde jetzt Notion…'; }
       if (btn) btn.textContent = '✅ Weiter';
-      // Short delay then start OAuth
       setTimeout(() => {
-        showToast('success', '📱', 'Gerät erkannt', 'Verbinde jetzt Notion für dieses Gerät.');
+        showToast('success', '📱', 'Gerät erkannt', 'Notion kurz verbinden — dann bist du drin.');
         Auth.startOAuth();
-      }, 1200);
+      }, 900);
     } else {
       const msg = data.error === 'expired' ? 'Code abgelaufen — bitte neuen Code generieren'
                 : data.error === 'invalid_code' ? 'Code ungültig — bitte nochmals prüfen'
