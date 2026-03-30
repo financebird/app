@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.7e.2026-03-30">
+<meta name="fb-version" content="2.7f.2026-03-30">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -3750,7 +3750,13 @@ async function notionFetch(path, method = 'GET', body = null, _retry = 0) {
   // Nur Banner zeigen wenn wirklich ein Lizenz-Key vorhanden ist (nicht bei leerem State)
   if (resp.status === 403) {
     const lkPresent = !!Auth.licenseKey;
-    if (lkPresent) showLicenseExpiredBanner();
+    if (lkPresent) {
+      // Key vorhanden aber abgelaufen/ungültig
+      showLicenseExpiredBanner();
+    } else {
+      // Key fehlt komplett — sofort Recovery-Dialog zeigen
+      showLicenseMissingBanner();
+    }
     throw new Error('LICENSE_INVALID');
   }
 
@@ -4534,7 +4540,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.7e.2026-03-30';
+const APP_VERSION = '2.7f.2026-03-30';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -5638,6 +5644,37 @@ async function triggerReAuthFlow() {
 }
 
 /** Lizenz-Banner — erscheint wenn 403 von Worker A zurückkommt */
+function showLicenseMissingBanner() {
+  // Lizenz-Key fehlt komplett (z.B. nach localStorage-Reset oder Website-Daten löschen)
+  // Einmalig anzeigen — kein Spam
+  if (document.getElementById('licenseBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'licenseBanner';
+  banner.style.cssText = `
+    position:fixed;top:0;left:0;right:0;z-index:9001;
+    background:#5a3a0a;color:white;
+    padding:12px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;
+    box-shadow:0 2px 12px rgba(0,0,0,.2);
+  `;
+  banner.innerHTML = `
+    <div style="flex:1;min-width:0">
+      <strong style="display:block;font-size:13px">Lizenz-Key nicht gefunden</strong>
+      <span style="font-size:11px;opacity:.85">Bitte gib deinen Lizenz-Key erneut ein — er wurde aus dem Browser-Speicher entfernt.</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button onclick="showLicenseKeyScreen()"
+        style="background:white;color:#5a3a0a;border:none;border-radius:7px;
+               padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;
+               font-family:inherit">
+        Key eingeben
+      </button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+}
+
 function showLicenseExpiredBanner() {
   if (document.getElementById('licenseBanner')) return;
   const banner = document.createElement('div');
