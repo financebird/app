@@ -2681,8 +2681,12 @@ function saveAppState() {
 }
 
 
-/* ══════════════════════════════════════════════════════
-   LAYER 1 — AUTH LAYER
+/* ════════════════════════════════════════════════════════════
+   BLOCK: AUTH
+   Scope: OAuth-Flow, Token-Management, License-Verify, Re-Auth
+   Key:   Auth.startOAuth(), Auth._applyToken(), Auth.licenseKey
+   Owner: App-Coding · Architektur-Entscheide → Strategie
+════════════════════════════════════════════════════════════
    Abstracts OAuth vs. manual token.
    getToken() → always returns a valid token or throws.
    ══════════════════════════════════════════════════════ */
@@ -3037,8 +3041,13 @@ const Auth = {
 };
 
 
-/* ══════════════════════════════════════════════════════
-   LAYER 1 — ADAPTER LAYER
+/* ════════════════════════════════════════════════════════════
+   BLOCK: GDRIVE
+   Scope: GDrive Token, Folder-Targets-Architektur, Upload, ZIP-Export
+   Key:   getGDriveToken(), getGDriveConfig(), uploadToGDrive(),
+          exportBelegeZip(), renderGDriveEinstellungenCard()
+   Owner: App-Coding
+════════════════════════════════════════════════════════════
 
    A. DATA LAYER INTERFACE
    ─────────────────────────
@@ -3128,8 +3137,13 @@ const TimeAdapterInterface = {
 };
 
 
-/* ══════════════════════════════════════════════════════
-   LAYER 2 — NOTION ADAPTER
+/* ════════════════════════════════════════════════════════════
+   BLOCK: NOTION-ADAPTER
+   Scope: Notion API Calls, DB-Discovery, DB-Creation, Schema-Patch
+   Key:   notionFetch(), discoverDatabases(), createMissingDatabases(),
+          ensureBuchungenSchema(), findSharedParentPage()
+   Owner: App-Coding
+════════════════════════════════════════════════════════════
    Implements DataLayerInterface for Notion backend.
 
    Notion DB IDs (Osi's workspace):
@@ -4183,8 +4197,13 @@ function recurringToProps(d) {
 }
 
 
-/* ══════════════════════════════════════════════════════
-   LAYER 2 — DATA LAYER (Cache + Queue)
+/* ════════════════════════════════════════════════════════════
+   BLOCK: DATA-LAYER
+   Scope: In-Memory Store, Write-Queue, Sync (full/delta), Parse-Fns
+   Key:   Store, writeWithQueue(), fullSync(), deltaSync(), flushQueue()
+          parseBuchung(), parseRechnung(), parseKonto() etc.
+   Owner: App-Coding
+════════════════════════════════════════════════════════════
    ──────────────────────────────────────────────────────
    - Wraps NotionAdapter
    - Maintains localStorage cache
@@ -4637,8 +4656,13 @@ function updateQueueBanner() {
 }
 
 
-/* ══════════════════════════════════════════════════════
-   LAYER 3 — COMPUTED LAYER
+/* ════════════════════════════════════════════════════════════
+   BLOCK: COMPUTED-LAYER
+   Scope: Alle berechneten KPIs, Scores, Aggregationen
+   Key:   Computed.cockpitSummary(), calculateTaxReadiness(),
+          Computed.projekteSummary()
+   Owner: App-Coding
+════════════════════════════════════════════════════════════
    All derived values live here.
    No tab computes its own values.
    ══════════════════════════════════════════════════════ */
@@ -5157,8 +5181,13 @@ const Computed = {
 };
 
 
-/* ══════════════════════════════════════════════════════
-   LAYER 4 — INBOX ENGINE
+/* ════════════════════════════════════════════════════════════
+   BLOCK: INBOX-ENGINE
+   Scope: Automatische Checks, Review-Queue, Empfehlungen
+   Key:   InboxEngine.check(), InboxEngine.updateBadge(),
+          cockpitRecommendationChecks()
+   Owner: App-Coding
+════════════════════════════════════════════════════════════
    Evaluates trigger conditions → produces Inbox items.
    Items grouped in stacks (oldest first per series).
    ══════════════════════════════════════════════════════ */
@@ -5858,8 +5887,13 @@ function restoreTab() {
   nav(tabId);
 }
 
-/* ══════════════════════════════════════════════════════
-   C3 — ERFASSEN OVERLAY
+/* ════════════════════════════════════════════════════════════
+   BLOCK: ERFASSEN
+   Scope: Buchung/Rechnung/Transfer erfassen, Beleg-Scan, KI-Analyse
+   Key:   openErfassen(), closeErfassen(), erfSave(), erfUploadReceipt(),
+          openErfassenScan(), Erf state object
+   Owner: App-Coding
+════════════════════════════════════════════════════════════
    FAB → 4 Karten → Form → Save → Notion
    ══════════════════════════════════════════════════════ */
 
@@ -5900,8 +5934,14 @@ async function getFXRate(from, to = 'CHF', date = null) {
 }
 
 
-/* ══════════════════════════════════════════════════════
-   CATEGORIES — 20 Business + Private + Einnahmen (Session 3)
+/* ════════════════════════════════════════════════════════════
+   BLOCK: CATEGORIES + TAX-MAPPING
+   Scope: Kategorie-Listen, MWST-Sätze, Steuerformular-Mapping CH/DE/AT
+   Key:   CATEGORIES_20, CATS_INCOME, CATS_EXPENSE, CATS_PRIVATE,
+          TAX_MAPPING, getMwstRate(), calcMwst(), getSteuerformular()
+          merchantRules, suggestCategory(), FIELD_HELP
+   Owner: App-Coding · Neue Kategorien → Strategie
+════════════════════════════════════════════════════════════ (Session 3)
    ══════════════════════════════════════════════════════ */
 
 // ── Einnahmen-Kategorien (3) ──
@@ -7560,8 +7600,13 @@ function renderAll() {
   }
 }
 
-/* ══════════════════════════════════════════════════════
-   C6 — COCKPIT TAB
+/* ════════════════════════════════════════════════════════════
+   BLOCK: COCKPIT
+   Scope: Cockpit-Tab Render, KPI-Cards, Steuerbereit-Score, Empfehlungen
+   Key:   renderCockpit(), renderCockpitRecommendations(),
+          calculateTaxReadiness()
+   Owner: App-Coding
+════════════════════════════════════════════════════════════
    ══════════════════════════════════════════════════════ */
 
 let _liqHorizon = 60; // active liquidity horizon in days
@@ -8108,8 +8153,13 @@ function renderRecentBookingsHTML() {
   </table>`;
 }
 
-/* ══════════════════════════════════════════════════════
-   C7 — BUCHHALTUNG TAB
+/* ════════════════════════════════════════════════════════════
+   BLOCK: BUCHHALTUNG
+   Scope: Buchungen/Rechnungen/Konten/Transfers/Recurrings/Abschlüsse
+   Key:   renderBuchhaltung(), renderBuchungenHTML(), buchungenFiltered(),
+          exportBuchungenCSV(), exportBelegeZip(), BuchFilter
+   Owner: App-Coding
+════════════════════════════════════════════════════════════
    Sub-Navigation: Buchungen · Rechnungen · Konten ·
                    Transfers · Recurrings · Abschlüsse
    ══════════════════════════════════════════════════════ */
@@ -10200,8 +10250,13 @@ function erfShowReceiptUI(thumb, filename, isPDF, context) {
 
 
 
-/* ══════════════════════════════════════════════════════
-   E1 / E4 / E5 — ONBOARDING FLOW
+/* ════════════════════════════════════════════════════════════
+   BLOCK: ONBOARDING
+   Scope: Setup-Flow (5 Screens), OB-State, Device-Pairing, claimCode
+   Key:   onboardNext(), onboardFinish(), obRenderSummary(),
+          claimPairingCode(), OB state object
+   Owner: App-Coding
+════════════════════════════════════════════════════════════
    Welcome → Connect → Quiz (9 Fragen) → Done → App
    ══════════════════════════════════════════════════════ */
 
@@ -11198,8 +11253,13 @@ function logout() {
 }
 
 
-/* ══════════════════════════════════════════════════════
-   SETTINGS HELPERS
+/* ════════════════════════════════════════════════════════════
+   BLOCK: EINSTELLUNGEN
+   Scope: Einstellungen-Tab Render, Land/MWST, Collaboration, Pairing
+   Key:   renderEinstellungen(), setCountry(), addCollaborator(),
+          settingsGeneratePairing(), showFieldHelp(), helpBtn()
+   Owner: App-Coding · VI für Layout-Fragen
+════════════════════════════════════════════════════════════
    ══════════════════════════════════════════════════════ */
 
 function setLang(lang) {

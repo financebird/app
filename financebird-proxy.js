@@ -11,14 +11,26 @@
  *   - KV-Lookup nutzt jetzt 'license:' Prefix (konsistent mit Worker B)
  *   - Lizenz-Key wird uppercase-normalisiert (konsistent mit Worker B)
  *
- * Deploy: https://financebird-proxy.[subdomain].workers.dev/v1
+ * Deploy: https://financebird-proxy.holy-forest-0174.workers.dev/v1
  */
+
+const WORKER_VERSION = '1.1.0'; // Major.Minor.Patch — bei jedem Deploy hochzählen
 
 export default {
   async fetch(request, env) {
+    const url  = new URL(request.url);
+    const path = url.pathname;
+
     // CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders() });
+    }
+
+    // Health-Check (kein Auth nötig)
+    if (path === '/health' && request.method === 'GET') {
+      let kvOk = false;
+      try { await env.LICENSE_KV.get('__health__'); kvOk = true; } catch {}
+      return json({ ok: true, service: 'financebird-proxy', version: WORKER_VERSION, kv: kvOk, ts: new Date().toISOString() });
     }
 
     // 1. Shared Secret prüfen (Spam-Filter)
@@ -33,7 +45,7 @@ export default {
       return json({ error: 'License key required' }, 403);
     }
 
-    const entry = await env.LICENSE_KV.get('license:' + licenseKey, { type: 'json' }).catch(() => null);
+    const entry = await env.LICENSE_KV.get(`license:${licenseKey}`, { type: 'json' }).catch(() => null);
     if (!entry || entry.active === false) {
       return json({ error: 'Invalid or expired license' }, 403);
     }
@@ -44,21 +56,16 @@ export default {
     }
 
     // lastUsed Tracking — non-blocking (Audit-Fix: Nutzungsstatistik)
-    // Schreibt nur Timestamp, keine personenbezogenen Daten
     const now = new Date().toISOString();
     if (!entry.lastUsed || entry.lastUsed.slice(0, 13) !== now.slice(0, 13)) {
-      // Max 1x pro Stunde updaten (reduziert KV-Writes)
       entry.lastUsed = now;
       env.LICENSE_KV.put('license:' + licenseKey, JSON.stringify(entry)).catch(() => {});
     }
 
     // 3. Request an Notion weiterleiten (blind — kein Logging)
-    const url = new URL(request.url);
-    // Pfad: /v1/... → https://api.notion.com/v1/...
     const notionPath = url.pathname.replace(/^\/v1/, '') || '/';
     const notionUrl  = 'https://api.notion.com/v1' + notionPath + url.search;
 
-    // Headers durchleiten — eigene Worker-Header entfernen
     const headers = new Headers(request.headers);
     headers.delete('X-FB-Key');
     headers.delete('X-FB-License');
@@ -70,7 +77,6 @@ export default {
       body:    ['GET', 'HEAD'].includes(request.method) ? null : request.body,
     });
 
-    // Notion-Response mit CORS-Headern zurückgeben
     const respHeaders = new Headers(notionResp.headers);
     Object.entries(corsHeaders()).forEach(([k, v]) => respHeaders.set(k, v));
 

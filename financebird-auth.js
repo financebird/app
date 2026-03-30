@@ -6,7 +6,7 @@
  * Env:
  *   NOTION_CLIENT_ID
  *   NOTION_CLIENT_SECRET
- *   OAUTH_REDIRECT_URI   = https://financebird-auth.[subdomain].workers.dev/oauth/callback
+ *   OAUTH_REDIRECT_URI   = https://financebird-auth.holy-forest-0174.workers.dev/oauth/callback
  *   APP_URL              = https://financebird.app/financebird_v2.html
  *   FB_SHARED_SECRET     = [32-char random string]
  *   FB_ADMIN_SECRET      = [separate string for admin console]
@@ -19,8 +19,10 @@
  *   - callbackPage: Weg C code-Element ist klickbar (copy to clipboard)
  *   - Fragment-Keys bleiben fb_token + fb_state (App wird angepasst)
  *
- * Deploy: https://financebird-auth.[subdomain].workers.dev
+ * Deploy: https://financebird-auth.holy-forest-0174.workers.dev
  */
+
+const WORKER_VERSION = '1.1.0'; // Major.Minor.Patch — bei jedem Deploy hochzählen
 
 export default {
   async fetch(request, env) {
@@ -32,8 +34,8 @@ export default {
       return resp(null, 204, corsHeaders());
     }
 
-    // Shared Secret prüfen (ausser OAuth-Endpoints — werden vom Browser direkt aufgerufen)
-    if (path !== '/oauth/callback' && path !== '/oauth/start') {
+    // Shared Secret prüfen (ausser OAuth-Endpoints + Health — werden vom Browser direkt aufgerufen)
+    if (path !== '/oauth/callback' && path !== '/oauth/start' && path !== '/health') {
       const fbKey = request.headers.get('X-FB-Key');
       if (!fbKey || fbKey !== env.FB_SHARED_SECRET) {
         return json({ error: 'Unauthorized' }, 401);
@@ -96,7 +98,6 @@ async function oauthCallback(request, env, url) {
     });
   }
 
-  // Token bei Notion holen
   const tokenResp = await fetch('https://api.notion.com/v1/oauth/token', {
     method:  'POST',
     headers: {
@@ -115,12 +116,10 @@ async function oauthCallback(request, env, url) {
   const tokenData = await tokenResp.json();
   const payload   = JSON.stringify({ access_token: tokenData.access_token, bot_id: tokenData.bot_id, workspace_name: tokenData.workspace_name });
 
-  // Weg A: Token in KV speichern (10 Min TTL) für PWA-Polling
   await env.OAUTH_KV.put('oauth:' + state, payload, { expirationTtl: 600 });
 
-  // Weg B: Token als URL-Fragment zurück zur App (direkter Browser-Empfang)
-  const appUrl    = env.APP_URL;
-  const fragment  = 'fb_token=' + encodeURIComponent(payload) + '&fb_state=' + encodeURIComponent(state);
+  const appUrl   = env.APP_URL;
+  const fragment = 'fb_token=' + encodeURIComponent(payload) + '&fb_state=' + encodeURIComponent(state);
 
   return new Response(callbackPage('Verbindung erfolgreich!', 'FinanceBird wurde mit deinem Notion verbunden.', fragment, appUrl, payload), {
     headers: { 'Content-Type': 'text/html;charset=utf-8' }
@@ -134,7 +133,6 @@ async function oauthPoll(request, env, url) {
   const stored = await env.OAUTH_KV.get('oauth:' + state);
   if (!stored) return json({ ready: false });
 
-  // Token einmalig abrufen und aus KV löschen
   await env.OAUTH_KV.delete('oauth:' + state);
   return json({ ready: true, token: stored });
 }
@@ -151,7 +149,7 @@ async function licenseVerify(request, env) {
   if (!key.startsWith('LK-')) return json({ valid: false, reason: 'not_found' });
 
   const entry = await env.OAUTH_KV.get('license:' + key, { type: 'json' }).catch(() => null);
-  if (!entry)              return json({ valid: false, reason: 'not_found' });
+  if (!entry)                 return json({ valid: false, reason: 'not_found' });
   if (entry.active === false) return json({ valid: false, reason: 'not_found' });
 
   if (entry.expiresAt && new Date(entry.expiresAt) < new Date()) {
@@ -172,11 +170,9 @@ async function deviceSetup(request, env) {
   const licenseKey = (body.licenseKey || '').toUpperCase().trim();
   if (!licenseKey.startsWith('LK-')) return json({ error: 'invalid_license' }, 400);
 
-  // Lizenz prüfen
   const entry = await env.OAUTH_KV.get('license:' + licenseKey, { type: 'json' }).catch(() => null);
   if (!entry || entry.active === false) return json({ error: 'invalid_license' }, 403);
 
-  // 6-Zeichen Code generieren (ohne 0/o, 1/l)
   const charset = 'abcdefghjkmnpqrstuvwxyz23456789';
   let code = '';
   const arr = new Uint8Array(6);
@@ -199,10 +195,8 @@ async function deviceClaim(request, env) {
   const stored = await env.OAUTH_KV.get('pair:' + code, { type: 'json' }).catch(() => null);
   if (!stored) return json({ error: 'expired' }, 410);
 
-  // Code einmalig verwenden — sofort löschen
   await env.OAUTH_KV.delete('pair:' + code);
 
-  // Lizenz nochmals validieren
   const licKey = (stored.licenseKey || '').toUpperCase();
   const entry  = await env.OAUTH_KV.get('license:' + licKey, { type: 'json' }).catch(() => null);
   if (!entry || entry.active === false) return json({ error: 'invalid_license' }, 403);
@@ -252,7 +246,7 @@ async function healthCheck(request, env) {
     await env.OAUTH_KV.get('__health__');
     kvOk = true;
   } catch {}
-  return json({ ok: true, service: 'financebird-auth', kv: kvOk, ts: new Date().toISOString() });
+  return json({ ok: true, service: 'financebird-auth', version: WORKER_VERSION, kv: kvOk, ts: new Date().toISOString() });
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -306,14 +300,13 @@ async function adminDeleteKey(request, env, path) {
   const existing = await env.OAUTH_KV.get('license:' + key, { type: 'json' }).catch(() => null);
   if (!existing) return json({ error: 'not_found' }, 404);
 
-  // Soft-delete: active = false
   const updated = { ...existing, active: false, deactivatedAt: new Date().toISOString() };
   await env.OAUTH_KV.put('license:' + key, JSON.stringify(updated));
   return json({ key, deactivated: true });
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Admin: Feedback (read from Notion)
+   Admin: Feedback
 ───────────────────────────────────────────────────────────── */
 
 async function adminListFeedback(request, env) {
@@ -353,20 +346,11 @@ async function adminListFeedback(request, env) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Callback-Page (Weg B + Fallback Weg C)
+   Callback-Page
 ───────────────────────────────────────────────────────────── */
 
-/**
- * callbackPage — Weg B (redirect) + Weg C (manual copy fallback)
- *
- * Audit-Fix 2026-03-22:
- *   - Fragment-Keys: fb_token + fb_state (konsistent mit App handleOAuthCallback)
- *   - Weg C: payload wird direkt ins HTML eingebettet statt aus query-params gelesen
- *   - payload param hinzugefügt für Weg C
- */
 function callbackPage(title, message, fragment, appUrl, payload) {
-  const redirectUrl = fragment ? appUrl + '#' + fragment : null;
-  // Weg C: Token-Payload für manuelles Copy-Paste (falls Redirect scheitert)
+  const redirectUrl    = fragment ? appUrl + '#' + fragment : null;
   const escapedPayload = (payload || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   return `<!DOCTYPE html>
 <html lang="de">
@@ -392,7 +376,7 @@ ${redirectUrl ? '<script>window.location.replace("' + redirectUrl + '");</script
   ${redirectUrl
     ? '<a href="' + redirectUrl + '" class="btn">Zurück zu FinanceBird →</a><p style="margin-top:16px;font-size:11px;color:#b0a090">Falls der Redirect nicht funktioniert, kopiere diesen Token und füge ihn in der App ein:</p><code onclick="navigator.clipboard.writeText(this.textContent).then(()=>this.style.background=\'#e8f3ea\')">' + escapedPayload + '</code>'
     : (escapedPayload
-      ? '<p style="margin-top:16px;font-size:12px">Kein automatischer Redirect möglich.<br>Kopiere diesen Token und füge ihn in der App unter "Token manuell eingeben" ein:</p><code onclick="navigator.clipboard.writeText(this.textContent).then(()=>this.style.background=\'#e8f3ea\')">' + escapedPayload + '</code>'
+      ? '<p style="margin-top:16px;font-size:12px">Kein automatischer Redirect möglich. Kopiere diesen Token:</p><code onclick="navigator.clipboard.writeText(this.textContent).then(()=>this.style.background=\'#e8f3ea\')">' + escapedPayload + '</code>'
       : '<p style="margin-top:16px;font-size:12px;color:#c4441a">Verbindung fehlgeschlagen. Bitte erneut versuchen.</p>')
   }
 </div>
