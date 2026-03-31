@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.9b.2026-03-31">
+<meta name="fb-version" content="2.9c.2026-03-31">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -4425,7 +4425,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.9b.2026-03-31';
+const APP_VERSION = '2.9c.2026-03-31';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -10417,7 +10417,7 @@ function onboardNext(from, to) {
   const targetId = screenIds[to];
   if (targetId) { const el = document.getElementById(targetId); if (el) el.style.display = ''; }
   if (to === 'accounts') obRenderAccountChips();
-  if (to === 'integrations') { OB.notionConnected = Auth.isAuthenticated; obUpdateIntTiles(); }
+  if (to === 'integrations') { OB.notionConnected = Auth.isAuthenticated; obUpdateIntTiles(); const poll = document.getElementById('obIntPolling'); if (poll) poll.style.display = 'none'; }
   if (to === 'overview') obRenderOverview();
   if (to === 'license') { const existing = loadLocal('fb_license_key', ''); const inp = document.getElementById('onboardLicenseInput'); if (inp && existing) inp.value = existing; }
   if (to === 'welcome') setTimeout(renderWelcomeLang, 50);
