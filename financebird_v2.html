@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://lh3.googleusercontent.com; connect-src 'self' https://financebird-proxy.holy-forest-0174.workers.dev https://financebird-auth.holy-forest-0174.workers.dev https://api.frankfurter.app https://www.googleapis.com https://accounts.google.com; manifest-src 'self' blob:; frame-src 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://lh3.googleusercontent.com; connect-src 'self' https://financebird-proxy.holy-forest-0174.workers.dev https://financebird-auth.holy-forest-0174.workers.dev https://api.frankfurter.app https://www.googleapis.com https://accounts.google.com https://api.clockify.me https://api.anthropic.com; manifest-src 'self' blob:; frame-src 'none'; object-src 'none';">
 <title>FinanceBird</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.9a.2026-03-31">
+<meta name="fb-version" content="2.9b.2026-03-31">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1607,8 +1607,6 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
           <button class="btn btn-outline btn-sm" onclick="document.getElementById('obIntClockifyWrap').style.display='none'" style="font-size:12px">Überspringen</button>
         </div>
       </div>
-        <button class="btn btn-primary btn-sm" onclick="obSaveClockify()" style="width:100%">Speichern</button>
-      </div>
       <div id="obIntKiWrap" style="display:none;margin-top:12px;padding:14px 16px;background:var(--bg2);border-radius:12px">
         <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Erweiterung</div>
         <div style="font-size:12.5px;color:var(--ink2);margin-bottom:8px;line-height:1.6"><strong>KI-Beleganalyse</strong> — liest Belege automatisch: Betrag, Datum, Händler, Kategorie. Kosten: ~0.01 CHF pro Beleg.</div>
@@ -1625,8 +1623,6 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
           <button class="btn btn-primary btn-sm" onclick="obSaveKi()" style="flex:1">Speichern</button>
           <button class="btn btn-outline btn-sm" onclick="document.getElementById('obIntKiWrap').style.display='none'" style="font-size:12px">Überspringen</button>
         </div>
-      </div>
-        <button class="btn btn-primary btn-sm" onclick="obSaveKi()" style="width:100%">Speichern</button>
       </div>
       <button class="btn btn-primary" id="obIntNextBtn" style="width:100%;padding:14px;font-size:15px;margin-top:18px" onclick="obIntNext()">
         Notion verbinden
@@ -2861,17 +2857,25 @@ const Auth = {
 
     showToast('success', '✅', 'Notion verbunden', tokenData.workspace_name || 'OAuth erfolgreich');
 
-    // DB-Setup: Discover oder erstellen (Audit-Fix K1 — Multi-User)
+    // DB-Setup: Discover oder erstellen — mit Mutex gegen Race Condition (BUG-032)
     if (!dbsConfigured()) {
+      const lockKey = 'fb_db_create_lock';
+      const existingLock = loadLocal(lockKey, null);
+      if (existingLock && (Date.now() - existingLock) < 60000) {
+        console.log('[Auth] DB creation locked by another tab, waiting…');
+        await new Promise(r => setTimeout(r, 5000));
+        await discoverDatabases();
+        saveLocal('fb_db_ids', DB);
+      } else {
+      saveLocal(lockKey, Date.now());
       showLoading('Datenbanken einrichten…');
       try {
         const { found, missing } = await discoverDatabases();
-        console.log(`[DB Setup] Discovery: ${found} found, ${missing.length} missing`, missing);
+        console.log('[DB Setup] Discovery:', found, 'found,', missing.length, 'missing', missing);
         if (missing.length > 0) {
           const parentPageId = await findSharedParentPage();
-          console.log(`[DB Setup] Parent page: ${parentPageId}`);
+          console.log('[DB Setup] Parent page:', parentPageId);
           if (parentPageId) {
-            // BUG-019: Wait briefly then re-discover — Notion search index may lag
             await new Promise(r => setTimeout(r, 1500));
             const recheck = await discoverDatabases();
             const stillMissing = recheck.missing;
@@ -2899,8 +2903,11 @@ const Auth = {
         console.error('DB setup failed:', e);
         showToast('warning', '⚠️', 'Datenbank-Setup fehlgeschlagen',
           'Die Datenbanken konnten nicht erstellt werden. Bitte prüfe die Notion-Verbindung.');
+      } finally {
+        localStorage.removeItem(lockKey);
       }
       hideLoading();
+      } // end of mutex else-branch
     }
 
     // Onboarding weiterführen falls noch nicht abgeschlossen
@@ -4418,7 +4425,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.9a.2026-03-31';
+const APP_VERSION = '2.9b.2026-03-31';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -11131,9 +11138,8 @@ async function obConnectDrive() {
     await getGDriveToken(); // triggers Google Consent Screen
     OB.driveConnected = true;
     obUpdateIntTiles();
-    // BUG-023: Nach erfolgreichem Connect Dialog schliessen — Clockify-Info soll prominent sichtbar sein
     if (wrap) wrap.style.display = 'none';
-    showToast('success', '📎', 'Google Drive verbunden', 'Belege werden automatisch abgelegt.');
+    showToast('success', '📎', 'Google Drive verbunden', 'Ein Ordner «FinanceBird» wurde in deiner Ablage erstellt. Du kannst ihn frei verschieben — über die Folder-ID findet FinanceBird ihn trotzdem.');
   } catch(e) {
     showToast('error', '📎', 'Verbindung fehlgeschlagen', 'Versuche es nochmal oder überspringe diesen Schritt.');
   } finally {
@@ -11153,7 +11159,7 @@ function obSaveClockify() {
     OB.clockifyConnected = true;
     document.getElementById('obIntClockifyWrap').style.display = 'none';
     obUpdateIntTiles();
-    showToast('success', '⏱', 'Clockify verbunden', '');
+    showToast('success', '⏱', 'Clockify Key erfasst', 'Wird beim Systemcheck geprüft.');
   }
 }
 
@@ -11169,7 +11175,7 @@ function obSaveKi() {
     OB.kiConnected = true;
     document.getElementById('obIntKiWrap').style.display = 'none';
     obUpdateIntTiles();
-    showToast('success', '🤖', 'KI verbunden', '');
+    showToast('success', '🤖', 'Claude Key erfasst', 'Wird beim Systemcheck geprüft.');
   }
 }
 
@@ -11192,9 +11198,15 @@ async function obRenderOverview() {
   rows.push(overviewRow('🗝', 'Lizenz', hc.license.key_present ? (hc.license.key_valid ? '✅ Aktiv' : '❌ Ungültig') : '❌ Fehlt', hc.license.key_present && hc.license.key_valid !== false));
   rows.push(overviewRow('📊', 'Datenbank', hc.notion.token_present ? (hc.notion.token_valid ? (hc.notion.dbs_found ? '✅ Verbunden · Datenbanken bereit' : '⚠️ Verbunden · DBs fehlen') : '❌ Token ungültig') : '❌ Nicht verbunden', hc.notion.token_valid && hc.notion.dbs_found !== false));
   rows.push(overviewRow('📎', 'Belege', hc.gdrive.token_present ? (hc.gdrive.token_valid ? '✅ Google Drive verbunden' : '⚠️ Token abgelaufen') : '⬜ Nicht konfiguriert (Erweiterung)', hc.gdrive.token_present ? hc.gdrive.token_valid : null));
-  rows.push(overviewRow('⏱', 'Zeit & Projekte', hc.clockify.key_present ? (hc.clockify.key_valid ? '✅ Clockify verbunden' : '⚠️ Key ungültig') : '⬜ Nicht konfiguriert (Erweiterung)', hc.clockify.key_present ? hc.clockify.key_valid : null));
-  rows.push(overviewRow('🤖', 'KI-Analyse', hc.claude.key_present ? (hc.claude.key_valid ? '✅ Claude API verbunden' : '⚠️ Key ungültig') : '⬜ Nicht konfiguriert (Erweiterung)', hc.claude.key_present ? hc.claude.key_valid : null));
+  rows.push(overviewRow('⏱', 'Zeit & Projekte', hc.clockify.key_present ? (hc.clockify.key_valid ? '✅ Clockify verbunden' : '⚠️ Key ungültig') : '⬜ Nicht konfiguriert (Erweiterung)', hc.clockify.key_present ? hc.clockify.key_valid : null, hc.clockify.key_valid === false ? '<button class=\"btn btn-outline btn-sm\" onclick=\"onboardNext(null,\'integrations\')\">Key ändern</button>' : ''));
+  rows.push(overviewRow('🤖', 'KI-Analyse', hc.claude.key_present ? (hc.claude.key_valid ? '✅ Claude API verbunden' : '⚠️ Key ungültig') : '⬜ Nicht konfiguriert (Erweiterung)', hc.claude.key_present ? hc.claude.key_valid : null, hc.claude.key_valid === false ? '<button class=\"btn btn-outline btn-sm\" onclick=\"onboardNext(null,\'integrations\')\">Key ändern</button>' : ''));
   el.innerHTML = rows.join('');
+  // Add re-check button if any issues
+  const hasIssues = !hc.license.key_valid || !hc.notion.token_valid || hc.clockify.key_valid === false || hc.claude.key_valid === false;
+  if (hasIssues) {
+    el.innerHTML += '<div style="text-align:center;margin-top:10px"><button class="btn btn-outline btn-sm" onclick="obRenderOverview()" style="font-size:12px">🔄 Erneut prüfen</button></div>';
+  }
+
   const btn = document.getElementById('overviewFinishBtn');
   const notionOk = hc.notion.token_present && hc.notion.token_valid !== false;
   if (btn) { btn.disabled = !notionOk; btn.textContent = notionOk ? 'Fertig — zum Cockpit →' : 'Notion muss verbunden sein'; }
