@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.7g.2026-03-30">
+<meta name="fb-version" content="2.9a.2026-03-31">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1373,26 +1373,17 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
         <strong style="color:var(--ink2)">Deine Daten gehören dir, leben bei dir, und wir sehen sie nie.</strong></div>
       </div>
 
-      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="saveLocal('fb_onboard_seen',true);onboardNext('welcome','country')">
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('welcome','license')">
         Neu einrichten →
       </button>
       <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px;margin-bottom:4px">
-        ca. 10–15 Min · einmalig · jederzeit anpassbar
+        ca. 5 Minuten · einmalig · jederzeit anpassbar
       </div>
       <div style="margin-top:10px;text-align:center">
         <button class="btn btn-outline" style="font-size:13px;padding:10px 20px"
-          onclick="document.getElementById('welcomePairingWrap').style.display=document.getElementById('welcomePairingWrap').style.display==='none'?'':'none'">
-          Weiteres Gerät einrichten
+          onclick="onboardNext('welcome','pairing')">
+          Bereits eingerichtet? Gerät koppeln
         </button>
-        <div id="welcomePairingWrap" style="display:none;margin-top:12px">
-          <div style="font-size:12px;color:var(--muted);margin-bottom:8px">6-stelligen Kopplungscode eingeben:</div>
-          <input type="text" id="welcomePairingInput" class="form-input"
-            placeholder="ABC123" maxlength="6"
-            style="text-align:center;font-family:'Courier Prime',monospace;font-size:22px;letter-spacing:.15em;text-transform:uppercase;padding:12px;margin-bottom:8px"
-            autocomplete="off" autocorrect="off" spellcheck="false">
-          <button class="btn btn-primary" style="width:100%;padding:12px" onclick="claimPairingCode()">Verbinden</button>
-          <div id="welcomePairingError" style="color:var(--red);font-size:12px;min-height:18px;margin-top:6px"></div>
-        </div>
       </div>
     </div>
   </div>
@@ -1401,7 +1392,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <div id="onboardLicense" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:440px;text-align:center">
       <button class="onboard-back" onclick="onboardNext('license','welcome')">← Zurück</button>
-      <div class="onboard-step-label">Schritt 1 von 3 — Lizenz</div>
+      <div class="onboard-step-label">Schritt 1 von 5</div>
 
       <div style="font-size:40px;margin-bottom:12px">🗝</div>
       <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:8px">
@@ -1513,7 +1504,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <!-- ── Screen 1: Land & Steuern ── -->
   <div id="onboardCountry" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:480px">
-      <button class="onboard-back" onclick="onboardNext('country','lang')">← Zurück</button>
+      <button class="onboard-back" onclick="onboardNext('country','license')">← Zurück</button>
       <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;text-align:center">
         Das Setup dauert 2 Minuten. Alles ist nachher anpassbar.
       </div>
@@ -1533,7 +1524,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
         </select>
         <button class="btn btn-primary" style="width:100%;padding:12px" onclick="obSetCountry('OTHER',document.getElementById('obOtherCurrencyInput').value)">Weiter →</button>
       </div>
-      <div class="onboard-dots"><div class="onboard-dot active"></div><div class="onboard-dot"></div><div class="onboard-dot"></div><div class="onboard-dot"></div></div>
+      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div><div class="onboard-dot"></div><div class="onboard-dot"></div></div>
     </div>
   </div>
 
@@ -1555,7 +1546,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <button class="btn btn-primary" id="obAccountsNextBtn" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('accounts','integrations')" disabled>
         Weiter →
       </button>
-      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div><div class="onboard-dot"></div></div>
+      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div><div class="onboard-dot"></div></div>
     </div>
   </div>
 
@@ -1600,28 +1591,47 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       📁 Expenses / ${new Date().getFullYear()}</div>
         <div style="color:var(--muted);font-size:12px">FinanceBird erstellt einen Ordner in deinem Google Drive. Du kannst ihn danach frei verschieben oder umbenennen — die App findet ihn über die Folder-ID trotzdem.</div>
       </div>
-      <div id="obIntClockifyWrap" style="display:none;margin-top:12px;padding:12px 14px;background:var(--bg2);border-radius:10px">
-        <div style="font-size:12.5px;color:var(--ink2);margin-bottom:10px;line-height:1.5">
-          <strong>Wozu?</strong> Clockify trackt deine Zeit — FinanceBird macht daraus Stundensätze, Projektvergleiche und zeigt dir wie viel deiner Zeit wirklich bezahlt ist.<br>
-          <span style="color:var(--muted);font-size:11.5px">Key findest du unter: clockify.me → Profil → Profile Settings → API</span>
+      <div id="obIntClockifyWrap" style="display:none;margin-top:12px;padding:14px 16px;background:var(--bg2);border-radius:12px">
+        <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Erweiterung</div>
+        <div style="font-size:12.5px;color:var(--ink2);margin-bottom:12px;line-height:1.6"><strong>Clockify</strong> trackt deine Zeit — FinanceBird macht daraus Stundensätze und Projektvergleiche.</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;padding:10px 12px;background:var(--paper);border-radius:8px">
+          <strong style="color:var(--ink2)">So findest du den Key:</strong><br>
+          1. Öffne <a href="https://clockify.me/user/settings" target="_blank" style="color:var(--accent);text-decoration:none">clockify.me/user/settings</a><br>
+          2. Scrolle zu «API»<br>
+          3. Kopiere den Key
         </div>
         <label class="form-label" style="font-size:12px">Clockify API Key</label>
-        <input type="password" id="obClockifyKey" class="form-input" placeholder="API Key aus Profile Settings" style="margin-bottom:6px">
+        <input type="password" id="obClockifyKey" class="form-input" placeholder="API Key" style="margin-bottom:6px">
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="obSaveClockify()" style="flex:1">Speichern</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('obIntClockifyWrap').style.display='none'" style="font-size:12px">Überspringen</button>
+        </div>
+      </div>
         <button class="btn btn-primary btn-sm" onclick="obSaveClockify()" style="width:100%">Speichern</button>
       </div>
-      <div id="obIntKiWrap" style="display:none;margin-top:12px;padding:12px 14px;background:var(--bg2);border-radius:10px">
-        <div style="font-size:12.5px;color:var(--ink2);margin-bottom:10px;line-height:1.5">
-          <strong>Wozu?</strong> Die KI liest deine Belege automatisch aus — Betrag, Datum, Händler, Kategorie. Spart Zeit beim Erfassen.<br>
-          <strong>Wie?</strong> Du bringst deinen eigenen Anthropic API Key mit. Kosten: ~0.01 CHF pro Beleg. Deine Daten gehen nie durch unsere Server.<br>
-          <span style="color:var(--muted);font-size:11.5px">Key unter: console.anthropic.com → API Keys → Create Key</span>
+      <div id="obIntKiWrap" style="display:none;margin-top:12px;padding:14px 16px;background:var(--bg2);border-radius:12px">
+        <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Erweiterung</div>
+        <div style="font-size:12.5px;color:var(--ink2);margin-bottom:8px;line-height:1.6"><strong>KI-Beleganalyse</strong> — liest Belege automatisch: Betrag, Datum, Händler, Kategorie. Kosten: ~0.01 CHF pro Beleg.</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:12px;line-height:1.5">🔒 Deine Belege gehen nie durch unsere Server.</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;padding:10px 12px;background:var(--paper);border-radius:8px">
+          <strong style="color:var(--ink2)">So findest du den Key:</strong><br>
+          1. Öffne <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent);text-decoration:none">console.anthropic.com/settings/keys</a><br>
+          2. Klicke «Create Key»<br>
+          3. Kopiere den Key (beginnt mit sk-ant-…)
         </div>
         <label class="form-label" style="font-size:12px">Claude API Key</label>
         <input type="password" id="obKiKey" class="form-input" placeholder="sk-ant-…" style="margin-bottom:6px">
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="obSaveKi()" style="flex:1">Speichern</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('obIntKiWrap').style.display='none'" style="font-size:12px">Überspringen</button>
+        </div>
+      </div>
         <button class="btn btn-primary btn-sm" onclick="obSaveKi()" style="width:100%">Speichern</button>
       </div>
       <button class="btn btn-primary" id="obIntNextBtn" style="width:100%;padding:14px;font-size:15px;margin-top:18px" onclick="obIntNext()">
         Notion verbinden
       </button>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">Notion ist Pflicht · alles andere jederzeit nachholbar</div>
       <!-- Polling status (shown after OAuth) -->
       <div id="obIntPolling" style="display:none;margin-top:14px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
@@ -1635,191 +1645,59 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
           Notion öffnet sich in einem neuen Tab oder Fenster. Schliesse es nach der Verbindung nicht — kehre hier zurück.
         </div>
       </div>
-      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div></div>
+      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div></div>
     </div>
   </div>
 
-  <!-- ── Screen 4: Übersicht ── -->
-  <div id="onboardSummary" class="onboard-screen" style="display:none">
+  <!-- ── Screen 5: Overview (v3 — mit Health-Checks) ── -->
+  <div id="onboardOverview" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:480px">
-      <button class="onboard-back" onclick="onboardNext('summary','integrations')">← Zurück</button>
+      <button class="onboard-back" onclick="onboardNext('overview','integrations')">← Zurück</button>
       <div style="font-size:40px;margin-bottom:8px;text-align:center">🎉</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:6px;text-align:center" id="obSummaryTitle">
-        Dein FinanceBird ist bereit!
-      </h2>
-      <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px">
-        Alles jederzeit in den Einstellungen anpassbar.
-      </div>
-      <div id="obSummaryTable" style="background:var(--bg2);border-radius:12px;padding:14px 18px;margin-bottom:16px"></div>
-      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('summary','done')">
-        Fast fertig — App einrichten →
-      </button>
-      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot active"></div></div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:6px;text-align:center" id="overviewTitle">System wird geprüft…</h2>
+      <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px">Alles jederzeit in den Einstellungen anpassbar.</div>
+      <div id="overviewChecks" style="background:var(--bg2);border-radius:12px;padding:14px 18px;margin-bottom:16px"></div>
+      <button class="btn btn-primary" id="overviewFinishBtn" style="width:100%;padding:14px;font-size:15px" onclick="onboardFinish()" disabled>System wird geprüft…</button>
+      <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot active"></div></div>
     </div>
   </div>
 
-  <!-- ── PHASE D: Fertig / Transition ── -->
-  <div id="onboardDone" class="onboard-screen" style="display:none">
-    <div class="onboard-card" style="max-width:480px">
-      <div style="font-size:48px;margin-bottom:12px;text-align:center">🎉</div>
-      <div class="setup-logo" style="font-size:28px;margin-bottom:4px;text-align:center">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px;text-align:center">
-        Dein FinanceBird ist startklar.
-      </h2>
-      <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;line-height:1.6">
-        Möchtest du FinanceBird gleich auch als App auf dem Desktop und auf deinem Mobile einrichten?<br>
-        <span style="font-size:11px">Du kannst das auch jederzeit später unter Einstellungen nachholen.</span>
-      </p>
-
-      <!-- Block: Weiteres Gerät -->
-      <details id="doneDeviceBlock" open style="margin-bottom:16px;border:1.5px solid var(--border);border-radius:14px;overflow:hidden">
-        <summary style="padding:14px 16px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:var(--ink);user-select:none"
-          onclick="onDoneDeviceOpen(this)">
-          <span>📱 App auf weiteren Geräten nutzen</span>
-          <span style="font-size:16px;color:var(--muted)">−</span>
-        </summary>
-        <div style="padding:0 16px 16px">
-          <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
-            Scanne den QR-Code oder gib die URL ein. Installiere die App auf dem Homescreen und gib dann den Kopplungscode ein.
-          </p>
-
-          <!-- QR Code -->
-          <div id="doneQrContainer" style="display:flex;justify-content:center;margin-bottom:14px">
-            <div id="doneQrCode" style="width:140px;height:140px;background:var(--bg2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)">
-              Lädt…
-            </div>
-          </div>
-
-          <!-- App URL -->
-          <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px">
-            <input type="text" id="doneAppUrl" class="form-input"
-              readonly style="font-size:11px;color:var(--muted);flex:1;cursor:text">
-            <button onclick="copyDoneUrl()"
-              style="padding:8px 12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;font-size:11px;cursor:pointer;white-space:nowrap;color:var(--ink2);font-family:inherit"
-              id="doneCopyUrlBtn">
-              Kopieren
-            </button>
-          </div>
-
-          <!-- Kopplungscode -->
-          <div style="background:var(--bg2);border-radius:12px;padding:14px 16px;text-align:center">
-            <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Kopplungscode</div>
-            <div id="donePairingCode" style="font-family:'Courier Prime',monospace;font-size:32px;letter-spacing:.2em;font-weight:700;color:var(--ink);margin-bottom:6px">
-              ······
-            </div>
-            <div id="donePairingCountdown" style="font-size:11px;color:var(--muted)">Lädt…</div>
-            <button onclick="refreshPairingCode()"
-              id="doneRefreshBtn"
-              style="margin-top:8px;background:none;border:none;font-size:11px;color:var(--accent);cursor:pointer;font-family:inherit;padding:0">
-              Neuen Code generieren
-            </button>
-          </div>
-
-          <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;text-align:center">
-            Auch später jederzeit unter Einstellungen → Weiteres Gerät einrichten.
-          </p>
-        </div>
-      </details>
-
-      <!-- Block: PWA installieren (Desktop) -->
-      <div id="donePwaBlock" style="display:none;margin-bottom:16px;padding:14px 16px;background:var(--bg2);border-radius:12px;font-size:12px;color:var(--muted)">
-        <strong style="color:var(--ink);display:block;margin-bottom:4px">💻 Tipp: Als App installieren</strong>
-        Installiere FinanceBird direkt auf deinem Desktop — kein Browser nötig, startet wie eine normale App.
-        <button id="donePwaInstallBtn" onclick="triggerPwaInstall()"
-          style="margin-top:10px;width:100%;padding:10px;background:var(--ink);color:white;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">
-          Installieren
-        </button>
-      </div>
-
-      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardFinish()">
-        Zum Cockpit →
-      </button>
-    </div>
-  </div>
-
-  <!-- ── PHASE: Mobile Onboarding ── -->
-
-  <!-- Screen M1: PWA installieren (erscheint in Browser, nicht in installierter PWA) -->
-  <div id="onboardMobileInstall" class="onboard-screen" style="display:none">
+  <!-- ── Pfad B: Pairing (v3) ── -->
+  <div id="onboardPairing" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:400px;text-align:center">
-      <div class="setup-logo" style="font-size:24px;margin-bottom:16px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
-      <div style="font-size:40px;margin-bottom:12px" id="mobileInstallIcon">📱</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;margin-bottom:8px">
-        Füge FinanceBird zu deinem Homescreen hinzu
-      </h2>
-
-      <!-- iOS Anleitung -->
-      <div id="mobileInstallIos" style="display:none;margin-bottom:20px">
-        <div style="background:var(--bg2);border-radius:12px;padding:14px 16px;text-align:left;font-size:13px;color:var(--ink2);line-height:1.8">
-          <div>1. Tippe auf <strong>⬆ Teilen</strong> (unten in Safari)</div>
-          <div>2. Wähle <strong>„Zum Home-Bildschirm"</strong></div>
-          <div>3. Tippe <strong>„Hinzufügen"</strong></div>
-        </div>
-      </div>
-
-      <!-- Android Anleitung -->
-      <div id="mobileInstallAndroid" style="display:none;margin-bottom:20px">
-        <div style="background:var(--bg2);border-radius:12px;padding:14px 16px;text-align:left;font-size:13px;color:var(--ink2);line-height:1.8">
-          <div>1. Tippe auf <strong>⋮ Menü</strong> (oben rechts)</div>
-          <div>2. Wähle <strong>„Zum Startbildschirm hinzufügen"</strong></div>
-          <div>3. Tippe <strong>„Hinzufügen"</strong></div>
-        </div>
-        <button id="androidInstallBtn" onclick="triggerPwaInstall()"
-          style="display:none;margin-top:10px;width:100%;padding:12px;background:var(--ink);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
-          Installieren
-        </button>
-      </div>
-
-      <!-- Desktop Fallback -->
-      <div id="mobileInstallDesktop" style="display:none;margin-bottom:20px">
-        <p style="font-size:13px;color:var(--muted);line-height:1.6">Öffne diese URL auf deinem Mobilgerät, um die App zu installieren.</p>
-      </div>
-
-      <p style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6">
-        Öffne danach die App von deinem Homescreen — dann kannst du den Kopplungscode eingeben.
-      </p>
-      <p style="font-size:11px;color:var(--muted);line-height:1.5">
-        Mit der Web-App auf deinem Homescreen hast du deinen Finanz-Companion mobil oder am Desktop von überall zur Hand und kannst z.B. direkt mit der Handykamera Belege scannen.
-      </p>
-    </div>
-  </div>
-
-  <!-- Screen M2: Kopplungscode eingeben (in installierter PWA) -->
-  <div id="onboardMobilePairing" class="onboard-screen" style="display:none">
-    <div class="onboard-card" style="max-width:380px;text-align:center">
+      <button class="onboard-back" onclick="onboardNext('pairing','welcome')">← Zurück</button>
       <div class="setup-logo" style="font-size:24px;margin-bottom:16px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
       <div style="font-size:40px;margin-bottom:12px">🔗</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">
-        Kopplungscode eingeben
-      </h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">
-        Den Code findest du auf dem anderen Gerät nach dem Setup.
-      </p>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">Gerät koppeln</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">Den 6-stelligen Code findest du auf deinem anderen Gerät unter Einstellungen → Weiteres Gerät.</p>
+      <input type="text" id="pairingInput" class="form-input" placeholder="A8F3X9" maxlength="6" style="text-align:center;font-family:'Courier Prime',monospace;font-size:28px;letter-spacing:.25em;text-transform:uppercase;padding:16px;margin-bottom:8px" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" autocomplete="off" autocorrect="off" spellcheck="false">
+      <div id="pairingError" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:16px"></div>
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" id="pairingBtn" onclick="v3SubmitPairingCode()">Verbinden</button>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">Keinen Code? <a href="#" onclick="v3PairingFallback();return false" style="color:var(--accent);text-decoration:none">Lizenz-Key direkt eingeben →</a></div>
+    </div>
+  </div>
 
-      <input type="text" id="mobilePairingInput" class="form-input"
-        placeholder="A8F3X9"
-        maxlength="6"
-        style="text-align:center;font-family:'Courier Prime',monospace;font-size:28px;
-               letter-spacing:.25em;text-transform:uppercase;padding:16px;margin-bottom:8px"
-        oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
-        autocomplete="off" autocorrect="off" spellcheck="false">
-      <div id="mobilePairingError" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:16px"></div>
-
-      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px"
-        id="mobilePairingBtn"
-        onclick="submitPairingCode()">
-        Verbinden
-      </button>
-
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">
-        Keinen Code?
-        <a href="#" onclick="onboardNext('mobile-pairing','license');return false"
-          style="color:var(--accent);text-decoration:none">
-          Lizenz-Key direkt eingeben →
-        </a>
+  <!-- ── Pfad C: Repair (v3) ── -->
+  <div id="onboardRepair" class="onboard-screen" style="display:none">
+    <div class="onboard-card" style="max-width:440px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">🔧</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">Verbindung wiederherstellen</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Etwas muss repariert werden — das geht schnell.</p>
+      <div id="repairChecks" style="background:var(--bg2);border-radius:12px;padding:14px 18px;margin-bottom:16px;text-align:left"></div>
+      <div id="repairLicenseWrap" style="display:none;margin-bottom:16px;text-align:left">
+        <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block">Lizenz-Key</label>
+        <input type="text" id="repairLicenseInput" class="form-input" placeholder="LK-XXXXXXXX" style="text-align:center;font-family:'Courier Prime',monospace;font-size:18px;letter-spacing:.1em;text-transform:uppercase;padding:12px;margin-bottom:6px" oninput="this.value=this.value.toUpperCase()" autocomplete="off" autocorrect="off" spellcheck="false">
+        <div id="repairLicenseError" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:8px"></div>
+        <button class="btn btn-primary" id="repairLicenseBtn" style="width:100%;padding:12px" onclick="v3RepairLicenseSubmit()">Prüfen</button>
       </div>
     </div>
   </div>
+
+
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     COLLABORATOR MODAL</div>
 
 </div>
 
@@ -4540,7 +4418,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.7g.2026-03-30';
+const APP_VERSION = '2.9a.2026-03-31';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -10360,82 +10238,193 @@ function erfShowReceiptUI(thumb, filename, isPDF, context) {
 
 /* ════════════════════════════════════════════════════════════
    BLOCK: ONBOARDING
-   Scope: Setup-Flow (5 Screens), OB-State, Device-Pairing, claimCode
+   Scope: Setup-Flow, OB-State, Device-Pairing, Health-Check, 3-Path Router
    Key:   onboardNext(), onboardFinish(), obRenderSummary(),
           claimPairingCode(), OB state object
    Owner: App-Coding
 ════════════════════════════════════════════════════════════
-   Welcome → Connect → Quiz (9 Fragen) → Done → App
+   Pfad A: Ersteinrichtung · Pfad B: Pairing · Pfad C: Repair
    ══════════════════════════════════════════════════════ */
 
-function onboardNext(from, to) {
-  // Alle bekannten Screens (inkl. neuer)
-  const screenIds = {
-    'welcome':        'onboardWelcome',
-    'license':        'onboardLicense',
-    'connect':        'onboardConnect',
-    'country':        'onboardCountry',
-    'accounts':       'onboardAccounts',
-    'integrations':   'onboardIntegrations',
-    'summary':        'onboardSummary',
-    'done':           'onboardDone',
-    'mobile-install': 'onboardMobileInstall',
-    'mobile-pairing': 'onboardMobilePairing',
+/* ── Health-Check System (Onboarding v3) ── */
+
+async function healthCheck(level = 'instant') {
+  const result = {
+    license:  { key_present: false, key_valid: null },
+    notion:   { token_present: false, token_valid: null, dbs_found: null, dbs_schema_ok: null, settings_readable: null },
+    gdrive:   { token_present: false, token_valid: null, folders_exist: null },
+    clockify: { key_present: false, key_valid: null },
+    claude:   { key_present: false, key_valid: null },
+    infra:    { online: false, worker_reachable: null },
   };
-  // PATCH B2: Save current step for resume after page refresh
-  const persistSteps = ['lang', 'country', 'accounts', 'integrations', 'summary'];
-  if (persistSteps.includes(to)) {
-    saveLocal('fb_onboard_step', to);
+
+  // Instant checks (localStorage only, <50ms)
+  result.license.key_present  = !!loadLocal('fb_license_key', null);
+  result.notion.token_present = !!AppState.notionToken;
+  result.gdrive.token_present = !!sessionStorage.getItem('fb_gdrive_token');
+  result.clockify.key_present = !!loadLocal('fb_clockify_key', '');
+  result.claude.key_present   = !!loadLocal('fb_claude_key', '');
+  result.infra.online         = navigator.onLine;
+
+  if (level === 'instant') return result;
+
+  // Quick checks (key + token validation, <2s)
+  const qp = [];
+  if (result.license.key_present) {
+    qp.push(Auth.verifyLicense(loadLocal('fb_license_key', '')).then(r => {
+      result.license.key_valid = r.valid;
+    }).catch(() => { result.license.key_valid = false; }));
   }
-  Object.values(screenIds).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
+  if (result.notion.token_present) {
+    qp.push(notionFetch('/users/me', 'GET').then(r => {
+      result.notion.token_valid = r.object === 'user';
+    }).catch(() => { result.notion.token_valid = false; }));
+  }
+  qp.push(fetch(Auth.FB_WORKER_AUTH + '/health', { signal: AbortSignal.timeout(3000) })
+    .then(r => { result.infra.worker_reachable = r.ok; })
+    .catch(() => { result.infra.worker_reachable = false; }));
+  await Promise.allSettled(qp);
+  if (level === 'quick') return result;
+
+  // Deep checks (DB discovery, schema, GDrive, API keys, 3-5s)
+  const dp = [];
+  if (result.notion.token_valid) {
+    dp.push(discoverDatabases().then(({ found, missing }) => {
+      result.notion.dbs_found = missing.length === 0;
+    }).catch(() => { result.notion.dbs_found = false; }));
+    if (DB.EINSTELLUNGEN) {
+      dp.push(notionFetch('/databases/' + DB.EINSTELLUNGEN + '/query', 'POST', { page_size: 1 }).then(r => {
+        result.notion.settings_readable = Array.isArray(r.results);
+      }).catch(() => { result.notion.settings_readable = false; }));
+    }
+  }
+  if (result.gdrive.token_present) {
+    dp.push(fetch('https://www.googleapis.com/drive/v3/about?fields=user', {
+      headers: { Authorization: 'Bearer ' + sessionStorage.getItem('fb_gdrive_token') }
+    }).then(r => { result.gdrive.token_valid = r.ok; }).catch(() => { result.gdrive.token_valid = false; }));
+  }
+  if (result.clockify.key_present) {
+    dp.push(fetch('https://api.clockify.me/api/v1/user', {
+      headers: { 'X-Api-Key': loadLocal('fb_clockify_key', '') }, signal: AbortSignal.timeout(3000)
+    }).then(r => { result.clockify.key_valid = r.ok; }).catch(() => { result.clockify.key_valid = false; }));
+  }
+  if (result.claude.key_present) {
+    dp.push(fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': loadLocal('fb_claude_key', ''), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1, messages: [{ role: 'user', content: 'hi' }] }),
+      signal: AbortSignal.timeout(5000)
+    }).then(r => { result.claude.key_valid = r.ok || r.status === 400; }).catch(() => { result.claude.key_valid = false; }));
+  }
+  await Promise.allSettled(dp);
+  return result;
+}
+
+function healthSummary(hc) {
+  const issues = [];
+  if (!hc.license.key_present)  issues.push({ key: 'license_missing', label: 'Lizenz-Key fehlt', action: 'key_input' });
+  if (hc.license.key_valid === false) issues.push({ key: 'license_invalid', label: 'Lizenz-Key ungültig', action: 'key_input' });
+  if (!hc.notion.token_present) issues.push({ key: 'notion_missing', label: 'Notion nicht verbunden', action: 'notion_reauth' });
+  if (hc.notion.token_valid === false) issues.push({ key: 'notion_invalid', label: 'Notion-Verbindung abgelaufen', action: 'notion_reauth' });
+  if (hc.notion.dbs_found === false)  issues.push({ key: 'dbs_missing', label: 'Datenbanken fehlen', action: 'db_repair' });
+  return { ok: issues.length === 0, issues };
+}
+
+/* ── Settings Sync: Notion ↔ localStorage ── */
+
+async function saveSettingsToNotion() {
+  if (!DB.EINSTELLUNGEN || !Auth.isAuthenticated) return;
+  const settings = {
+    land: AppState.country || 'CH', waehrung: AppState.currency || 'CHF',
+    sprache: AppState.lang || 'de', konten: JSON.stringify(OB.accounts || []),
+    clockify_key: loadLocal('fb_clockify_key', ''), claude_key: loadLocal('fb_claude_key', ''),
+  };
+  try {
+    const existing = await notionFetch('/databases/' + DB.EINSTELLUNGEN + '/query', 'POST', { page_size: 1 });
+    const props = {
+      'Land':     { rich_text: [{ text: { content: settings.land } }] },
+      'Waehrung': { rich_text: [{ text: { content: settings.waehrung } }] },
+      'Sprache':  { rich_text: [{ text: { content: settings.sprache } }] },
+      'Konten':   { rich_text: [{ text: { content: settings.konten } }] },
+      'Clockify': { rich_text: [{ text: { content: settings.clockify_key } }] },
+      'Claude':   { rich_text: [{ text: { content: settings.claude_key } }] },
+    };
+    if (existing.results && existing.results.length > 0) {
+      await notionFetch('/pages/' + existing.results[0].id, 'PATCH', { properties: props });
+    } else {
+      props['Name'] = { title: [{ text: { content: 'Device Settings' } }] };
+      await notionFetch('/pages', 'POST', { parent: { database_id: DB.EINSTELLUNGEN }, properties: props });
+    }
+    console.log('[Settings] Saved to Notion');
+  } catch (e) { console.warn('[Settings] Save failed:', e.message); }
+}
+
+async function loadSettingsFromNotion() {
+  if (!DB.EINSTELLUNGEN && Auth.isAuthenticated) {
+    try { await discoverDatabases(); saveLocal('fb_db_ids', DB); } catch {}
+  }
+  if (!DB.EINSTELLUNGEN) return;
+  try {
+    const resp = await notionFetch('/databases/' + DB.EINSTELLUNGEN + '/query', 'POST', { page_size: 1 });
+    if (!resp.results || !resp.results.length) return;
+    const props = resp.results[0].properties;
+    const gt = (p) => p?.rich_text?.[0]?.plain_text || '';
+    const land = gt(props['Land']), waehrung = gt(props['Waehrung']), sprache = gt(props['Sprache']);
+    const kontenStr = gt(props['Konten']), clockify = gt(props['Clockify']), claude = gt(props['Claude']);
+    if (land) AppState.country = land;
+    if (waehrung) AppState.currency = waehrung;
+    if (sprache) AppState.lang = sprache;
+    saveAppState();
+    if (kontenStr) { try { const k = JSON.parse(kontenStr); if (Array.isArray(k)) { OB.accounts = k; saveLocal('fb_ob_accounts', k); } } catch {} }
+    if (clockify) { saveLocal('fb_clockify_key', clockify); OB.clockifyConnected = true; }
+    if (claude) { saveLocal('fb_claude_key', claude); OB.kiConnected = true; }
+    console.log('[Settings] Loaded from Notion:', { land, waehrung, sprache });
+  } catch (e) { console.warn('[Settings] Load failed:', e.message); }
+}
+
+async function ensureSettingsSchema() {
+  if (!DB.EINSTELLUNGEN) return;
+  try {
+    const db = await notionFetch('/databases/' + DB.EINSTELLUNGEN, 'GET');
+    const existing = Object.keys(db.properties || {});
+    const missing = ['Land', 'Waehrung', 'Sprache', 'Konten', 'Clockify', 'Claude'].filter(p => !existing.includes(p));
+    if (missing.length > 0) {
+      const update = {};
+      for (const p of missing) update[p] = { rich_text: {} };
+      await notionFetch('/databases/' + DB.EINSTELLUNGEN, 'PATCH', { properties: update });
+    }
+  } catch (e) { console.warn('[Settings] Schema check failed:', e.message); }
+}
+
+
+
+function onboardNext(from, to) {
+  const screenIds = {
+    'welcome': 'onboardWelcome', 'license': 'onboardLicense', 'country': 'onboardCountry',
+    'accounts': 'onboardAccounts', 'integrations': 'onboardIntegrations',
+    'overview': 'onboardOverview', 'pairing': 'onboardPairing', 'repair': 'onboardRepair',
+  };
+  const persistSteps = ['license', 'country', 'accounts', 'integrations', 'overview'];
+  if (persistSteps.includes(to)) saveLocal('fb_onboard_step', to);
+  Object.values(screenIds).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   const targetId = screenIds[to];
-  if (targetId) {
-    const el = document.getElementById(targetId);
-    if (el) el.style.display = '';
-  }
-  if (to === 'accounts') { obRenderAccountChips(); }
+  if (targetId) { const el = document.getElementById(targetId); if (el) el.style.display = ''; }
+  if (to === 'accounts') obRenderAccountChips();
   if (to === 'integrations') { OB.notionConnected = Auth.isAuthenticated; obUpdateIntTiles(); }
-  if (to === 'summary') { obRenderSummary(); }
-  if (to === 'license') {
-    // Lizenz-Key vorausfüllen falls bereits gespeichert
-    const existing = loadLocal('fb_license_key', '');
-    const inp = document.getElementById('onboardLicenseInput');
-    if (inp && existing) inp.value = existing;
-  }
-  if (to === 'mobile-install') {
-    // Platform detection (Audit-Fix R7)
-    const ua = navigator.userAgent || '';
-    const isIOS     = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isAndroid = /Android/.test(ua);
-    const iosEl     = document.getElementById('mobileInstallIos');
-    const androidEl = document.getElementById('mobileInstallAndroid');
-    const desktopEl = document.getElementById('mobileInstallDesktop');
-    if (iosEl)     iosEl.style.display     = isIOS     ? '' : 'none';
-    if (androidEl) androidEl.style.display = isAndroid  ? '' : 'none';
-    if (desktopEl) desktopEl.style.display = (!isIOS && !isAndroid) ? '' : 'none';
-  }
-  if (to === 'done') { initDoneScreen(); }
-  if (to === 'welcome') { setTimeout(renderWelcomeLang, 50); }
+  if (to === 'overview') obRenderOverview();
+  if (to === 'license') { const existing = loadLocal('fb_license_key', ''); const inp = document.getElementById('onboardLicenseInput'); if (inp && existing) inp.value = existing; }
+  if (to === 'welcome') setTimeout(renderWelcomeLang, 50);
 }
 
 function showSetup() {
   document.getElementById('setupScreen').style.display = 'block';
   document.getElementById('mainApp').style.display     = 'none';
-  const seen       = loadLocal('fb_onboard_seen', false);
-  const hasLicense = !!Auth.licenseKey;
-  const hasToken   = !!AppState.notionToken;
-
-  if (!seen || (!hasLicense && !hasToken)) {
-    // Erster Besuch ODER: seen=true aber alles gelöscht → Welcome zeigen
-    // BUG-020: Flag erst beim Klick auf "Neu einrichten" setzen
-    onboardNext(null, 'welcome');
+  const savedStep = loadLocal('fb_onboard_step', null);
+  const validSteps = ['license', 'country', 'accounts', 'integrations', 'overview'];
+  if (savedStep && validSteps.includes(savedStep) && !!Auth.licenseKey) {
+    onboardNext(null, savedStep);
   } else {
-    // Returning user mit gültigem State — gespeicherten Step oder license
-    const savedStep = loadLocal('fb_onboard_step', null);
-    onboardNext(null, savedStep || 'license');
+    onboardNext(null, 'welcome');
   }
 }
 
@@ -10445,51 +10434,45 @@ function showApp() {
 }
 
 function showQuizAfterAuth() {
-  // setupScreen sicherstellen (nach OAuth-Redirect kann mainApp bereits sichtbar sein)
   const setupEl = document.getElementById('setupScreen');
   const mainEl  = document.getElementById('mainApp');
   if (setupEl) setupEl.style.display = 'block';
   if (mainEl)  mainEl.style.display  = 'none';
-  // Notion ist jetzt verbunden (OAuth erfolgreich) — OB-State synchronisieren
   if (Auth.isAuthenticated) OB.notionConnected = true;
-  // BUG-025: Gepaartes Gerät hat keinen Setup-Durchlauf — licenseKey vorhanden aber kein savedStep
-  // → direkt in die App, Setup als abgeschlossen markieren
+
   const savedStep = loadLocal('fb_onboard_step', null);
   const hasLicense = !!Auth.licenseKey;
-  if (!savedStep && hasLicense) {
-    // Pairing-Flow: Setup überspringen, Standard-Werte übernehmen falls nicht gesetzt
-    if (!AppState.lang)    { AppState.lang = 'de'; }
-    if (!AppState.country) { AppState.country = 'CH'; AppState.currency = 'CHF'; }
-    saveAppState();
-    saveLocal('fb_onboard_complete', true);
-    localStorage.removeItem('fb_onboard_step'); // Alten Step aus vorherigem Setup clearen
-    showApp();
-    restoreTab();
-    return;
-  }
-  // Pairing auch wenn savedStep noch gesetzt ist aber pair-param in URL war
-  const urlParamsCheck = new URLSearchParams(window.location.search);
-  const wasPairing = urlParamsCheck.get('pair') && urlParamsCheck.get('pair') !== '1';
+  const wasPairing = loadLocal('fb_pairing_active', false);
+
+  // Pfad B: Pairing — load settings from Notion, go to Cockpit
   if (wasPairing && hasLicense) {
-    if (!AppState.lang)    { AppState.lang = 'de'; }
-    if (!AppState.country) { AppState.country = 'CH'; AppState.currency = 'CHF'; }
-    saveAppState();
-    saveLocal('fb_onboard_complete', true);
-    localStorage.removeItem('fb_onboard_step');
-    showApp();
-    restoreTab();
+    localStorage.removeItem('fb_pairing_active');
+    loadSettingsFromNotion().then(() => {
+      saveLocal('fb_onboard_complete', true);
+      localStorage.removeItem('fb_onboard_step');
+      showApp(); restoreTab();
+      setTimeout(() => showToast('success', '🎉', 'Gerät gekoppelt', 'Einstellungen übernommen.'), 500);
+    }).catch(() => {
+      if (!AppState.lang) { AppState.lang = 'de'; }
+      if (!AppState.country) { AppState.country = 'CH'; AppState.currency = 'CHF'; }
+      saveAppState();
+      saveLocal('fb_onboard_complete', true);
+      localStorage.removeItem('fb_onboard_step');
+      showApp(); restoreTab();
+    });
     return;
   }
-  // PATCH B1: Context-aware routing after OAuth
-  // If user was on integrations screen, stay there (OAuth just connected Notion)
-  if (savedStep === 'integrations') {
-    OB.notionConnected = true;
-    onboardNext(null, 'integrations');
-  } else if (savedStep) {
-    onboardNext(null, savedStep);
-  } else {
-    onboardNext(null, 'country');
+
+  // Pfad C: Repair — was already complete, just needed re-auth
+  if (loadLocal('fb_onboard_complete', false) && hasLicense) {
+    showApp(); restoreTab(); return;
   }
+
+  // Pfad A: Normal setup
+  if (savedStep === 'integrations') { OB.notionConnected = true; onboardNext(null, 'integrations'); }
+  else if (savedStep) { onboardNext(null, savedStep); }
+  else if (hasLicense) { onboardNext(null, 'country'); }
+  else { onboardNext(null, 'welcome'); }
 }
 
 /* ── Lizenz-Key (E2) ── */
@@ -10542,6 +10525,77 @@ async function onboardCheckLicense() {
 /* ── Done-Screen (Screen 5) ── */
 
 let _pairingCountdownInterval = null;
+
+/* ── Pfad C: Repair Screen Logic ── */
+
+function v3RenderRepair(hc) {
+  const container = document.getElementById('repairChecks');
+  if (!container) return;
+  const items = [];
+  if (!hc.license.key_present) items.push({ icon: '🗝', label: 'Lizenz-Key fehlt', action: '<button class="btn btn-primary btn-sm" onclick="v3RepairLicense()">Key eingeben</button>' });
+  if (!hc.notion.token_present) items.push({ icon: '📊', label: 'Notion nicht verbunden', action: '<button class="btn btn-primary btn-sm" onclick="v3RepairNotion()">Notion verbinden</button>' });
+  if (items.length === 0) items.push({ icon: '⚠️', label: 'Unbekanntes Problem', action: '<button class="btn btn-primary btn-sm" onclick="v3RepairNotion()">Notion verbinden</button>' });
+  container.innerHTML = items.map(i => '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)"><span style="font-size:20px">' + i.icon + '</span><div style="flex:1;font-size:14px;color:var(--ink)">' + i.label + '</div>' + i.action + '</div>').join('');
+}
+
+function v3RepairLicense() {
+  const wrap = document.getElementById('repairLicenseWrap');
+  if (wrap) wrap.style.display = wrap.style.display === 'none' ? '' : 'none';
+}
+
+async function v3RepairLicenseSubmit() {
+  const input = document.getElementById('repairLicenseInput');
+  const errEl = document.getElementById('repairLicenseError');
+  const btn   = document.getElementById('repairLicenseBtn');
+  if (!input) return;
+  const key = input.value.trim().toUpperCase();
+  if (!key.startsWith('LK-') || key.length < 5) { if (errEl) errEl.textContent = 'Format: LK-xxxxxxxx'; return; }
+  if (errEl) errEl.textContent = '';
+  if (btn) { btn.textContent = 'Prüfe…'; btn.disabled = true; }
+  const result = await Auth.verifyLicense(key);
+  if (btn) { btn.textContent = 'Prüfen'; btn.disabled = false; }
+  if (result.valid) {
+    saveLocal('fb_license_key', key);
+    showToast('success', '✅', 'Lizenz aktiv', '');
+    if (Auth.isAuthenticated) { showApp(); restoreTab(); } else { v3RepairNotion(); }
+  } else {
+    if (errEl) errEl.textContent = result.reason === 'expired' ? 'Abgelaufen — hello@oswaldkoenig.ch' : 'Key nicht gefunden';
+  }
+}
+
+function v3RepairNotion() {
+  showToast('info', '🔗', 'Verbindung läuft…', 'Notion-Fenster wird geöffnet');
+  Auth.startOAuth();
+}
+
+/* ── Pfad B: Pairing (v3 unified) ── */
+
+async function v3SubmitPairingCode() {
+  const input = document.getElementById('pairingInput');
+  const errEl = document.getElementById('pairingError');
+  const btn   = document.getElementById('pairingBtn');
+  if (!input || !errEl) return;
+  const code = input.value.trim().toUpperCase();
+  if (code.length !== 6) { errEl.textContent = 'Code muss 6 Zeichen haben.'; return; }
+  errEl.textContent = '';
+  if (btn) { btn.textContent = 'Verbinde…'; btn.disabled = true; }
+  const result = await Auth.claimPairingCode(code);
+  if (btn) { btn.textContent = 'Verbinden'; btn.disabled = false; }
+  if (result.licenseKey) {
+    saveLocal('fb_license_key', result.licenseKey);
+    saveLocal('fb_pairing_active', true);
+    if (errEl) { errEl.style.color = 'var(--green)'; errEl.textContent = '✅ Code korrekt — verbinde Notion…'; }
+    if (btn) btn.textContent = '✅ Weiter';
+    setTimeout(() => { showToast('success', '📱', 'Gerät erkannt', 'Notion kurz verbinden — dann bist du drin.'); Auth.startOAuth(); }, 900);
+  } else if (result.error === 'expired') {
+    errEl.style.color = ''; errEl.textContent = 'Code abgelaufen. Generiere einen neuen am anderen Gerät.';
+  } else {
+    errEl.style.color = ''; errEl.textContent = 'Code ungültig — bitte nochmal versuchen.';
+  }
+}
+
+function v3PairingFallback() { onboardNext('pairing', 'license'); }
+
 
 function onDoneDeviceOpen(summaryEl) {
   const details = summaryEl.closest('details');
@@ -10829,8 +10883,7 @@ async function settingsGeneratePairing() {
   if (block) block.style.display = 'block';
   if (codeEl) codeEl.textContent = result.code.toUpperCase();
 
-  // URL + QR-Code (Audit-Fix K3) — BUG-015: add ?pair=1 so recipient lands on pairing screen
-  const pairingUrl = window.location.origin + window.location.pathname + '?pair=1';
+  const pairingUrl = window.location.origin + window.location.pathname + '?pair=' + result.code.toUpperCase() + '&lang=' + (AppState.lang || 'de');
   const urlInput = document.getElementById('settingsPairingUrl');
   if (urlInput) urlInput.value = pairingUrl;
   if (qrEl) renderQrCodeSvg(pairingUrl, qrEl);
@@ -10901,6 +10954,8 @@ async function onboardFinish() {
       // Session 3: Save merchant rules defaults
       merchantRules = getDefaultRules(OB.country);
       await saveMerchantRules();
+      await ensureSettingsSchema();
+      await saveSettingsToNotion();
       saveLocal('fb_onboard_complete', true);
       localStorage.removeItem('fb_onboard_step'); // PATCH B2: cleanup
       await ensureBuchungenSchema();
@@ -10941,12 +10996,7 @@ const OB = {
 
 const OB_ACCOUNT_PRESETS = ['Bankkonto', 'PostFinance', 'Revolut', 'Bargeld', 'Kreditkarte'];
 
-function obSetLang(lang) {
-  OB.lang = lang;
-  AppState.lang = lang;
-  saveAppState();
-  onboardNext('lang', 'country');
-}
+function obSetLang(lang) { obSetLangOnly(lang); }
 
 function renderWelcomeLang() {
   // Highlight aktive Sprache im Welcome-Screen
@@ -11128,54 +11178,37 @@ function obIntNext() {
     obConnectNotion();
     return;
   }
-  // Render summary
-  obRenderSummary();
-  onboardNext('integrations', 'summary');
+  onboardNext('integrations', 'overview');
 }
 
-/* ── Übersicht / Summary ── */
+/* ── Overview Screen with Deep Health-Checks (v3) ── */
 
-function obRenderSummary() {
-  const el = document.getElementById('obSummaryTable');
+async function obRenderOverview() {
+  const el = document.getElementById('overviewChecks');
   if (!el) return;
-
-  // Zone 1: Heute eingerichtet (confirmed items)
-  const configured = [];
-  configured.push({ label: 'Sprache', value: OB.lang === 'de' ? 'Deutsch' : 'English' });
-  configured.push({ label: 'Land & Steuern', value: { CH: '🇨🇭 Schweiz', DE: '🇩🇪 Deutschland', AT: '🇦🇹 Österreich' }[OB.country] || OB.country });
-  configured.push({ label: 'Währung', value: OB.currency });
-  if (OB.accounts.length > 0) configured.push({ label: 'Konten', value: OB.accounts.length + ' definiert' });
-  configured.push({ label: 'Kategorien & Steuer-Mapping', value: 'Standard automatisch' });
-  if (OB.notionConnected) configured.push({ label: 'Notion', value: '✅ Verbunden' });
-  if (OB.driveConnected)  configured.push({ label: 'Google Drive', value: '✅ Verbunden' });
-  if (OB.clockifyConnected) configured.push({ label: 'Clockify', value: '✅ Verbunden' });
-  if (OB.kiConnected)     configured.push({ label: 'KI (Claude)', value: '✅ Verbunden' });
-
-  // Zone 2: Noch konfigurierbar (optional/skipped)
-  const optional = [];
-  if (!OB.driveConnected)    optional.push({ label: 'Belege-Ablage', hint: 'Google Drive — in Einstellungen nachholen' });
-  if (!OB.clockifyConnected) optional.push({ label: 'Zeit & Projekte', hint: 'Clockify — in Einstellungen nachholen' });
-  if (!OB.kiConnected)       optional.push({ label: 'KI-Beleganalyse', hint: 'Claude API Key — in Einstellungen nachholen' });
-  if (OB.accounts.length === 0) optional.push({ label: 'Konten', hint: 'Bankkonten — in Einstellungen ergänzen' });
-
-  el.innerHTML = `
-    <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Heute eingerichtet</div>
-    ${configured.map(r => `
-      <div class="onboard-summary-row">
-        <span class="onboard-summary-label">${r.label}</span>
-        <span class="onboard-summary-value">${r.value}</span>
-      </div>`).join('')}
-    ${optional.length > 0 ? `
-    <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:16px;margin-bottom:8px;padding-top:12px;border-top:1px solid var(--border)">Jederzeit nachholen</div>
-    ${optional.map(r => `
-      <div class="onboard-summary-row" style="opacity:.7">
-        <span class="onboard-summary-label">${r.label}</span>
-        <span class="onboard-summary-value" style="font-size:12px;color:var(--muted);font-weight:400">${r.hint}</span>
-      </div>`).join('')}` : ''}
-  `;
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">System wird geprüft…</div>';
+  const hc = await healthCheck('deep');
+  const rows = [];
+  rows.push(overviewRow('🗝', 'Lizenz', hc.license.key_present ? (hc.license.key_valid ? '✅ Aktiv' : '❌ Ungültig') : '❌ Fehlt', hc.license.key_present && hc.license.key_valid !== false));
+  rows.push(overviewRow('📊', 'Datenbank', hc.notion.token_present ? (hc.notion.token_valid ? (hc.notion.dbs_found ? '✅ Verbunden · Datenbanken bereit' : '⚠️ Verbunden · DBs fehlen') : '❌ Token ungültig') : '❌ Nicht verbunden', hc.notion.token_valid && hc.notion.dbs_found !== false));
+  rows.push(overviewRow('📎', 'Belege', hc.gdrive.token_present ? (hc.gdrive.token_valid ? '✅ Google Drive verbunden' : '⚠️ Token abgelaufen') : '⬜ Nicht konfiguriert (Erweiterung)', hc.gdrive.token_present ? hc.gdrive.token_valid : null));
+  rows.push(overviewRow('⏱', 'Zeit & Projekte', hc.clockify.key_present ? (hc.clockify.key_valid ? '✅ Clockify verbunden' : '⚠️ Key ungültig') : '⬜ Nicht konfiguriert (Erweiterung)', hc.clockify.key_present ? hc.clockify.key_valid : null));
+  rows.push(overviewRow('🤖', 'KI-Analyse', hc.claude.key_present ? (hc.claude.key_valid ? '✅ Claude API verbunden' : '⚠️ Key ungültig') : '⬜ Nicht konfiguriert (Erweiterung)', hc.claude.key_present ? hc.claude.key_valid : null));
+  el.innerHTML = rows.join('');
+  const btn = document.getElementById('overviewFinishBtn');
+  const notionOk = hc.notion.token_present && hc.notion.token_valid !== false;
+  if (btn) { btn.disabled = !notionOk; btn.textContent = notionOk ? 'Fertig — zum Cockpit →' : 'Notion muss verbunden sein'; }
+  const title = document.getElementById('overviewTitle');
+  if (title) title.textContent = (hc.license.key_valid !== false && notionOk) ? 'Dein FinanceBird ist bereit!' : 'Fast bereit — schau dir die offenen Punkte an';
 }
 
-/* ── Notion OAuth Callback für Onboarding ── */
+function overviewRow(icon, label, status, ok) {
+  const color = ok === true ? 'var(--green)' : ok === false ? 'var(--red)' : 'var(--muted)';
+  return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:20px">' + icon + '</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">' + label + '</div><div style="font-size:12px;color:' + color + ';margin-top:2px">' + status + '</div></div></div>';
+}
+
+
+/* ── Notion OAuth Callback für Onboarding ── *//* ── Notion OAuth Callback für Onboarding ── */
 
 function obNotionConnected() {
   OB.notionConnected = true;
@@ -11183,6 +11216,9 @@ function obNotionConnected() {
   if (pollEl) pollEl.style.display = 'none';
   obUpdateIntTiles();
 }
+function claimPairingCode() { v3SubmitPairingCode(); }
+function submitPairingCode() { v3SubmitPairingCode(); }
+function showPairingFallback() { v3PairingFallback(); }
 
 /* ── claimPairingCode (Welcome screen) ── */
 async function claimPairingCode() {
@@ -11264,7 +11300,7 @@ function renderCockpitRecommendations() {
 }
 
 function cockpitRecommendationChecks() {
-  return [
+  const checks = [
     {
       icon:'🏦', label:'Konto mit Startsaldo einrichten',
       sub: 'Für genaue Liquiditätsvorschau',
@@ -11301,6 +11337,10 @@ function cockpitRecommendationChecks() {
       actionLabel: 'Verbinden',
     },
   ];
+  const isPwa = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (!isPwa) { checks.push({ icon:'📱', label:'Als App installieren', sub:'Belege direkt scannen.', done:false, action:"nav('einstellungen')", actionLabel:'Anleitung' }); }
+  checks.push({ icon:'🔗', label:'Weiteres Gerät', sub:'Desktop + Mobile.', done:loadLocal('fb_pairing_done',false), action:"nav('einstellungen');setTimeout(()=>settingsGeneratePairing(),300)", actionLabel:'Koppeln' });
+  return checks;
 }
 
 
@@ -11964,170 +12004,108 @@ function migrateLocalStorage() {
 }
 
 (async function init() {
-  // 0. SW2: localStorage-Migrationen (vor allem anderen)
   migrateLocalStorage();
-
-  // 1. Load persisted state
   loadAppState();
-
-  // 2. Restore dark mode immediately (before anything renders)
   restoreDarkMode();
-
-  // 2b. Splash progress — zeige Aktivität während Init
-  (function() {
-    const bar = document.getElementById('splash-progress');
-    if (!bar) return;
-    bar.style.width = '30%';
-    setTimeout(() => { if (bar) bar.style.width = '70%'; }, 400);
-  })();
-
-  // 3. Load caches into Store (instant — no network)
+  (function() { const bar = document.getElementById('splash-progress'); if (!bar) return; bar.style.width = '30%'; setTimeout(() => { if (bar) bar.style.width = '70%'; }, 400); })();
   loadCaches();
-
-  // 3b. Background: FX rates (non-blocking) + trash cleanup
   loadFXRates().catch(() => {});
   pruneTrash();
 
-  // 4. Check for OAuth callback (Weg B: URL-Fragment)
-  try {
-    const handled = await Auth.handleOAuthCallback();
-    if (handled) return; // _applyToken übernimmt routing
-  } catch (e) {
-    showToast('error', '❌', 'OAuth Fehler', e.message);
+  // OAuth callback check
+  try { const handled = await Auth.handleOAuthCallback(); if (handled) return; }
+  catch (e) { showToast('error', '❌', 'OAuth Fehler', e.message); }
+
+  // ═══ v3 THREE-PATH ROUTER ═══
+  const urlParams = new URLSearchParams(window.location.search);
+  const pairCode = urlParams.get('pair');
+
+  // ── PATH B: Pairing via URL ──
+  if (pairCode && pairCode.length === 6) {
+    hideSplashOnce();
+    const urlLang = urlParams.get('lang');
+    if (urlLang && (urlLang === 'de' || urlLang === 'en')) { AppState.lang = urlLang; OB.lang = urlLang; saveAppState(); }
+    window.history.replaceState({}, '', window.location.pathname);
+    document.getElementById('setupScreen').style.display = 'block';
+    document.getElementById('mainApp').style.display     = 'none';
+    onboardNext(null, 'pairing');
+    setTimeout(async () => {
+      const inp = document.getElementById('pairingInput');
+      if (inp) inp.value = pairCode.toUpperCase();
+      await v3SubmitPairingCode();
+    }, 300);
+    return;
   }
 
-  // 5. Route: authenticated vs. setup
-  if (Auth.isAuthenticated) {
-    const onboardDone = loadLocal('fb_onboard_complete', false);
-    if (!onboardDone) {
-      // Token vorhanden aber Quiz noch nicht — Quiz zeigen
-      document.getElementById('setupScreen').style.display = 'block';
-      document.getElementById('mainApp').style.display     = 'none';
-      showQuizAfterAuth();
-    } else {
-      // Lizenz validieren im Hintergrund (nicht-blockierend)
-      const lk = Auth.licenseKey;
-      if (lk) {
-        Auth.verifyLicense(lk).then(result => {
-          if (!result.valid) showLicenseExpiredBanner();
-        }).catch(() => {}); // Netzwerkfehler ignorieren — App läuft mit Cache
-      }
-      showApp();
-      restoreTab();
-    }
+  // ── PATH C: Returning user (onboard_complete = true) ──
+  const onboardComplete = loadLocal('fb_onboard_complete', false);
+  if (onboardComplete) {
+    const hc = await healthCheck('instant');
+    const summary = healthSummary(hc);
 
-    // 6. Offline/online detection
-    window.addEventListener('offline', () => { setAppStatus('offline', t('app.offline')); });
-    window.addEventListener('online',  () => { setAppStatus('idle', t('app.connected')); flushQueue(); });
-
-    if (onboardDone) {
-      // 7. Check if DBs are missing (repair flow)
+    if (summary.ok && Auth.isAuthenticated) {
+      showApp(); restoreTab();
+      // Background health + license
+      healthCheck('quick').then(hcQ => {
+        const s = healthSummary(hcQ);
+        if (!s.ok) s.issues.forEach(i => {
+          if (i.key === 'license_invalid') showLicenseExpiredBanner();
+          if (i.key === 'notion_invalid') Auth.triggerReAuth('Token abgelaufen');
+        });
+      }).catch(() => {});
+      window.addEventListener('offline', () => { setAppStatus('offline', t('app.offline')); });
+      window.addEventListener('online',  () => { setAppStatus('idle', t('app.connected')); flushQueue(); });
+      // DB repair
       if (!dbsConfigured()) {
         showLoading('Datenbanken einrichten…');
         try {
           const { found, missing } = await discoverDatabases();
-          if (missing.length > 0) {
-            const parentPageId = await findSharedParentPage();
-            if (parentPageId) {
-              await createMissingDatabases(parentPageId, missing);
-            }
-          }
-        } catch (e) {
-          console.warn('DB repair failed:', e.message);
-        }
+          if (missing.length > 0) { const pid = await findSharedParentPage(); if (pid) await createMissingDatabases(pid, missing); }
+        } catch (e) { console.warn('DB repair failed:', e.message); }
         hideLoading();
         if (!dbsConfigured()) {
-          showToast('error', '⚠️', 'Notion-Datenbanken fehlen',
-            'Bitte Notion neu verbinden und mindestens eine Seite teilen.',
-            [], { label: 'Jetzt verbinden →', fn: () => { nav('einstellungen'); } }, 0);
+          showToast('error', '⚠️', 'Notion-Datenbanken fehlen', 'Bitte Notion neu verbinden.',
+            [], { label: 'Jetzt verbinden →', fn: () => nav('einstellungen') }, 0);
         }
       }
-      // 8. Session 3: Ensure new DB properties exist + load merchant rules
       await ensureBuchungenSchema();
+      await ensureSettingsSchema();
       await loadMerchantRules();
-      // 9. Show cached data immediately
       renderAll();
-      // 9. Splash hides after first render
       setTimeout(hideSplashOnce, 800);
-      // 10. Background sync
       setTimeout(async () => {
         try {
-          await deltaSync();
-          renderAll();
-          InboxEngine.updateBadge();
-          updateQueueBanner();
-          InboxEngine.check();
+          await deltaSync(); renderAll(); InboxEngine.updateBadge(); updateQueueBanner(); InboxEngine.check();
           const pending = loadLocal(QUEUE_KEY, []).filter(e => e.status === 'pending' || e.status === 'error');
           if (pending.length > 0) await flushQueue();
-        } catch (e) {
-          console.error('Background sync failed:', e);
-          setAppStatus('error', t('app.error'));
-        }
+        } catch (e) { console.error('Background sync failed:', e); setAppStatus('error', t('app.error')); }
       }, 300);
     } else {
-      setTimeout(hideSplashOnce, 400);
+      // REPAIR: Something missing
+      hideSplashOnce();
+      document.getElementById('setupScreen').style.display = 'block';
+      document.getElementById('mainApp').style.display     = 'none';
+      onboardNext(null, 'repair');
+      v3RenderRepair(hc);
     }
-
-  } else {
-    // Not authenticated — Onboarding starten
-    hideSplashOnce();
-    document.getElementById('setupScreen').style.display = 'block';
-    document.getElementById('mainApp').style.display     = 'none';
-
-    // Mobile-Erkennung: Ist es eine installierte PWA ohne Token?
-    const isPwa      = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    const hasLicense = !!Auth.licenseKey;
-    const seen       = loadLocal('fb_onboard_seen', false);
-
-    // Reset-Flag: nach triggerReset() immer Welcome-Flow statt Pairing
-    const resetPending = loadLocal('fb_reset_pending', false);
-    // BUG-015: ?pair=1 URL-Parameter → direkt auf Pairing-Screen (funktioniert in Browser + PWA)
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasPairParam = urlParams.get('pair') === '1';
-    if (resetPending) {
-      localStorage.removeItem('fb_reset_pending');
-      onboardNext(null, 'welcome');
-    } else if (hasPairParam) {
-      // Direkt-Einstieg über Pairing-Link oder QR-Code
-      saveLocal('fb_onboard_seen', true);
-      // Sprache aus URL übernehmen falls mitgeschickt
-      const urlLang = urlParams.get('lang');
-      if (urlLang && (urlLang === 'de' || urlLang === 'en')) {
-        AppState.lang = urlLang;
-        OB.lang = urlLang;
-        saveAppState();
-      }
-      const pairCode = urlParams.get('pair');
-      if (pairCode && pairCode.length === 6) {
-        // Code direkt in Input vorausfüllen + Auto-Submit
-        onboardNext(null, 'mobile-pairing');
-        setTimeout(async () => {
-          const inp = document.getElementById('mobilePairingInput');
-          if (inp) inp.value = pairCode.toUpperCase();
-          await submitPairingCode();
-        }, 300);
-      } else {
-        // Fallback: ?pair=1 → manueller Input-Screen
-        onboardNext(null, 'mobile-pairing');
-      }
-    } else if (isPwa && !seen && !hasLicense) {
-      // Installierte PWA ohne Setup — Kopplungscode-Screen
-      saveLocal('fb_onboard_seen', true);
-      onboardNext(null, 'mobile-pairing');
-    } else if (!seen || !hasLicense) {
-      // Erster Besuch ODER: seen=true aber kein Key (z.B. nach SW-Update-Reload,
-      // Website-Daten gelöscht, oder unvollständiger Reset) → immer Welcome
-      // BUG-020: Flag erst beim Klick auf "Neu einrichten" setzen
-      onboardNext(null, 'welcome');
-    } else if (hasLicense) {
-      // Returning user: Lizenz bekannt, Token fehlt — gespeicherten Step oder lang
-      const savedStep = loadLocal('fb_onboard_step', null);
-      onboardNext(null, savedStep || 'country');
-    } else {
-      // Fallback (sollte durch obigen Branch abgedeckt sein)
-      onboardNext(null, 'license');
-    }
+    return;
   }
+
+  // ── PATH A: Fresh setup ──
+  hideSplashOnce();
+  document.getElementById('setupScreen').style.display = 'block';
+  document.getElementById('mainApp').style.display     = 'none';
+  const resetPending = loadLocal('fb_reset_pending', false);
+  if (resetPending) { localStorage.removeItem('fb_reset_pending'); onboardNext(null, 'welcome'); return; }
+  const savedStep = loadLocal('fb_onboard_step', null);
+  const validSteps = ['license', 'country', 'accounts', 'integrations', 'overview'];
+  if (savedStep && validSteps.includes(savedStep) && !!Auth.licenseKey) { onboardNext(null, savedStep); }
+  else { onboardNext(null, 'welcome'); }
+})();
+
+
+/* ══════════════════════════════════════════════════════
+   DEBUG  }
 })();
 
 /* ══════════════════════════════════════════════════════
