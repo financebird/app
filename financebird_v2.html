@@ -9,10 +9,11 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.9d.2026-04-01">
+<meta name="fb-version" content="2.12a.2026-04-02">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://accounts.google.com/gsi/client" defer></script>
 <meta name="apple-mobile-web-app-title" content="FinanceBird">
 <meta name="theme-color" content="#2c1f0e">
 <script>
@@ -2696,10 +2697,17 @@ const Auth = {
     const lk = this.licenseKey;
     const stateWithLk = lk ? `${state}__lk_${lk}` : state;
     saveLocal('fb_oauth_state', stateWithLk);
-    // Polling starten — wartet bis Token in KV landet (iOS PWA Fix)
-    this._startPolling(stateWithLk, base);
     const authUrl = `${base}/oauth/start?state=${encodeURIComponent(stateWithLk)}`;
-    window.open(authUrl, '_blank');
+
+    // S12 BUG-037: Mobile navigiert im selben Tab (kein Popup, kein Polling)
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.location.href = authUrl;
+    } else {
+      // Desktop: Zwei-Tab-Modell mit Polling (unverändert)
+      this._startPolling(stateWithLk, base);
+      window.open(authUrl, '_blank');
+    }
   },
 
   /**
@@ -3069,18 +3077,20 @@ async function getGDriveParent() {
 }
 
 /** Get Google Drive OAuth token — prompts if not cached */
+/** Wait for Google GSI to load (static script in <head>) */
+async function waitForGoogle(maxMs = 5000) {
+  const start = Date.now();
+  while (typeof google === 'undefined' || !google?.accounts?.oauth2) {
+    if (Date.now() - start > maxMs) throw new Error('Google Sign-In konnte nicht geladen werden.');
+    await new Promise(r => setTimeout(r, 100));
+  }
+}
+
 async function getGDriveToken() {
   if (_gdriveToken) return _gdriveToken;
   const cached = sessionStorage.getItem('fb_gdrive_token');
   if (cached) { _gdriveToken = cached; return _gdriveToken; }
-  // Load Google GSI if not already loaded
-  await new Promise((resolve, reject) => {
-    if (typeof google !== 'undefined' && google?.accounts?.oauth2) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = 'https://accounts.google.com/gsi/client';
-    s.onload = resolve; s.onerror = reject;
-    document.head.appendChild(s);
-  });
+  await waitForGoogle();
   return new Promise((resolve, reject) => {
     const client = google.accounts.oauth2.initTokenClient({
       client_id: GDRIVE_CLIENT_ID,
@@ -3149,7 +3159,7 @@ function gdriveUpdateConfig(keyPath, value) {
 function renderGDriveEinstellungenCard() {
   const cfg = getGDriveConfig();
   const yr = new Date().getFullYear();
-  const gdriveToken = sessionStorage.getItem('fb_gdrive_token');
+  const gdriveConfigured = !!loadLocal('fb_gdrive_parent', null); // S12 BUG-035: localStorage statt sessionStorage
   const fields = [
     { key: 'rootName',               label: 'Root-Ordnername',     val: cfg.rootName || 'FinanceBird', flat: true, help: 'gdrive-root' },
     { key: 'folders.business_in.name',  label: 'Business · Einnahmen', val: cfg.folders.business_in?.name || 'Income',   help: 'gdrive-income' },
@@ -3164,7 +3174,7 @@ function renderGDriveEinstellungenCard() {
     <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
       <div style="font-weight:600;font-size:14px">Google Drive</div>
       <div>
-        ${gdriveToken
+        ${gdriveConfigured
           ? '<span style="font-size:12px;color:var(--green)">✅ Verbunden</span>'
           : '<button class="btn btn-primary btn-sm" onclick="settingsConnectGDrive()">Verbinden</button>'}
       </div>
@@ -3200,6 +3210,7 @@ function renderGDriveEinstellungenCard() {
 async function settingsConnectGDrive() {
   try {
     await getGDriveToken();
+    await getGDriveParent(); // S12 BUG-033: Ordner sofort erstellen
     showToast('success', '📎', 'Google Drive verbunden', 'Belege werden automatisch abgelegt.');
     renderEinstellungen();
   } catch(e) {
@@ -4425,7 +4436,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.9d.2026-04-01';
+const APP_VERSION = '2.12a.2026-04-02';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -5795,58 +5806,6 @@ function hideSplashOnce() {
 
 const VALID_TABS = ['cockpit', 'buchhaltung', 'ziele', 'aktivitaeten', 'kompass', 'einstellungen'];
 
-function nav(tabId) {
-  // Guard: unknown tab → cockpit
-  if (!VALID_TABS.includes(tabId)) tabId = 'cockpit';
-
-  AppState.currentTab = tabId;
-  saveAppState();
-
-  // Deactivate all pages + sidebar items
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-
-  // Activate target
-  const page = document.getElementById('tab-' + tabId);
-  if (page) page.classList.add('active');
-  document.querySelectorAll(`[data-tab="${tabId}"]`).forEach(el => el.classList.add('active'));
-
-  // Close sidebar on mobile after nav
-  closeSidebar();
-
-  // PATCH B-FAB: Cockpit shows text in desktop header; mobile FAB = "+" only on other tabs
-  const fabMobile = document.getElementById('fabMobile');
-  if (fabMobile) {
-    fabMobile.classList.remove('fab-hidden');
-    if (tabId === 'cockpit') {
-      fabMobile.innerHTML = '<span style="font-size:18px;line-height:1">+</span> Erfassen';
-    } else {
-      fabMobile.innerHTML = '<span style="font-size:20px;line-height:1;font-weight:300">+</span>';
-      fabMobile.style.padding = '14px 18px';
-    }
-  }
-
-  // Hash routing — enables back/forward + PWA deep-links
-  if (window.location.hash !== '#' + tabId) {
-    history.pushState({ tab: tabId }, '', '#' + tabId);
-  }
-
-  // Session 3: Reset review filter when leaving buchhaltung
-  if (tabId !== 'buchhaltung') BuchFilter.review = false;
-
-  // Tab-specific render
-  switch (tabId) {
-    case 'cockpit':       renderCockpit();       break;
-    case 'buchhaltung':   renderBuchhaltung();   break;
-    case 'ziele':         renderZiele();         break;
-    case 'aktivitaeten':  renderAktivitaeten();  break;
-    case 'kompass':       renderKompass();        break;
-    case 'einstellungen': renderEinstellungen(); break;
-  }
-
-  window.scrollTo(0, 0);
-}
-
 /** Handle browser back/forward navigation */
 window.addEventListener('popstate', e => {
   const tabId = e.state?.tab || window.location.hash.replace('#', '') || 'cockpit';
@@ -6180,10 +6139,10 @@ let merchantRules = {};
 /** Load merchant rules (called in init) */
 async function loadMerchantRules() {
   try {
-    const settingsPages = Store.einstellungen || [];
-    const rulesPage = settingsPages.find(s => s.key === 'merchant_rules');
-    if (rulesPage?.value) {
-      merchantRules = JSON.parse(rulesPage.value);
+    const settings = Store.einstellungen || {}; // S12 BUG-038: Object, nicht Array
+    const rulesStr = settings['merchant_rules'];
+    if (rulesStr) {
+      merchantRules = JSON.parse(rulesStr);
     } else {
       merchantRules = getDefaultRules(AppState.country || 'CH');
     }
@@ -6227,18 +6186,23 @@ async function updateMerchantRule(description, category) {
 /** Persist merchant rules to Notion Einstellungen */
 async function saveMerchantRules() {
   try {
-    const settingsPages = Store.einstellungen || [];
-    const rulesPage = settingsPages.find(s => s.key === 'merchant_rules');
     const value = JSON.stringify(merchantRules);
-    if (rulesPage?._id) {
-      await updateWithQueue(rulesPage._id, {
-        'Value': { rich_text: [{ text: { content: value } }] }
-      }, { desc: 'merchant_rules', type: 'einstellungen' });
-    } else if (DB.EINSTELLUNGEN) {
-      await writeWithQueue(DB.EINSTELLUNGEN, {
-        'Key': { title: [{ text: { content: 'merchant_rules' } }] },
-        'Value': { rich_text: [{ text: { content: value } }] },
-      }, { desc: 'merchant_rules', type: 'einstellungen' });
+    // S12 BUG-038: Upsert merchant_rules via Notion
+    if (DB.EINSTELLUNGEN) {
+      const searchResp = await notionFetch('/databases/' + DB.EINSTELLUNGEN + '/query', 'POST', {
+        filter: { property: 'Key', title: { equals: 'merchant_rules' } }, page_size: 1
+      });
+      const existing = searchResp?.results?.[0];
+      if (existing) {
+        await updateWithQueue(existing.id, {
+          'Value': { rich_text: [{ text: { content: value } }] }
+        }, { desc: 'merchant_rules', type: 'einstellungen' });
+      } else {
+        await writeWithQueue(DB.EINSTELLUNGEN, {
+          'Key': { title: [{ text: { content: 'merchant_rules' } }] },
+          'Value': { rich_text: [{ text: { content: value } }] },
+        }, { desc: 'merchant_rules', type: 'einstellungen' });
+      }
     }
   } catch (e) {
     console.warn('saveMerchantRules failed:', e.message);
@@ -6583,29 +6547,23 @@ async function erfSaveBuchung() {
     return;
   }
 
-  // Upload receipt if present
+  // Upload receipt if present (S12 BUG-034: aktiver Token-Abruf statt passiver Check)
   let receiptFile = null, receiptLink = null;
   if (Erf.receipt) {
-    const gdriveToken = sessionStorage.getItem('fb_gdrive_token');
-    if (!gdriveToken) {
-      showToast('warning', '☁️', 'Google Drive nicht verbunden',
-        'Beleg kann nicht hochgeladen werden — Buchung wird ohne Beleg gespeichert.',
+    const ext = Erf.receipt.isPDF ? 'pdf' : (Erf.receipt.filename?.split('.').pop() || 'jpg');
+    const filename = erfBuildFilename(ext, date, amt, Erf.cat, desc);
+    btn.textContent = '📤 Beleg hochladen…';
+    try {
+      const up = await erfUploadReceipt(filename);
+      receiptFile = up.filename;
+      receiptLink = up.link;
+    } catch (e) {
+      console.warn('Receipt upload failed:', e.message);
+      showToast('warning', '☁️', 'Beleg-Upload fehlgeschlagen',
+        e.message || 'Buchung wird trotzdem gespeichert.',
         [], { label: 'Drive verbinden', fn: () => nav('einstellungen') });
-      Erf.receipt = null; // Beleg überspringen, Buchung trotzdem speichern
-    } else {
-      const ext = Erf.receipt.isPDF ? 'pdf' : (Erf.receipt.filename?.split('.').pop() || 'jpg');
-      const filename = erfBuildFilename(ext, date, amt, Erf.cat, desc);
-      btn.textContent = '📤 Beleg hochladen…';
-      try {
-        const up = await erfUploadReceipt(filename);
-        receiptFile = up.filename;
-        receiptLink = up.link;
-      } catch (e) {
-        console.warn('Receipt upload failed:', e.message);
-        showToast('warning', '☁️', 'Beleg-Upload fehlgeschlagen', 'Buchung wird trotzdem gespeichert');
-      }
-      btn.textContent = 'Speichert…';
     }
+    btn.textContent = 'Speichert…';
   }
 
   const tm = loadLocal('fb_tax_mapping', DEFAULT_TAX_MAPPING);
@@ -7023,6 +6981,11 @@ function erfShowReceiptUI(thumb, filename, isPDF, context) {
   if (context === 'beleg') {
     const scanBtn = document.getElementById('erfBelegScanBtn');
     if (scanBtn) scanBtn.style.display = '';
+  }
+  // KI-Trigger (S12: integriert aus ehemaligem Monkey-Patch)
+  const hasKey = !!loadLocal('fb_claude_key', '');
+  if (hasKey && context !== 'beleg') {
+    setTimeout(() => analyseBeleg(Erf.receipt?.original, isPDF), 200);
   }
 }
 
@@ -8176,9 +8139,12 @@ async function exportBelegeZip() {
       document.head.appendChild(s);
     });
   }
-  const token = sessionStorage.getItem('fb_gdrive_token');
-  if (!token) {
-    showToast('error', '📦', 'Nicht verbunden', 'Verbinde zuerst Google Drive in den Einstellungen.');
+  let token;
+  try {
+    token = await getGDriveToken(); // S12: aktiver Token-Abruf
+  } catch (e) {
+    showToast('error', '📦', 'Nicht verbunden', 'Verbinde zuerst Google Drive in den Einstellungen.',
+      [], { label: 'Drive verbinden', fn: () => nav('einstellungen') });
     return;
   }
   const prog = document.getElementById('belegeZipProgress');
@@ -8481,20 +8447,7 @@ async function confirmBuchungCategory(id) {
   }
 }
 
-async function deleteBuchung(id) {
-  const b = Store.buchungen.find(x => x._id === id);
-  if (!confirm(`Buchung "${b?.desc || fmt(b?.amount)+' CHF'}" löschen?`)) return;
-  try {
-    await notionArchive(id);
-    Store.buchungen = Store.buchungen.filter(x => x._id !== id);
-    saveCache('buchungen');
-    renderBuchSubtab();
-    renderCockpit();
-    showToast('info', '🗑', 'Buchung gelöscht', b?.desc || '');
-  } catch (e) {
-    showToast('error', '❌', 'Fehler', e.message);
-  }
-}
+
 
 function exportBuchungenCSV() {
   const tm   = loadLocal('fb_tax_mapping', DEFAULT_TAX_MAPPING);
@@ -9380,22 +9333,6 @@ function renderAktivitaeten() {
     </div>`;
 }
 
-function renderKompass() {
-  const el = document.getElementById('kompassContent');
-  if (!el) return;
-  // Kompass concept TBD — always Landing Page for now
-  el.innerHTML = `
-    <div class="landing-page">
-      <div class="landing-icon">🦉</div>
-      <h2>${t('nav.kompass')}</h2>
-      <p style="font-style:italic;color:var(--ink2)">"Komme ich mit dem was ich tue dahin wo ich hinwill?"</p>
-      <p style="margin-top:12px">Der Kompass verbindet Geld, Zeit und Intention zu einem persönlichen Orientierungssystem. In Entwicklung.</p>
-      <div style="margin-top:24px;padding:16px;background:var(--bg2);border-radius:12px;font-size:12px;color:var(--muted);max-width:320px">
-        Konzept-Session ausstehend — Landing Page bis Kompass-Konzept steht.
-      </div>
-    </div>`;
-}
-
 /** BL-030: Kontextuelle Hilfe für konfigurierbare Felder */
 const FIELD_HELP = {
   'gdrive-root': {
@@ -9970,8 +9907,6 @@ async function archiveDriveReceipt(receiptLink) {
   }
 }
 
-// Override deleteBuchung to use soft-delete + drive archive
-const _origDeleteBuchung = deleteBuchung;
 async function deleteBuchung(id) {
   const b = Store.buchungen.find(x => x._id === id);
   if (!confirm(`Buchung "${b?.desc || fmt(b?.amount)+' CHF'}" löschen?\n\nSie wird 30 Tage im Papierkorb behalten.`)) return;
@@ -10221,16 +10156,7 @@ function erfApplyAiFields(data) {
   document.getElementById('erfAmt')?.focus();
 }
 
-// Wire AI analysis to Erfassen file picker
-const _origErfShowReceiptUI = erfShowReceiptUI;
-function erfShowReceiptUI(thumb, filename, isPDF, context) {
-  _origErfShowReceiptUI(thumb, filename, isPDF, context);
-  // Auto-trigger AI if key exists + image/PDF
-  const hasKey = !!loadLocal('fb_claude_key', '');
-  if (hasKey && context !== 'beleg') {
-    setTimeout(() => analyseBeleg(Erf.receipt?.original, isPDF), 200);
-  }
-}
+
 
 
 /* ══════════════════════════════════════════════════════
@@ -10268,7 +10194,7 @@ async function healthCheck(level = 'instant') {
   // Instant checks (localStorage only, <50ms)
   result.license.key_present  = !!loadLocal('fb_license_key', null);
   result.notion.token_present = !!AppState.notionToken;
-  result.gdrive.token_present = !!sessionStorage.getItem('fb_gdrive_token');
+  result.gdrive.token_present = !!loadLocal('fb_gdrive_parent', null); // S12 BUG-035: localStorage-basiert
   result.clockify.key_present = !!loadLocal('fb_clockify_key', '');
   result.claude.key_present   = !!loadLocal('fb_claude_key', '');
   result.infra.online         = navigator.onLine;
@@ -10865,10 +10791,6 @@ async function initDoneScreen() {
 
 /* ── Mobile Pairing Fallback ── */
 
-function showPairingFallback() {
-  onboardNext('mobile-pairing', 'license');
-}
-
 let _settingsPairingInterval = null;
 
 async function settingsGeneratePairing() {
@@ -10998,7 +10920,7 @@ const OB = {
   currency: 'CHF',
   accounts: loadLocal('fb_ob_accounts', []), // PATCH B10: restore after OAuth redirect
   notionConnected: false,
-  driveConnected: !!sessionStorage.getItem('fb_gdrive_token'), // BUG-018: restore from session
+  driveConnected: !!loadLocal('fb_gdrive_parent', null), // S12 BUG-035: localStorage-basiert
   clockifyConnected: !!loadLocal('fb_clockify_key', ''),       // BUG-018: restore from localStorage
   kiConnected: !!loadLocal('fb_claude_key', ''),               // BUG-018: restore from localStorage
 };
@@ -11138,6 +11060,7 @@ async function obConnectDrive() {
   if (tile) tile.style.opacity = '0.6';
   try {
     await getGDriveToken(); // triggers Google Consent Screen
+    await getGDriveParent(); // S12 BUG-033: Ordner sofort erstellen
     OB.driveConnected = true;
     obUpdateIntTiles();
     if (wrap) wrap.style.display = 'none';
@@ -11427,8 +11350,6 @@ function renderZieleWithTiers() {
   renderZiele();
 }
 
-// Patch nav to use tier render for ziele
-const _origNav = nav;
 function nav(tabId) {
   if (!VALID_TABS.includes(tabId)) tabId = 'cockpit';
   AppState.currentTab = tabId;
@@ -11849,8 +11770,6 @@ function getRechnungsInfo() {
   };
 }
 
-// Override previewRechnung to use dynamic info
-const _origPreviewRechnung = previewRechnung;
 function previewRechnung(invId) {
   const r    = Store.rechnungen.find(x => x._id === invId);
   if (!r) return;
