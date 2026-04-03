@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.15a.2026-04-03">
+<meta name="fb-version" content="2.15b.2026-04-03">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -4696,7 +4696,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.15a.2026-04-03';
+const APP_VERSION = '2.15b.2026-04-03';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -8032,7 +8032,7 @@ function cockpitCashflowHTML(C) {
       : '';
     return `
       <div class="cf-bar-group" ${isTip}>
-        <div style="display:flex;gap:2px;align-items:flex-end;height:82px">
+        <div style="display:flex;gap:2px;align-items:flex-end;height:82px;width:100%">
           <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:82px">
             ${iHExtra ? `<div class="cf-bar inc unconf" style="height:${iHExtra}px"></div>` : ''}
             <div class="cf-bar inc" style="height:${iHConf}px;opacity:${i===curM?1:.7}"></div>
