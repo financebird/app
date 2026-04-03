@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.12a.2026-04-02">
+<meta name="fb-version" content="2.13a.2026-04-03">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -4436,7 +4436,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.12a.2026-04-02';
+const APP_VERSION = '2.13a.2026-04-03';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -10080,6 +10080,9 @@ async function applyAiBelegResult(data) {
     } catch {}
   }
 
+  // BUG-039 Fix: store result for onclick handler (avoids JSON-in-HTML-attribute escaping)
+  window._lastKiResult = { ...data, betragCHF, fxNote };
+
   // Show result banner in Erfassen overlay
   const previewEl = document.getElementById('erfReceiptPreview');
   if (previewEl) {
@@ -10106,7 +10109,7 @@ async function applyAiBelegResult(data) {
               ${confIcon(r.conf)}
             </span>
           </div>`).join('')}
-        <button onclick="erfApplyAiFields(${JSON.stringify({ ...data, betragCHF, fxNote }).replace(/'/g,'&#39;')})"
+        <button onclick="erfApplyAiFields()"
           style="width:100%;margin-top:10px;background:var(--sky);color:white;border:none;border-radius:8px;
             padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
           ✓ Felder übernehmen
@@ -10116,7 +10119,10 @@ async function applyAiBelegResult(data) {
 }
 
 /** Apply AI-suggested fields to Erfassen form */
+// BUG-039 Fix: data stored in window._lastKiResult to avoid JSON-in-onclick HTML escaping issues
 function erfApplyAiFields(data) {
+  if (!data) data = window._lastKiResult;
+  if (!data) return;
   if (data.betragCHF != null) document.getElementById('erfAmt').value = Number(data.betragCHF).toFixed(2);
   else if (data.betrag != null) document.getElementById('erfAmt').value = Number(data.betrag).toFixed(2);
   if (data.datum)        document.getElementById('erfDate').value        = data.datum;
