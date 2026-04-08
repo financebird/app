@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.21b.2026-04-08">
+<meta name="fb-version" content="2.21d.2026-04-08">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -4911,7 +4911,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.21b.2026-04-08';
+const APP_VERSION = '2.21d.2026-04-08';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -7256,6 +7256,10 @@ async function erfSaveRechnung() {
       const links = result?.url ? [{ label: 'In Notion', url: result.url }] : [];
       showToast('success', '🧾', 'Rechnung gespeichert',
         nr + ' · ' + client + ' · CHF ' + fmt(amt), links);
+      // BL-066: Auto-create booking if invoice is already paid
+      if (data.status === 'Bezahlt' && data.amount > 0) {
+        createBookingFromInvoice({ ...data, _id: result?.id });
+      }
       closeErfassen();
       deltaSync().then(() => { renderAll(); InboxEngine.updateBadge(); });
     } else {
@@ -9562,7 +9566,7 @@ function openRechnungEdit(id) {
     delBtn.style.display = '';
     delBtn.onclick = async () => {
       if (!confirm('Rechnung ' + (r.nr || '') + ' wirklich löschen?')) return;
-      await deleteInvoice(id);
+      await deleteRechnung(id);
       closeErfassen();
     };
   }, 50);
