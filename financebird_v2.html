@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.21d.2026-04-08">
+<meta name="fb-version" content="2.21e.2026-04-08">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -4911,7 +4911,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.21d.2026-04-08';
+const APP_VERSION = '2.21e.2026-04-08';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -7813,12 +7813,15 @@ async function createBookingFromInvoice(inv) {
       Store.buchungen.push(parseBuchung(result));
       saveCache('buchungen');
       // BL-081: Bidirectional reference — store booking ID in invoice
+      // Fire-and-forget, skip if column doesn't exist (no toast, no queue)
       if (result.id && inv._id) {
-        db.updateInvoice(inv._id, { _partial: {
-          'Buchungs-ID': { rich_text: [{ text: { content: result.id } }] },
-        }, _label: 'Buchungs-Referenz' }).catch(e => {
-          console.warn('BL-081 back-reference failed:', e.message);
-        });
+        const token = Auth.getToken();
+        const base = 'https://' + PROXY_DOMAIN;
+        fetch(base + '/v1/pages/' + inv._id, {
+          method: 'PATCH',
+          headers: { 'Authorization': 'Bearer ' + token, 'Notion-Version': NOTION_VER, 'Content-Type': 'application/json', 'X-FB-Key': Auth.FB_SHARED_SECRET },
+          body: JSON.stringify({ properties: { 'Buchungs-ID': { rich_text: [{ text: { content: result.id } }] } } })
+        }).catch(() => {});
       }
     }
     showToast('success', '📝', 'Buchung erstellt', `Einnahme ${fmtS(inv.amount)} aus Rechnung ${inv.nr}`);
@@ -9564,8 +9567,24 @@ function openRechnungEdit(id) {
       saveBtn.parentNode.insertBefore(delBtn, saveBtn.nextSibling);
     }
     delBtn.style.display = '';
+    delBtn._confirmState = false;
+    delBtn.textContent = '🗑 Rechnung löschen';
     delBtn.onclick = async () => {
-      if (!confirm('Rechnung ' + (r.nr || '') + ' wirklich löschen?')) return;
+      if (!delBtn._confirmState) {
+        delBtn._confirmState = true;
+        delBtn.textContent = '⚠️ Wirklich löschen?';
+        delBtn.style.background = 'var(--expense)';
+        delBtn.style.color = '#fff';
+        setTimeout(() => {
+          if (delBtn._confirmState) {
+            delBtn._confirmState = false;
+            delBtn.textContent = '🗑 Rechnung löschen';
+            delBtn.style.background = 'transparent';
+            delBtn.style.color = 'var(--expense)';
+          }
+        }, 4000);
+        return;
+      }
       await deleteRechnung(id);
       closeErfassen();
     };
