@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.21a.2026-04-08">
+<meta name="fb-version" content="2.21b.2026-04-08">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -3839,7 +3839,7 @@ async function ensureBuchungenSchema() {
   // PATCH B9: also update Kategorie options to include CATS_PRIVATE
   // (Notion API limit prevents setting all options during DB creation)
   const kategorieUpdate = {
-    'Kategorie': { select: { options: CATEGORIES_20.concat(CATS_PRIVATE).map(c => ({ name: c })) } },
+    'Kategorie': { select: { options: [...new Set(CATEGORIES_20.concat(CATS_PRIVATE))].map(c => ({ name: c })) } },
     'Korrektur-Kategorie': { select: { options: CATEGORIES_20.map(c => ({ name: c })) } },
   };
   try {
@@ -4544,8 +4544,8 @@ function invoiceToProps(d) {
     'Status':       { select: { name: d.status || 'Offen' } },
     'Notiz':        { rich_text: [{ text: { content: d.note || '' } }] },
     'Bezahlt am':   d.paidDate ? { date: { start: d.paidDate } } : { date: null },
-    'Bereits erhalten': { number: d.paidAmount || 0 },
   };
+  if (d.paidAmount) props['Bereits erhalten'] = { number: d.paidAmount };
   if (d.account) props['Konto']   = { select: { name: d.account } };
   if (d.type)    props['Typ']     = { select: { name: d.type } };
   if (d.projekt) props['Projekt'] = { rich_text: [{ text: { content: d.projekt } }] };
@@ -4911,7 +4911,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.21a.2026-04-08';
+const APP_VERSION = '2.21b.2026-04-08';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
