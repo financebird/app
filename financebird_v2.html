@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.19a.2026-04-07">
+<meta name="fb-version" content="2.21a.2026-04-08">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -3976,6 +3976,18 @@ async function notionFetch(path, method = 'GET', body = null, _retry = 0) {
     return notionFetch(path, method, body, 1);
   }
 
+  // 400 — Bad Request: Notion rejected the payload. Log details + inform user.
+  if (resp.status === 400) {
+    let errBody;
+    try { errBody = await resp.json(); } catch { errBody = { message: 'Unknown 400 error' }; }
+    const errMsg = errBody.message || JSON.stringify(errBody).slice(0, 200);
+    console.error(`Notion 400 on ${method} ${path}:`, errMsg, body);
+    showToast('error', '⚠️', 'Notion-Fehler',
+      `${method} ${path.split('/').pop()}: ${errMsg.slice(0, 120)}`,
+      [], null, 10000);
+    return errBody;
+  }
+
   return resp.json();
 }
 
@@ -4899,7 +4911,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.19a.2026-04-07';
+const APP_VERSION = '2.21a.2026-04-08';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -7357,9 +7369,13 @@ function erfBuildFilename(ext, date, amt, cat, desc) {
 function erfResetForms() {
   const fields = ['erfAmt','erfDesc','erfCounterpart','erfNote','erfInvRef',
                   'erfTransAmt','erfTransDesc','erfTransNote',
-                  'erfInvNr','erfInvClient','erfInvDesc','erfInvAmt','erfInvMwst','erfInvNote'];
+                  'erfInvNr','erfInvClient','erfInvDesc','erfInvAmt','erfInvMwst','erfInvNote',
+                  'erfDate','erfTransDate','erfInvDate','erfInvDue'];
   fields.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   Erf.cat = ''; Erf.source = '';
+  // BUG-072: hide invoice delete button when not editing
+  const invDel = document.getElementById('erfInvDeleteBtn');
+  if (invDel) invDel.style.display = 'none';
   const warns = ['erfDupWarn','erfFeedback','erfTransFeedback','erfInvFeedback'];
   warns.forEach(id => { const el = document.getElementById(id); if (el) { el.style.display = 'none'; el.textContent = ''; } });
   document.getElementById('erfReceiptPreview').innerHTML = '';
@@ -8307,13 +8323,17 @@ const WIDGETS = [
     render() {
       const z = Computed.zeitKPIs();
       if (!z.hasClockify) return '<div class="w-val muted">—</div><div class="w-sub">Clockify verbinden</div>';
+      if (!z.effectiveRate) return '<div class="w-val muted">—</div><div class="w-sub">Noch keine Einnahmen</div>';
       return `<div class="w-val">${fmtS(z.effectiveRate)}/h</div>`;
     },
     detail() {
       const z = Computed.zeitKPIs();
-      return { value: z.hasClockify ? fmtS(z.effectiveRate)+'/h' : '—',
+      const noRate = z.hasClockify && !z.effectiveRate;
+      return { value: z.hasClockify && z.effectiveRate ? fmtS(z.effectiveRate)+'/h' : '—',
         formula: 'Geschäfts-Einnahmen / getrackte Stunden',
-        interpretation: z.hasClockify ? 'Dein effektiver Stundensatz basierend auf allen getrackten Stunden.' : 'Verbinde Clockify um deinen Stundensatz zu berechnen.' };
+        interpretation: !z.hasClockify ? 'Verbinde Clockify um deinen Stundensatz zu berechnen.'
+          : noRate ? 'Stundensatz kann erst berechnet werden wenn Einnahmen erfasst sind.'
+          : 'Dein effektiver Stundensatz basierend auf allen getrackten Stunden.' };
     }
   },
   { id: 'auslastung', cat: 'geschaeft', name: 'Auslastung', icon: '📅', size: 'small',
@@ -8335,14 +8355,23 @@ const WIDGETS = [
     requires: ['buchungen','clockify'], desc: 'Minimum-Stunden für Fixkosten',
     render() {
       const d = Computed.deckungsbeitrag();
-      if (!d || !d.hourlyRate) return '<div class="w-val muted">—</div><div class="w-sub">Clockify + Recurrings nötig</div>';
+      if (!d) return '<div class="w-val muted">—</div><div class="w-sub">Daten fehlen</div>';
+      if (!d.hourlyRate) {
+        const z = Computed.zeitKPIs();
+        const hint = !z.hasClockify ? 'Clockify verbinden' : z.totalH === 0 ? 'Keine Stunden erfasst' : 'Noch keine Einnahmen erfasst';
+        return `<div class="w-val muted">—</div><div class="w-sub">${hint}</div>`;
+      }
       return `<div class="w-val">${d.minBillableHours}h</div>
         <div class="w-sub">Minimum/Monat bei ${fmtS(d.fixCosts)} Fixkosten</div>
         ${d.surplusHours !== null ? `<div class="w-sub ${d.surplusHours >= 0 ? 'pos' : 'neg'}">${d.surplusHours >= 0 ? '+' : ''}${d.surplusHours}h Surplus</div>` : ''}`;
     },
     detail() {
       const d = Computed.deckungsbeitrag();
-      if (!d || !d.hourlyRate) return { value: '—', interpretation: 'Braucht Clockify-Daten und geschäftliche Recurrings.' };
+      if (!d || !d.hourlyRate) {
+        const z = Computed.zeitKPIs();
+        const hint = !z.hasClockify ? 'Clockify verbinden → Einstellungen' : z.totalH === 0 ? 'Keine Stunden in Clockify erfasst' : 'Stundensatz kann erst berechnet werden wenn Einnahmen vorhanden sind (Einnahmen ÷ Stunden)';
+        return { value: '—', interpretation: hint };
+      }
       return { value: d.minBillableHours + 'h/Monat',
         formula: 'Monatliche Fixkosten (geschäftl. Recurrings) ÷ Effektiver Stundensatz',
         interpretation: d.surplusHours >= 0 ? `Du arbeitest ${d.surplusHours}h über dem Minimum.` : `Dir fehlen ${Math.abs(d.surplusHours)}h um Fixkosten zu decken.`,
@@ -8430,7 +8459,7 @@ const WIDGETS = [
       const le = Computed.lifeEnergyRate();
       if (!le.hasData) return '<div class="w-val muted">—</div><div class="w-sub">Clockify nötig</div>';
       return `<div class="w-val">${fmtS(le.trueRate)}/h</div>
-        <div class="w-sub">Nominal: ${fmtS(le.nominal)}/h</div>`;
+        <div class="w-sub">Nominal: ${le.nominal ? fmtS(le.nominal) + '/h' : '—'}</div>`;
     },
     detail() {
       const le = Computed.lifeEnergyRate();
@@ -9520,6 +9549,22 @@ function openRechnungEdit(id) {
     window._editInvoiceId = id;
     const saveBtn = document.getElementById('erfInvSaveBtn');
     if (saveBtn) saveBtn.textContent = '✓ Aktualisieren';
+    // BUG-072: Show delete button in edit mode
+    let delBtn = document.getElementById('erfInvDeleteBtn');
+    if (!delBtn) {
+      delBtn = document.createElement('button');
+      delBtn.id = 'erfInvDeleteBtn';
+      delBtn.className = 'btn';
+      delBtn.style.cssText = 'width:100%;padding:14px;margin-top:8px;background:transparent;color:var(--expense);border:1px solid var(--expense);cursor:pointer';
+      delBtn.textContent = '🗑 Rechnung löschen';
+      saveBtn.parentNode.insertBefore(delBtn, saveBtn.nextSibling);
+    }
+    delBtn.style.display = '';
+    delBtn.onclick = async () => {
+      if (!confirm('Rechnung ' + (r.nr || '') + ' wirklich löschen?')) return;
+      await deleteInvoice(id);
+      closeErfassen();
+    };
   }, 50);
 }
 
