@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.21e.2026-04-08">
+<meta name="fb-version" content="2.22a.2026-04-09">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -3225,6 +3225,7 @@ const DataLayerInterface = {
   async saveDeviceSettings(settings)   { throw new Error('Not implemented'); },
   async loadDeviceSettings()           { throw new Error('Not implemented'); },
   async saveSetting(key, value)        { throw new Error('Not implemented'); },
+  async loadSetting(key)               { throw new Error('Not implemented'); },
 };
 
 /**
@@ -3699,7 +3700,13 @@ async function createMissingDatabases(parentPageId, missingKeys) {
       'Typ': { select: { options: [] } },
       'Projekt': { rich_text: {} },
       'Notiz': { rich_text: {} },
-      'Buchungs-ID': { rich_text: {} },
+      'Buchung': {
+        relation: {
+          database_id: DB.BUCHUNGEN,
+          type: 'dual_property',
+          dual_property: {}
+        }
+      },
     },
     TRANSFERS: {
       'Beschreibung': { title: {} },
@@ -3847,6 +3854,33 @@ async function ensureBuchungenSchema() {
     console.log('ensureBuchungenSchema: properties updated');
   } catch (e) {
     console.warn('ensureBuchungenSchema: failed (non-critical):', e.message);
+  }
+}
+
+async function ensureRechnungenSchema() {
+  if (!DB.RECHNUNGEN || !DB.BUCHUNGEN) return;
+  try {
+    const dbInfo = await notionFetch('/databases/' + DB.RECHNUNGEN, 'GET');
+    const existing = Object.keys(dbInfo.properties || {});
+    const updates = {};
+    if (!existing.includes('Bereits erhalten')) {
+      updates['Bereits erhalten'] = { number: { format: 'number' } };
+    }
+    if (!existing.includes('Buchung')) {
+      updates['Buchung'] = {
+        relation: {
+          database_id: DB.BUCHUNGEN,
+          type: 'dual_property',
+          dual_property: {}
+        }
+      };
+    }
+    if (Object.keys(updates).length > 0) {
+      await notionFetch('/databases/' + DB.RECHNUNGEN, 'PATCH', { properties: updates });
+      console.log('ensureRechnungenSchema: properties updated —', Object.keys(updates).join(', '));
+    }
+  } catch (e) {
+    console.warn('ensureRechnungenSchema: failed (non-critical):', e.message);
   }
 }
 
@@ -4092,6 +4126,7 @@ function parseRechnung(page) {
     note:     N.txt(p['Notiz']),
     type:     N.sel(p['Typ']),
     projekt:  N.txt(p['Projekt']),
+    buchungIds: N.rel(p['Buchung']),  // Array of Buchung page IDs, [] if empty
   };
 }
 
@@ -4410,16 +4445,33 @@ NotionAdapter.saveSetting = async function(key, value) {
   }
 };
 
+NotionAdapter.loadSetting = async function(key) {
+  if (!DB.EINSTELLUNGEN) return null;
+  try {
+    const resp = await notionFetch('/databases/' + DB.EINSTELLUNGEN + '/query', 'POST', {
+      filter: { property: 'Key', title: { equals: key } }, page_size: 1
+    });
+    if (!resp.results?.length) return null;
+    return resp.results[0].properties?.Value?.rich_text?.[0]?.plain_text || null;
+  } catch { return null; }
+};
+
 NotionAdapter.ensureSchema = async function() {
-  if (!DB.EINSTELLUNGEN) return;
-  const db = await notionFetch('/databases/' + DB.EINSTELLUNGEN, 'GET');
-  const existing = Object.keys(db.properties || {});
-  const missing = ['Land', 'Waehrung', 'Sprache', 'Konten', 'Clockify', 'Claude'].filter(p => !existing.includes(p));
-  if (missing.length > 0) {
-    const update = {};
-    for (const p of missing) update[p] = { rich_text: {} };
-    await notionFetch('/databases/' + DB.EINSTELLUNGEN, 'PATCH', { properties: update });
+  // Einstellungen-Schema
+  if (DB.EINSTELLUNGEN) {
+    const db = await notionFetch('/databases/' + DB.EINSTELLUNGEN, 'GET');
+    const existing = Object.keys(db.properties || {});
+    const missing = ['Land', 'Waehrung', 'Sprache', 'Konten', 'Clockify', 'Claude'].filter(p => !existing.includes(p));
+    if (missing.length > 0) {
+      const update = {};
+      for (const p of missing) update[p] = { rich_text: {} };
+      await notionFetch('/databases/' + DB.EINSTELLUNGEN, 'PATCH', { properties: update });
+    }
   }
+  // Buchungen-Schema (BL-102)
+  await ensureBuchungenSchema();
+  // Rechnungen-Schema (BL-102)
+  await ensureRechnungenSchema();
 };
 
 NotionAdapter.validateConnection = async function() {
@@ -4549,6 +4601,10 @@ function invoiceToProps(d) {
   if (d.account) props['Konto']   = { select: { name: d.account } };
   if (d.type)    props['Typ']     = { select: { name: d.type } };
   if (d.projekt) props['Projekt'] = { rich_text: [{ text: { content: d.projekt } }] };
+  // BL-081: Preserve Buchung relation on edit
+  if (d.buchungIds && d.buchungIds.length > 0) {
+    props['Buchung'] = { relation: d.buchungIds.map(id => ({ id })) };
+  }
   return props;
 }
 
@@ -4911,7 +4967,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.21e.2026-04-08';
+const APP_VERSION = '2.22a.2026-04-09';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -5480,13 +5536,16 @@ const Computed = {
     };
 
     let billableH = 0, heartH = 0, overheadH = 0;
+    const projectsList = [];
     cfProjects.forEach(cp => {
       const h = cfHours[cp.id] || 0;
       const t = classify(cp);
       if (t === 'auftrag')  billableH  += h;
       if (t === 'heart')    heartH     += h;
       if (t === 'overhead') overheadH  += h;
+      if (h > 0) projectsList.push({ name: cp.name, hours: Math.round(h * 10) / 10, type: t });
     });
+    projectsList.sort((a, b) => b.hours - a.hours);
 
     const totalH   = billableH + heartH + overheadH;
     const totalInc = this.totalIncome();
@@ -5508,6 +5567,7 @@ const Computed = {
       billablePct:  totalH > 0 ? Math.round(billableH / totalH * 100) : 0,
       heartPct:     totalH > 0 ? Math.round(heartH    / totalH * 100) : 0,
       overheadPct:  totalH > 0 ? Math.round(overheadH / totalH * 100) : 0,
+      projects:    projectsList,
       lastSync,
     };
   },
@@ -7812,16 +7872,17 @@ async function createBookingFromInvoice(inv) {
     if (success && result) {
       Store.buchungen.push(parseBuchung(result));
       saveCache('buchungen');
-      // BL-081: Bidirectional reference — store booking ID in invoice
-      // Fire-and-forget, skip if column doesn't exist (no toast, no queue)
+      // BL-081: Bidirectional reference via Notion Relation
       if (result.id && inv._id) {
-        const token = Auth.getToken();
-        const base = 'https://' + PROXY_DOMAIN;
-        fetch(base + '/v1/pages/' + inv._id, {
-          method: 'PATCH',
-          headers: { 'Authorization': 'Bearer ' + token, 'Notion-Version': NOTION_VER, 'Content-Type': 'application/json', 'X-FB-Key': Auth.FB_SHARED_SECRET },
-          body: JSON.stringify({ properties: { 'Buchungs-ID': { rich_text: [{ text: { content: result.id } }] } } })
-        }).catch(() => {});
+        db.updateInvoice(inv._id, {
+          _partial: {
+            'Buchung': { relation: [{ id: result.id }] }
+          },
+          _label: 'Buchungs-Referenz'
+        }).catch(e => {
+          console.warn('BL-081 back-reference failed:', e.message);
+          // Not fatal: booking was created, only the link is missing.
+        });
       }
     }
     showToast('success', '📝', 'Buchung erstellt', `Einnahme ${fmtS(inv.amount)} aus Rechnung ${inv.nr}`);
@@ -8614,11 +8675,13 @@ function getCockpitLayout() {
 
 function saveCockpitLayout(layout) {
   saveLocal('fb_cockpit_layout', layout);
-  // Phase 1: also persist to Notion settings (async, non-blocking)
-  const db = getActiveDataAdapter();
-  if (db.saveDeviceSettings) {
-    db.saveDeviceSettings({ cockpit_layout: JSON.stringify(layout) }).catch(() => {});
-  }
+  // BUG-071: Persist to Notion via key-value settings (async, non-blocking)
+  try {
+    const db = getActiveDataAdapter();
+    if (db.saveSetting) {
+      db.saveSetting('cockpit_layout', JSON.stringify(layout)).catch(() => {});
+    }
+  } catch {}
 }
 
 function getActiveWidgets() {
@@ -8730,9 +8793,9 @@ function cockpitCashflowInner() {
       const incH = Math.round(d.income / maxVal * maxH);
       const expH = Math.round(d.expense / maxVal * maxH);
       return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px">
-        <div style="display:flex;flex-direction:column;gap:1px;width:100%;align-items:center;height:${maxH}px;justify-content:flex-end">
-          <div style="width:70%;background:var(--green);border-radius:3px 3px 0 0;height:${incH}px;min-height:${d.income>0?2:0}px"></div>
-          <div style="width:70%;background:var(--red);border-radius:0 0 3px 3px;height:${expH}px;min-height:${d.expense>0?2:0}px;opacity:0.7"></div>
+        <div style="display:flex;flex-direction:row;gap:1px;width:100%;justify-content:center;align-items:flex-end;height:${maxH}px">
+          <div style="width:40%;background:var(--green);border-radius:3px 3px 0 0;height:${incH}px;min-height:${d.income>0?2:0}px"></div>
+          <div style="width:40%;background:var(--red);border-radius:3px 3px 0 0;height:${expH}px;min-height:${d.expense>0?2:0}px;opacity:0.7"></div>
         </div>
         <div style="font-size:9px;color:var(--muted);margin-top:2px">${d.label}</div>
       </div>`;
@@ -11508,6 +11571,14 @@ async function loadSettingsFromNotion() {
     if (s.konten) { try { const k = JSON.parse(s.konten); if (Array.isArray(k)) { OB.accounts = k; saveLocal('fb_ob_accounts', k); } } catch {} }
     if (s.clockify) { saveLocal('fb_clockify_key', s.clockify); OB.clockifyConnected = true; }
     if (s.claude) { saveLocal('fb_claude_key', s.claude); OB.kiConnected = true; }
+    // BUG-071: Sync cockpit layout from Notion (Notion = source of truth)
+    try {
+      const layoutJson = await db.loadSetting('cockpit_layout');
+      if (layoutJson) {
+        const layout = JSON.parse(layoutJson);
+        if (layout && layout.order) { saveLocal('fb_cockpit_layout', layout); }
+      }
+    } catch {}
     console.log('[Settings] Loaded from Notion:', { land: s.land, waehrung: s.waehrung, sprache: s.sprache });
   } catch (e) { console.warn('[Settings] Load failed:', e.message); }
 }
@@ -12166,7 +12237,6 @@ async function onboardFinish() {
       await saveSettingsToNotion();
       saveLocal('fb_onboard_complete', true);
       localStorage.removeItem('fb_onboard_step'); // PATCH B2: cleanup
-      await ensureBuchungenSchema();
       await loadMerchantRules();
       await fullSync();
       renderAll();
@@ -13277,8 +13347,8 @@ function migrateLocalStorage() {
             [], { label: 'Jetzt verbinden →', fn: () => nav('einstellungen') }, 0);
         }
       }
-      await ensureBuchungenSchema();
       await ensureSettingsSchema();
+      await loadSettingsFromNotion();
       await loadMerchantRules();
       renderAll();
       setTimeout(hideSplashOnce, 800);
