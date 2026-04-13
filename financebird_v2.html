@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.23c.2026-04-12">
+<meta name="fb-version" content="2.23d.2026-04-13">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -50,27 +50,36 @@
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').then(reg => {
-      // SW: Update-Mechanismus — zeigt Toast wenn neue Version wartet
+      // SW: Beim App-Start prüfen ob bereits ein wartender SW da ist → sofort aktivieren
+      if (reg.waiting) {
+        console.log('[SW] Wartender Worker beim Start gefunden — aktiviere sofort');
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+      // SW: Update-Mechanismus — zeigt Toast wenn neue Version während Nutzung bereit wird
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // Neue Version verfügbar — Toast mit Update-Button
+            // Prüfen ob App gerade erst gestartet (< 5s) → auto-update
+            const appAge = performance.now();
+            if (appAge < 5000) {
+              console.log('[SW] Neuer Worker beim Start — auto-activate');
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+              return;
+            }
+            // Mitten in der Nutzung → Toast mit Update-Button
+            window._swNewWorker = newWorker;
             setTimeout(() => {
-              // Neue Version via showToast mit Action-Button
-              window._swNewWorker = newWorker;
-              setTimeout(() => {
-                if (typeof showToast === 'function') {
-                  showToast('info', '🔄', 'Update verfügbar',
-                    'Eine neue Version von FinanceBird ist bereit.',
-                    [],
-                    { label: 'Jetzt updaten', fn: () => {
-                      window._swNewWorker?.postMessage({ type: 'SKIP_WAITING' });
-                    }},
-                    0 // kein auto-dismiss
-                  );
-                }
-              }, 1500);
+              if (typeof showToast === 'function') {
+                showToast('info', '🔄', 'Update verfügbar',
+                  'Eine neue Version von FinanceBird ist bereit.',
+                  [],
+                  { label: 'Jetzt updaten', fn: () => {
+                    window._swNewWorker?.postMessage({ type: 'SKIP_WAITING' });
+                  }},
+                  0 // kein auto-dismiss
+                );
+              }
             }, 1500);
           }
         });
@@ -5082,7 +5091,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.23c.2026-04-12';
+const APP_VERSION = '2.23d.2026-04-13';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
