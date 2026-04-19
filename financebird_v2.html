@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.26c.2026-04-18">
+<meta name="fb-version" content="2.26d.2026-04-19">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2805,6 +2805,86 @@ const I18N = {
     'toast.recurring_saved':       'Recurring erstellt',
     'toast.recurring_updated':     'Recurring aktualisiert',
     'toast.opening_balance_saved': 'Startsaldo gespeichert',
+    /* Toasts GDrive Connect-Kette (S29 Teil 2b) */
+    'toast.gdrive_connected_settings_sub': 'Belege werden automatisch abgelegt.',
+    'toast.gdrive_connect_failed':         'Verbindung fehlgeschlagen',
+    'toast.gdrive_connect_failed_sub':     'Versuche es nochmal. Falls das Problem bleibt, melde dich via Feedback.',
+    'toast.gdrive_connect_failed_onb_sub': 'Schritt erneut versuchen oder via «Überspringen» später in den Einstellungen verbinden.',
+    'toast.gdrive_disconnected':           'Google Drive getrennt',
+    'toast.gdrive_disconnected_sub':       'Du kannst jederzeit wieder verbinden.',
+    'toast.gdrive_no_folder':              'Kein Ordner gesetzt',
+    'toast.gdrive_no_folder_sub':          'Bitte zuerst Google Drive verbinden.',
+    'toast.receipts_flushed_one':          '1 Beleg nachgeliefert',
+    'toast.receipts_flushed_many':         '{n} Belege nachgeliefert',
+    'toast.receipts_flushed_sub':          'Zwischengespeicherte Belege wurden hochgeladen.',
+    /* Toasts Beleg-Attach (S29 Teil 2b Gruppe 2) */
+    'toast.booking_not_found':                 'Buchung nicht gefunden',
+    'toast.booking_not_found_sub':             'Aktualisiere die Liste und versuch es erneut.',
+    'toast.receipt_uploading':                 'Beleg wird hochgeladen…',
+    'toast.receipt_upload_failed':             'Upload fehlgeschlagen',
+    'toast.receipt_upload_failed_queued_sub':  'In Warteschlange gestellt — wird bei nächstem Sync erneut versucht.',
+    'toast.receipt_upload_failed_retry_sub':   '{msg} — erneut versuchen?',
+    'toast.receipt_upload_failed_no_retry_sub':'Kein Retry möglich: {msg}',
+    'toast.unknown_error':                     'Unbekannter Fehler',
+    /* Toasts Sync · Time-Tracker (S29 Teil 2b Gruppe 3) */
+    'toast.no_time_tracker':        'Kein Zeittracker',
+    'toast.no_time_tracker_sub':    'Verbinde Clockify oder Toggl in den Einstellungen.',
+    'toast.no_provider_key':        'Kein {provider} API Key',
+    'toast.no_provider_key_sub':    'Bitte in Einstellungen → API Keys hinterlegen',
+    'toast.provider_sync_ok':       '{provider} sync OK',
+    'toast.provider_sync_ok_sub':   '{total} Projekte · {billable} Aufträge · {heart} ❤ · {overhead} Overhead',
+    'toast.provider_error':         '{provider} Fehler',
+    /* Toasts Feedback-Flow (S29 Teil 2b Gruppe 4) */
+    'toast.feedback_too_short':     'Zu kurz',
+    'toast.feedback_too_short_sub': 'Bitte mindestens 10 Zeichen schreiben.',
+    'toast.rate_limit':             'Rate-Limit',
+    'toast.rate_limit_sub':         'Bitte warte einen Moment und versuche es erneut.',
+    'toast.feedback_copied':        'Feedback kopiert',
+    'toast.feedback_copied_sub':    'Senden fehlgeschlagen — bitte per E-Mail an hello@oswaldkoenig.ch',
+    'toast.send_failed':            'Senden fehlgeschlagen',
+    'toast.send_failed_sub':        'Bitte versuche es später erneut.',
+    /* Toasts Generischer Error + deleteBuchung (S29 Teil 2b Gruppe 4) */
+    'toast.error':                  'Fehler',
+    'toast.booking_deleted_sub':    '{desc} · 30 Tage wiederherstellbar',
+    'action.undo':                  '↩ Rückgängig',
+    /* Toasts Notion-OAuth + DB-Setup (S29 Teil 2b Gruppe 5) */
+    'toast.oauth_poll_timeout':          'Verbindungs-Timeout',
+    'toast.oauth_poll_timeout_sub':      'Bitte erneut versuchen oder Token manuell eingeben',
+    'toast.oauth_error':                 'OAuth Fehler',
+    'toast.notion_parent_not_found':     'Seite nicht gefunden',
+    'toast.notion_parent_not_found_sub': 'Öffne Notion → wähle eine Seite → Teilen → FinanceBird-Integration hinzufügen. Dann nochmals versuchen.',
+    'toast.db_setup_failed':             'Datenbank-Setup fehlgeschlagen',
+    'toast.db_setup_failed_sub':         'Die Datenbanken konnten nicht erstellt werden. Bitte prüfe die Notion-Verbindung.',
+    /* Toasts Sync-Kette (S29 Teil 2b Gruppe 6) */
+    'toast.notion_dbs_missing':          'Notion-Datenbanken fehlen',
+    'toast.notion_dbs_missing_sub':      'Bitte Onboarding abschliessen.',
+    'toast.many_bookings':               '{n} Buchungen',
+    'toast.many_bookings_sub':           'Archivierung älterer Einträge empfohlen für bessere Performance',
+    'toast.queue_sending':               'Sende {n} Einträge…',
+    'toast.n_failed_sub':                '{sent} OK · {failed} Fehler',
+    'toast.queue_empty':                 'Queue leer',
+    'toast.queue_empty_sub':             'Nichts zu entfernen',
+    'toast.queue_cleared_sub':           '{n} Einträge entfernt',
+    /* Toasts CRUD + Validation (S29 Teil 2b Gruppe 7) */
+    'toast.delete_failed':           'Löschen fehlgeschlagen',
+    'toast.booking_confirmed':       'Buchung bestätigt',
+    'toast.category_confirmed':     'Kategorie bestätigt',
+    'toast.name_missing':            'Name fehlt',
+    'toast.name_amount_required':    'Name und Betrag erforderlich',
+    'toast.amount_date_required':    'Bitte Betrag und Datum eingeben',
+    'toast.account_not_found':       'Konto nicht gefunden',
+    'toast.amount_required':         'Betrag eingeben',
+    'toast.inbox_empty':             'Inbox leer',
+    'toast.inbox_empty_sub':         'Keine fälligen Einträge',
+    'toast.copied':                  'Kopiert',
+    'toast.copied_invite_sub':       'Einladungstext in Zwischenablage',
+    'toast.logged_out':              'Abgemeldet',
+    'toast.reset_done':              'Zurückgesetzt',
+    'toast.reset_done_sub':          'Bitte neu verbinden',
+    'toast.due_shifted':             'Fälligkeit verschoben',
+    'toast.skipped':                 'Übersprungen',
+    'toast.reminder_kept':           'Erinnerung bleibt',
+    'toast.payment_received':        'Zahlungseingang bestätigt',
   },
   en: {
     'nav.cockpit':       'Cockpit',
@@ -2928,6 +3008,86 @@ const I18N = {
     'toast.recurring_saved':       'Recurring created',
     'toast.recurring_updated':     'Recurring updated',
     'toast.opening_balance_saved': 'Opening balance saved',
+    /* Toasts GDrive Connect-Kette (S29 Teil 2b) */
+    'toast.gdrive_connected_settings_sub': 'Receipts are stored automatically.',
+    'toast.gdrive_connect_failed':         'Connection failed',
+    'toast.gdrive_connect_failed_sub':     'Please try again. If the issue persists, send us feedback.',
+    'toast.gdrive_connect_failed_onb_sub': 'Retry this step or skip and connect later in settings.',
+    'toast.gdrive_disconnected':           'Google Drive disconnected',
+    'toast.gdrive_disconnected_sub':       'You can reconnect any time.',
+    'toast.gdrive_no_folder':              'No folder configured',
+    'toast.gdrive_no_folder_sub':          'Please connect Google Drive first.',
+    'toast.receipts_flushed_one':          '1 receipt uploaded',
+    'toast.receipts_flushed_many':         '{n} receipts uploaded',
+    'toast.receipts_flushed_sub':          'Cached receipts were uploaded.',
+    /* Toasts Beleg-Attach (S29 Teil 2b Gruppe 2) */
+    'toast.booking_not_found':                 'Booking not found',
+    'toast.booking_not_found_sub':             'Refresh the list and try again.',
+    'toast.receipt_uploading':                 'Uploading receipt…',
+    'toast.receipt_upload_failed':             'Upload failed',
+    'toast.receipt_upload_failed_queued_sub':  'Queued — will retry on next sync.',
+    'toast.receipt_upload_failed_retry_sub':   '{msg} — retry?',
+    'toast.receipt_upload_failed_no_retry_sub':'Retry unavailable: {msg}',
+    'toast.unknown_error':                     'Unknown error',
+    /* Toasts Sync · Time-Tracker (S29 Teil 2b Gruppe 3) */
+    'toast.no_time_tracker':        'No time tracker',
+    'toast.no_time_tracker_sub':    'Connect Clockify or Toggl in settings.',
+    'toast.no_provider_key':        'No {provider} API key',
+    'toast.no_provider_key_sub':    'Add it in Settings → API Keys',
+    'toast.provider_sync_ok':       '{provider} sync OK',
+    'toast.provider_sync_ok_sub':   '{total} projects · {billable} billable · {heart} ❤ · {overhead} overhead',
+    'toast.provider_error':         '{provider} error',
+    /* Toasts Feedback-Flow (S29 Teil 2b Gruppe 4) */
+    'toast.feedback_too_short':     'Too short',
+    'toast.feedback_too_short_sub': 'Please write at least 10 characters.',
+    'toast.rate_limit':             'Rate limit',
+    'toast.rate_limit_sub':         'Please wait a moment and try again.',
+    'toast.feedback_copied':        'Feedback copied',
+    'toast.feedback_copied_sub':    'Sending failed — please email hello@oswaldkoenig.ch',
+    'toast.send_failed':            'Sending failed',
+    'toast.send_failed_sub':        'Please try again later.',
+    /* Toasts Generischer Error + deleteBuchung (S29 Teil 2b Gruppe 4) */
+    'toast.error':                  'Error',
+    'toast.booking_deleted_sub':    '{desc} · 30 days recoverable',
+    'action.undo':                  '↩ Undo',
+    /* Toasts Notion-OAuth + DB-Setup (S29 Teil 2b Gruppe 5) */
+    'toast.oauth_poll_timeout':          'Connection timeout',
+    'toast.oauth_poll_timeout_sub':      'Please try again or enter the token manually',
+    'toast.oauth_error':                 'OAuth error',
+    'toast.notion_parent_not_found':     'Page not found',
+    'toast.notion_parent_not_found_sub': 'Open Notion → pick a page → Share → add FinanceBird integration. Then retry.',
+    'toast.db_setup_failed':             'Database setup failed',
+    'toast.db_setup_failed_sub':         'Databases could not be created. Please check your Notion connection.',
+    /* Toasts Sync-Kette (S29 Teil 2b Gruppe 6) */
+    'toast.notion_dbs_missing':          'Notion databases missing',
+    'toast.notion_dbs_missing_sub':      'Please complete onboarding.',
+    'toast.many_bookings':               '{n} bookings',
+    'toast.many_bookings_sub':           'Archiving older entries recommended for better performance',
+    'toast.queue_sending':               'Sending {n} entries…',
+    'toast.n_failed_sub':                '{sent} OK · {failed} errors',
+    'toast.queue_empty':                 'Queue empty',
+    'toast.queue_empty_sub':             'Nothing to remove',
+    'toast.queue_cleared_sub':           '{n} entries removed',
+    /* Toasts CRUD + Validation (S29 Teil 2b Gruppe 7) */
+    'toast.delete_failed':           'Delete failed',
+    'toast.booking_confirmed':       'Booking confirmed',
+    'toast.category_confirmed':      'Category confirmed',
+    'toast.name_missing':            'Name required',
+    'toast.name_amount_required':    'Name and amount required',
+    'toast.amount_date_required':    'Please enter amount and date',
+    'toast.account_not_found':       'Account not found',
+    'toast.amount_required':         'Amount required',
+    'toast.inbox_empty':             'Inbox empty',
+    'toast.inbox_empty_sub':         'No pending items',
+    'toast.copied':                  'Copied',
+    'toast.copied_invite_sub':       'Invitation text in clipboard',
+    'toast.logged_out':              'Logged out',
+    'toast.reset_done':              'Reset complete',
+    'toast.reset_done_sub':          'Please reconnect',
+    'toast.due_shifted':             'Due date shifted',
+    'toast.skipped':                 'Skipped',
+    'toast.reminder_kept':           'Reminder kept',
+    'toast.payment_received':        'Payment received',
   }
 };
 
@@ -3255,7 +3415,7 @@ const Auth = {
       attempts++;
       if (attempts > maxAttempts) {
         this._stopPolling();
-        showToast('error', '⏱', 'Verbindungs-Timeout', 'Bitte erneut versuchen oder Token manuell eingeben');
+        showToast('error', '⏱', t('toast.oauth_poll_timeout'), t('toast.oauth_poll_timeout_sub'));
         return;
       }
       try {
@@ -3319,7 +3479,7 @@ const Auth = {
     // oauth_error im URL?
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get('oauth_error')) {
-      showToast('error', '❌', 'OAuth Fehler', searchParams.get('oauth_error'));
+      showToast('error', '❌', t('toast.oauth_error'), searchParams.get('oauth_error'));
       window.history.replaceState({}, '', window.location.pathname);
       return false;
     }
@@ -3426,9 +3586,9 @@ const Auth = {
             }
           } else {
             console.warn('No shared parent page found — DB creation skipped');
-            showToast('warning', '⚠️', 'Seite nicht gefunden',
-              'Öffne Notion → wähle eine Seite → Teilen → FinanceBird-Integration hinzufügen. Dann nochmals versuchen.',
-              [], { label: 'Nochmals versuchen', fn: () => onboardNext(null, 'integrations') }, 0);
+            showToast('warning', '⚠️', t('toast.notion_parent_not_found'),
+              t('toast.notion_parent_not_found_sub'),
+              [], { label: t('action.retry'), fn: () => onboardNext(null, 'integrations') }, 0);
           }
         }
         // Always save whatever we have (even partial)
@@ -3439,8 +3599,8 @@ const Auth = {
         }
       } catch (e) {
         console.error('DB setup failed:', e);
-        showToast('warning', '⚠️', 'Datenbank-Setup fehlgeschlagen',
-          'Die Datenbanken konnten nicht erstellt werden. Bitte prüfe die Notion-Verbindung.');
+        showToast('warning', '⚠️', t('toast.db_setup_failed'),
+          t('toast.db_setup_failed_sub'));
       } finally {
         localStorage.removeItem(lockKey);
       }
@@ -3852,7 +4012,7 @@ async function settingsConnectGDrive() {
   try {
     await getGDriveToken();
     await getGDriveParent(); // S12 BUG-033: Ordner sofort erstellen
-    showToast('success', '📎', 'Google Drive verbunden', 'Belege werden automatisch abgelegt.');
+    showToast('success', '📎', t('toast.gdrive_connected'), t('toast.gdrive_connected_settings_sub'));
     // Sprint 5 BUG-041: Provider-Selector-State aktualisieren
     if (!AppState.providers) AppState.providers = {};
     AppState.providers.storage = 'gdrive';
@@ -3861,7 +4021,7 @@ async function settingsConnectGDrive() {
     // BL-107: Auto-Flush pending Beleg-Queue nach erfolgreicher Re-Auth
     await flushReceiptQueueAfterReauth();
   } catch(e) {
-    showToast('error', '📎', 'Verbindung fehlgeschlagen', 'Versuche es nochmal. Falls das Problem bleibt, melde dich via Feedback.');
+    showToast('error', '📎', t('toast.gdrive_connect_failed'), t('toast.gdrive_connect_failed_sub'));
   }
 }
 
@@ -3881,10 +4041,10 @@ async function flushReceiptQueueAfterReauth() {
     const uploaded = before - after;
     if (uploaded > 0) {
       const msg = uploaded === 1
-        ? '1 Beleg nachgeliefert'
-        : uploaded + ' Belege nachgeliefert';
+        ? t('toast.receipts_flushed_one')
+        : t('toast.receipts_flushed_many', { n: uploaded });
       showToast('success', '✅', msg,
-        'Zwischengespeicherte Belege wurden hochgeladen.', [], null, 6000);
+        t('toast.receipts_flushed_sub'), [], null, 6000);
     }
     try { updateQueueBanner(); } catch(_) {}
   } catch (e) {
@@ -3900,14 +4060,14 @@ function settingsDisconnectGDrive() {
   saveLocal('fb_gdrive_tier_business_tier', null);
   saveLocal('fb_gdrive_tier_private_tier', null);
   sessionStorage.removeItem('fb_gdrive_token');
-  showToast('success', '✂️', 'Google Drive getrennt', 'Du kannst jederzeit wieder verbinden.');
+  showToast('success', '✂️', t('toast.gdrive_disconnected'), t('toast.gdrive_disconnected_sub'));
   renderEinstellungen();
 }
 
 /** Sprint 5 BUG-041: Ordner in Google Drive öffnen */
 function openGDriveFolder() {
   const parent = loadLocal('fb_gdrive_parent', null);
-  if (!parent) { showToast('info', '📁', 'Kein Ordner gesetzt', 'Bitte zuerst Google Drive verbinden.'); return; }
+  if (!parent) { showToast('info', '📁', t('toast.gdrive_no_folder'), t('toast.gdrive_no_folder_sub')); return; }
   window.open('https://drive.google.com/drive/folders/' + parent, '_blank', 'noopener');
 }
 
@@ -5249,8 +5409,8 @@ async function fullSync() {
   if (!dbsConfigured()) {
     console.warn('fullSync aborted — DBs not configured');
     setAppStatus('error', 'Datenbanken nicht eingerichtet');
-    showToast('warning', '⚠️', 'Notion-Datenbanken fehlen', 'Bitte Onboarding abschliessen.',
-      [], { label: 'Einstellungen öffnen →', fn: () => { nav('einstellungen'); } }, 0);
+    showToast('warning', '⚠️', t('toast.notion_dbs_missing'), t('toast.notion_dbs_missing_sub'),
+      [], { label: t('action.settings_link'), fn: () => { nav('einstellungen'); } }, 0);
     return;
   }
   setAppStatus('syncing', t('app.syncing'));
@@ -5294,8 +5454,8 @@ async function fullSync() {
         Store[key].forEach(b => { if (thumbs[b._id]) b.receipt = thumbs[b._id]; });
         if (Store.buchungen.length > 3000) {
           console.warn(`${Store.buchungen.length} Buchungen — Archivierung empfohlen`);
-          showToast('warning', '📦', `${Store.buchungen.length} Buchungen`,
-            'Archivierung älterer Einträge empfohlen für bessere Performance');
+          showToast('warning', '📦', t('toast.many_bookings', { n: Store.buchungen.length }),
+            t('toast.many_bookings_sub'));
         }
       }
       saveCache(key);
@@ -5421,7 +5581,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.26c.2026-04-18';
+const APP_VERSION = '2.26d.2026-04-19';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -5538,7 +5698,7 @@ async function flushQueue() {
   const q = loadLocal(QUEUE_KEY, []);
   const pending = q.filter(e => e.status === 'pending' || e.status === 'error');
   if (!pending.length) return;
-  showToast('pending', '⏳', `Sende ${pending.length} Einträge…`, '');
+  showToast('pending', '⏳', t('toast.queue_sending', { n: pending.length }), '');
   const db = getActiveDataAdapter();
   const { sent, failed } = await db.flushQueue();
   if (failed === 0) {
@@ -5546,8 +5706,8 @@ async function flushQueue() {
     await fullSync();
     renderAll();
   } else {
-    showToast('error', '❌', `${failed} fehlgeschlagen`, `${sent} OK · ${failed} Fehler`, [],
-      { label: 'Nochmals', fn: flushQueue }, 0);
+    showToast('error', '❌', t('toast.n_failed', { n: failed }), t('toast.n_failed_sub', { sent, failed }), [],
+      { label: t('action.retry'), fn: flushQueue }, 0);
   }
 }
 
@@ -6433,9 +6593,9 @@ TogglAdapter.getTimeEntries = async function(from, to) {
 async function syncTimeTracker() {
   const adapter = getActiveTimeAdapter();
   if (!adapter) {
-    showToast('warning', '⚙️', 'Kein Zeittracker',
-      'Verbinde Clockify oder Toggl in den Einstellungen.',
-      [], { label: 'Einstellungen', fn: () => nav('einstellungen') }, 0);
+    showToast('warning', '⚙️', t('toast.no_time_tracker'),
+      t('toast.no_time_tracker_sub'),
+      [], { label: t('action.settings_link'), fn: () => nav('einstellungen') }, 0);
     return;
   }
 
@@ -6444,9 +6604,9 @@ async function syncTimeTracker() {
   const keyName = 'fb_' + providerId + '_key';
   const key = loadLocal(keyName, '');
   if (!key) {
-    showToast('warning', '⚙️', 'Kein ' + providerName + ' API Key',
-      'Bitte in Einstellungen → API Keys hinterlegen',
-      [], { label: 'Zu Einstellungen', fn: () => nav('einstellungen') }, 0);
+    showToast('warning', '⚙️', t('toast.no_provider_key', { provider: providerName }),
+      t('toast.no_provider_key_sub'),
+      [], { label: t('action.settings_link'), fn: () => nav('einstellungen') }, 0);
     return;
   }
 
@@ -6543,15 +6703,15 @@ async function syncTimeTracker() {
     const billable  = projects.filter(p => classify(p) === 'auftrag').length;
     const heart     = projects.filter(p => classify(p) === 'heart').length;
     const overhead  = projects.filter(p => classify(p) === 'overhead').length;
-    showToast('success', '🔄', providerName + ' sync OK',
-      `${projects.length} Projekte · ${billable} Aufträge · ${heart} ❤ · ${overhead} Overhead`);
+    showToast('success', '🔄', t('toast.provider_sync_ok', { provider: providerName }),
+      t('toast.provider_sync_ok_sub', { total: projects.length, billable, heart, overhead }));
 
     if (AppState.currentTab === 'aktivitaeten') renderAktivitaeten();
     renderCockpit();
   } catch (e) {
     hideLoading();
-    showToast('error', '❌', providerName + ' Fehler', e.message,
-      [], { label: 'Retry', fn: syncTimeTracker }, 0);
+    showToast('error', '❌', t('toast.provider_error', { provider: providerName }), e.message,
+      [], { label: t('action.retry'), fn: syncTimeTracker }, 0);
     console.error(providerName + ' sync failed:', e);
   }
 }
@@ -6637,8 +6797,8 @@ async function manualSync() {
     InboxEngine.updateBadge();
   } catch (e) {
     setAppStatus('error', t('app.error'));
-    showToast('error', '❌', 'Sync fehlgeschlagen', e.message,
-      [], { label: 'Erneut versuchen →', fn: () => { fullSync().then(renderAll).catch(() => {}); } });
+    showToast('error', '❌', t('toast.sync_failed'), e.message,
+      [], { label: t('action.retry'), fn: () => { fullSync().then(renderAll).catch(() => {}); } });
   }
 }
 
@@ -6708,7 +6868,7 @@ async function triggerReAuthFlow() {
     await Auth.startOAuth();
     showToast('info', '🔗', 'Verbindung läuft…', 'Notion-Fenster wurde geöffnet');
   } catch (e) {
-    showToast('error', '❌', 'Fehler', e.message);
+    showToast('error', '❌', t('toast.error'), e.message);
   }
 }
 
@@ -6881,7 +7041,7 @@ function triggerReset() {
   } catch {}
   // Force welcome screen on next load (nicht Pairing-Screen)
   saveLocal('fb_reset_pending', true);
-  showToast('info', '↺', 'Zurückgesetzt', 'Bitte neu verbinden');
+  showToast('info', '↺', t('toast.reset_done'), t('toast.reset_done_sub'));
   setTimeout(() => window.location.reload(), 1500);
 }
 
@@ -6894,7 +7054,7 @@ async function applyPastedToken() {
   try {
     await Auth.applyManualTokenPayload(val);
   } catch (e) {
-    showToast('error', '❌', 'Fehler', e.message);
+    showToast('error', '❌', t('toast.error'), e.message);
   }
 }
 
@@ -8346,7 +8506,7 @@ async function erfUploadReceipt(filename) {
  */
 async function attachReceiptToBooking(bookingId, file) {
   const b = Store.buchungen.find(x => x._id === bookingId);
-  if (!b) { showToast('error', '❌', 'Buchung nicht gefunden', 'Aktualisiere die Liste und versuch es erneut.'); return; }
+  if (!b) { showToast('error', '❌', t('toast.booking_not_found'), t('toast.booking_not_found_sub')); return; }
   if (!file) return;
 
   const storage = getActiveStorageAdapter();
@@ -8381,7 +8541,7 @@ async function attachReceiptToBooking(bookingId, file) {
   const year    = (b.date || toDay()).slice(0, 4);
   const filename = file.name || ('Beleg_' + bookingId.slice(0, 8) + '.jpg');
 
-  showToast('info', '⏳', 'Beleg wird hochgeladen…', filename);
+  showToast('info', '⏳', t('toast.receipt_uploading'), filename);
 
   try {
     const result = await storage.uploadReceipt(file, filename, { year, bereich, type });
@@ -8400,15 +8560,15 @@ async function attachReceiptToBooking(bookingId, file) {
     try {
       if (typeof queueAddReceipt === 'function') {
         await queueAddReceipt(bookingId, file);
-        showToast('warning', '📥', 'Upload fehlgeschlagen',
-          'In Warteschlange gestellt — wird bei nächstem Sync erneut versucht.');
+        showToast('warning', '📥', t('toast.receipt_upload_failed'),
+          t('toast.receipt_upload_failed_queued_sub'));
       } else {
-        showToast('error', '❌', 'Upload fehlgeschlagen',
-          (e.message || 'Unbekannter Fehler') + ' — erneut versuchen?');
+        showToast('error', '❌', t('toast.receipt_upload_failed'),
+          t('toast.receipt_upload_failed_retry_sub', { msg: e.message || t('toast.unknown_error') }));
       }
     } catch (qErr) {
-      showToast('error', '❌', 'Upload fehlgeschlagen',
-        'Kein Retry möglich: ' + (qErr.message || e.message || 'Unbekannt'));
+      showToast('error', '❌', t('toast.receipt_upload_failed'),
+        t('toast.receipt_upload_failed_no_retry_sub', { msg: qErr.message || e.message || t('toast.unknown_error') }));
     }
   }
 }
@@ -8488,7 +8648,7 @@ function openInbox() {
   const { invoices, recurrings, staleUnconfirmed, total, badgeCount } = InboxEngine.compute();
 
   if (total === 0) {
-    showToast('success', '✅', 'Inbox leer', 'Keine fälligen Einträge');
+    showToast('success', '✅', t('toast.inbox_empty'), t('toast.inbox_empty_sub'));
     return;
   }
 
@@ -8665,10 +8825,10 @@ async function confirmBuchung(id) {
     const b = Store.buchungen.find(x => x._id === id);
     if (b) { b.paid = true; saveCache('buchungen'); }
     inboxDoneByCardId('inboxStale_' + id);
-    showToast('success', '✅', 'Buchung bestätigt', b?.desc || '');
+    showToast('success', '✅', t('toast.booking_confirmed'), b?.desc || '');
     renderCockpit();
   } catch (e) {
-    showToast('error', '❌', 'Fehler', e.message);
+    showToast('error', '❌', t('toast.error'), e.message);
   }
 }
 
@@ -8754,7 +8914,7 @@ async function inboxInvPaid(invId) {
   if (inv) { inv.status = 'Bezahlt'; inv.paidDate = toDay(); saveCache('rechnungen'); }
   InboxEngine.updateBadge();
   inboxDoneByCardId('inboxInv_' + invId);
-  showToast('success', '💰', 'Zahlungseingang bestätigt',
+  showToast('success', '💰', t('toast.payment_received'),
     inv ? `${esc(inv.nr)} · CHF ${fmt(inv.amount)}` : '');
   // BL-066: Auto-create booking
   if (inv) createBookingFromInvoice(inv);
@@ -8782,7 +8942,7 @@ async function inboxInvConfirmShift(invId) {
   // Optimistic update
   if (inv2) { inv2.due = inp.value; saveCache('rechnungen'); }
   InboxEngine.updateBadge();
-  showToast('success', '📅', 'Fälligkeit verschoben', fmtDate(inp.value));
+  showToast('success', '📅', t('toast.due_shifted'), fmtDate(inp.value));
   inboxDoneByCardId('inboxInv_' + invId);
   // S14: via adapter (partial update)
   const db = getActiveDataAdapter();
@@ -8865,7 +9025,7 @@ async function inboxRecurBook(recurId) {
   } catch (e) {
     r._booking = false;
     if (card) { card.style.opacity = '1'; card.style.pointerEvents = ''; }
-    showToast('error', '❌', 'Fehler', e.message);
+    showToast('error', '❌', t('toast.error'), e.message);
   }
 }
 
@@ -8882,7 +9042,7 @@ function inboxRecurSkip(recurId) {
   r.nextDate = newNextDate;
   saveCache('recurrings');
   InboxEngine.updateBadge();
-  showToast('info', '⏭', 'Übersprungen', r.name);
+  showToast('info', '⏭', t('toast.skipped'), r.name);
   inboxDoneByCardId('inboxRecur_' + recurId);
 }
 
@@ -8890,7 +9050,7 @@ function inboxRecurSnooze(recurId) {
   // "Nicht bezahlt" — keep nextDate, just dismiss from inbox for this session
   // We don't advance the date — next time app opens it'll show again
   const r = Store.recurrings.find(x => x._id === recurId);
-  showToast('info', '🔔', 'Erinnerung bleibt', r?.name || '');
+  showToast('info', '🔔', t('toast.reminder_kept'), r?.name || '');
   inboxDoneByCardId('inboxRecur_' + recurId);
 }
 
@@ -10327,9 +10487,9 @@ async function confirmBuchungCategory(id) {
     if (b) { b.categoryStatus = 'bestätigt'; saveCache('buchungen'); }
     renderBuchSubtab();
     renderCockpit();
-    showToast('success', '✅', 'Kategorie bestätigt', b?.cat || '');
+    showToast('success', '✅', t('toast.category_confirmed'), b?.cat || '');
   } catch (e) {
-    showToast('error', '❌', 'Fehler', e.message);
+    showToast('error', '❌', t('toast.error'), e.message);
   }
 }
 
@@ -10436,7 +10596,7 @@ async function cycleInvStatus(id) {
     renderBuchSubtab();
     InboxEngine.updateBadge();
   } catch (e) {
-    showToast('error', '❌', 'Fehler', e.message);
+    showToast('error', '❌', t('toast.error'), e.message);
   }
 }
 
@@ -10475,7 +10635,7 @@ async function submitPartialPayment(invId) {
   const inv = Store.rechnungen.find(r => r._id === invId);
   if (!inv) return;
   const amt = parseFloat(document.getElementById('partialPayAmt')?.value);
-  if (!amt || amt <= 0) { showToast('warning', '⚠️', 'Betrag eingeben', ''); return; }
+  if (!amt || amt <= 0) { showToast('warning', '⚠️', t('toast.amount_required'), ''); return; }
 
   const re = disableBtn('partialPayBtn');
   try {
@@ -10506,7 +10666,7 @@ async function submitPartialPayment(invId) {
       t('toast.partial_received', { amt: fmtS(amt) }) + ' · ' + (isFullyPaid ? t('toast.partial_payment_done') : t('toast.partial_payment_open', { amt: fmtS(inv.amount - newPaidAmount) })));
   } catch (e) {
     re();
-    showToast('error', '❌', 'Fehler', e.message);
+    showToast('error', '❌', t('toast.error'), e.message);
   }
 }
 
@@ -10711,7 +10871,7 @@ async function saveKontoForm() {
   const datum = document.getElementById('kfDatum')?.value;
   const icon  = document.getElementById('kfIcon')?.value || '💰';
   const currency = document.getElementById('kfCurrency')?.value || 'CHF';
-  if (!name) { showToast('warning','⚠️','Name fehlt',''); return; }
+  if (!name) { showToast('warning','⚠️',t('toast.name_missing'),''); return; }
 
   const data = { name, typ, group, icon, currency, stand: isNaN(stand) ? null : stand, saldoDatum: datum || toDay(), active: true };
   try {
@@ -10728,7 +10888,7 @@ async function saveKontoForm() {
     renderCockpit();
     showToast('success','🏦',t('toast.account_created'), name);
   } catch (e) {
-    showToast('error','❌','Fehler', e.message);
+    showToast('error','❌',t('toast.error'), e.message);
   }
 }
 
@@ -10820,7 +10980,7 @@ async function saveRecurringForm(editId = '') {
     note:     document.getElementById('rfNote')?.value?.trim(),
     paused:   false,
   };
-  if (!data.name || isNaN(data.amt)) { showToast('warning','⚠️','Name und Betrag erforderlich',''); return; }
+  if (!data.name || isNaN(data.amt)) { showToast('warning','⚠️',t('toast.name_amount_required'),''); return; }
   try {
     if (editId) {
       const db = getActiveDataAdapter();
@@ -10839,7 +10999,7 @@ async function saveRecurringForm(editId = '') {
     InboxEngine.updateBadge();
     showToast('success','🔄', editId ? t('toast.recurring_updated') : t('toast.recurring_saved'), data.name);
   } catch (e) {
-    showToast('error','❌','Fehler', e.message);
+    showToast('error','❌',t('toast.error'), e.message);
   }
 }
 
@@ -10860,9 +11020,9 @@ async function deleteRecurring(id, name) {
     saveCache('recurrings');
     renderBuchSubtab();
     InboxEngine.updateBadge();
-    showToast('success', '🗑', 'Gelöscht', name);
+    showToast('success', '🗑', t('toast.deleted'), name);
   } catch (e) {
-    showToast('error', '❌', 'Löschen fehlgeschlagen', e.message);
+    showToast('error', '❌', t('toast.delete_failed'), e.message);
   }
 }
 
@@ -11816,10 +11976,10 @@ function setCurrency(val) {
 
 function clearQueue() {
   const q = loadLocal(QUEUE_KEY, []);
-  if (!q.length) { showToast('info','ℹ️','Queue leer','Nichts zu entfernen'); return; }
+  if (!q.length) { showToast('info','ℹ️',t('toast.queue_empty'),t('toast.queue_empty_sub')); return; }
   saveLocal(QUEUE_KEY, []);
   updateQueueBanner();
-  showToast('success','🗑','Queue geleert', q.length + ' Einträge entfernt');
+  showToast('success','🗑',t('toast.queue_flushed'), t('toast.queue_cleared_sub', { n: q.length }));
 }
 
 
@@ -11974,7 +12134,7 @@ function fbSelectType(type) {
 async function submitFeedback() {
   const msg = document.getElementById('fbMessage')?.value?.trim();
   if (!msg || msg.length < 10) {
-    showToast('warning', '✏️', 'Zu kurz', 'Bitte mindestens 10 Zeichen schreiben.');
+    showToast('warning', '✏️', t('toast.feedback_too_short'), t('toast.feedback_too_short_sub'));
     return;
   }
   const btn = document.getElementById('fbSendBtn');
@@ -12003,14 +12163,14 @@ async function submitFeedback() {
       document.getElementById('feedbackOverlay')?.remove();
       showToast('success', '💬', t('toast.feedback_sent'), t('toast.feedback_sent_sub'));
     } else if (resp.status === 429) {
-      showToast('warning', '⏳', 'Rate-Limit', 'Bitte warte einen Moment und versuche es erneut.');
+      showToast('warning', '⏳', t('toast.rate_limit'), t('toast.rate_limit_sub'));
     } else { throw new Error('Status ' + resp.status); }
   } catch (e) {
     const fallback = msg + '\n\n[Typ: ' + _fbType + ']\n[Diagnostik: ' + JSON.stringify(diagnostics) + ']';
     navigator.clipboard?.writeText(fallback).then(() => {
-      showToast('info', '📋', 'Feedback kopiert', 'Senden fehlgeschlagen — bitte per E-Mail an hello@oswaldkoenig.ch');
+      showToast('info', '📋', t('toast.feedback_copied'), t('toast.feedback_copied_sub'));
     }).catch(() => {
-      showToast('error', '❌', 'Senden fehlgeschlagen', 'Bitte versuche es später erneut.');
+      showToast('error', '❌', t('toast.send_failed'), t('toast.send_failed_sub'));
     });
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Feedback senden'; }
@@ -12058,7 +12218,7 @@ async function restoreBuchung(id) {
     await deltaSync();
     renderAll();
   } catch (e) {
-    showToast('error', '❌', 'Fehler', e.message);
+    showToast('error', '❌', t('toast.error'), e.message);
   }
 }
 
@@ -12103,11 +12263,11 @@ async function deleteBuchung(id) {
     saveCache('buchungen');
     renderBuchSubtab();
     renderCockpit();
-    showToast('info', '🗑', 'Buchung gelöscht',
-      (b?.desc || '') + ' · 30 Tage wiederherstellbar',
-      [], { label: '↩ Rückgängig', fn: () => restoreBuchung(id) }, 8000);
+    showToast('info', '🗑', t('toast.booking_deleted'),
+      t('toast.booking_deleted_sub', { desc: b?.desc || '' }),
+      [], { label: t('action.undo'), fn: () => restoreBuchung(id) }, 8000);
   } catch (e) {
-    showToast('error', '❌', 'Fehler', e.message);
+    showToast('error', '❌', t('toast.error'), e.message);
   }
 }
 
@@ -13409,7 +13569,7 @@ async function settingsGeneratePairing() {
   if (btn)   { btn.textContent = 'Neuen Code generieren'; btn.disabled = false; }
 
   if (!result || !result.code) {
-    showToast('error', '⚠️', 'Fehler', 'Kopplungscode konnte nicht generiert werden.');
+    showToast('error', '⚠️', t('toast.error'), 'Kopplungscode konnte nicht generiert werden.');
     return;
   }
 
@@ -13823,7 +13983,7 @@ async function obConnectDrive() {
     await flushReceiptQueueAfterReauth();
   } catch(e) {
     // Sprint 5 BL-073: Fehlermeldung mit Lösungsweg (Design-Prinzip 8)
-    showToast('error', '📎', 'Verbindung fehlgeschlagen', 'Schritt erneut versuchen oder via "Überspringen" später in den Einstellungen verbinden.');
+    showToast('error', '📎', t('toast.gdrive_connect_failed'), t('toast.gdrive_connect_failed_onb_sub'));
   } finally {
     if (tile) tile.style.opacity = '';
   }
@@ -14179,7 +14339,7 @@ async function saveManualToken() {
 function logout() {
   Auth.logout();
   showSetup();
-  showToast('info', '👋', 'Abgemeldet', '');
+  showToast('info', '👋', t('toast.logged_out'), '');
 }
 
 
@@ -14373,7 +14533,7 @@ Danke & beste Grüsse`;
 function copyCollabInvite() {
   const text = document.getElementById('collabInviteText')?.textContent || '';
   navigator.clipboard?.writeText(text).then(() => {
-    showToast('success', '✅', 'Kopiert', 'Einladungstext in Zwischenablage');
+    showToast('success', '✅', t('toast.copied'), t('toast.copied_invite_sub'));
   }).catch(() => {});
 }
 
@@ -14506,7 +14666,7 @@ function erfApplyFX() {
 
 function openSaldoForm(kontoId) {
   const k = Store.konten.find(k => k._id === kontoId || k.appId === kontoId);
-  if (!k) { showToast('warning','⚠️','Konto nicht gefunden',''); return; }
+  if (!k) { showToast('warning','⚠️',t('toast.account_not_found'),''); return; }
 
   document.getElementById('saldoModalKontoId').value = kontoId;
   document.getElementById('saldoModalTitle').textContent = 'Startsaldo · ' + k.name;
@@ -14533,7 +14693,7 @@ async function saveSaldoModal() {
   const kontoId = document.getElementById('saldoModalKontoId').value;
   const amt     = parseFloat(document.getElementById('saldoModalAmt').value);
   const date    = document.getElementById('saldoModalDate').value;
-  if (isNaN(amt) || !date) { showToast('warning','⚠️','Bitte Betrag und Datum eingeben',''); return; }
+  if (isNaN(amt) || !date) { showToast('warning','⚠️',t('toast.amount_date_required'),''); return; }
 
   const k = Store.konten.find(k => k._id === kontoId || k.appId === kontoId);
   if (!k) return;
@@ -15127,7 +15287,7 @@ function csvParseText(text, filename, size) {
 
   // Simple RFC 4180-ish parser
   const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l => l.trim());
-  if (lines.length < 2) { showToast('error','⚠️','Fehler','CSV hat zu wenig Zeilen'); return; }
+  if (lines.length < 2) { showToast('error','⚠️',t('toast.error'),'CSV hat zu wenig Zeilen'); return; }
 
   function parseLine(line) {
     const cells = []; let cur = ''; let inQ = false;
