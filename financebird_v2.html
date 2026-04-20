@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.26d.2026-04-19">
+<meta name="fb-version" content="2.27a.2026-04-20">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -71,10 +71,11 @@ if ('serviceWorker' in navigator) {
             window._swNewWorker = newWorker;
             setTimeout(() => {
               if (typeof showToast === 'function') {
-                showToast('info', '🔄', 'Update verfügbar',
-                  'Eine neue Version von FinanceBird ist bereit.',
+                const _t = (k,f) => (typeof t === 'function' ? t(k) : f);
+                showToast('info', '🔄', _t('toast.sw_update', 'Update verfügbar'),
+                  _t('toast.sw_update_sub', 'Eine neue Version von FinanceBird ist bereit.'),
                   [],
-                  { label: 'Jetzt updaten', fn: () => {
+                  { label: _t('action.update_now', 'Jetzt updaten'), fn: () => {
                     window._swNewWorker?.postMessage({ type: 'SKIP_WAITING' });
                   }},
                   0 // kein auto-dismiss
@@ -91,7 +92,8 @@ if ('serviceWorker' in navigator) {
           refreshing = true;
           // Brief "Wird aktualisiert…" before reload
           if (typeof showToast === 'function') {
-            showToast('info', '🔄', 'Wird aktualisiert…', 'Neue Version wird geladen.', [], null, 1500);
+            const _t = (k,f) => (typeof t === 'function' ? t(k) : f);
+            showToast('info', '🔄', _t('toast.sw_updating', 'Wird aktualisiert…'), _t('toast.sw_updating_sub', 'Neue Version wird geladen.'), [], null, 1500);
             setTimeout(() => window.location.reload(), 1200);
           } else {
             window.location.reload();
@@ -2885,6 +2887,87 @@ const I18N = {
     'toast.skipped':                 'Übersprungen',
     'toast.reminder_kept':           'Erinnerung bleibt',
     'toast.payment_received':        'Zahlungseingang bestätigt',
+    /* S30 Teil 3 Gruppe 1 */
+    'toast.sw_update':               'Update verfügbar',
+    'toast.sw_update_sub':           'Eine neue Version von FinanceBird ist bereit.',
+    'toast.sw_updating':             'Wird aktualisiert…',
+    'toast.sw_updating_sub':         'Neue Version wird geladen.',
+    'action.update_now':             'Jetzt updaten',
+    /* S30 Teil 3 Gruppe 2 */
+    'toast.oauth_connecting':        'Verbindung läuft…',
+    'toast.oauth_sub_opened':        'Notion-Fenster wurde geöffnet',
+    'toast.oauth_sub_opening':       'Notion-Fenster wird geöffnet',
+    'toast.oauth_sub_switchback':    'Notion-Fenster wurde geöffnet — wechsle zurück wenn fertig',
+    'toast.no_token':                'Kein Token',
+    'toast.no_token_sub':            'Bitte Token einfügen',
+    /* S30 Teil 3 Gruppe 3 — License */
+    'toast.license_active':          'Lizenz aktiv',
+    'toast.license_plan':            'Plan: {plan}',
+    /* S30 Teil 3 Gruppe 4 — DB/Schema */
+    'toast.dbs_ready':               'Datenbanken bereit',
+    'toast.dbs_failed_count':        '{n} Datenbank(en) nicht erstellt',
+    'toast.notion_page_missing':     'Keine Notion-Seite gefunden',
+    'toast.notion_page_missing_sub': 'Bitte Notion neu verbinden.',
+    'action.reconnect_notion':       'Notion neu verbinden →',
+    'toast.dbs_create_failed':       'Datenbanken konnten nicht erstellt werden',
+    'toast.dbs_create_failed_sub':   'Stelle sicher, dass du in Notion mindestens eine Seite mit FinanceBird geteilt hast.',
+    'toast.dbs_repaired':            'Datenbanken repariert',
+    'toast.repair_failed':           'Reparatur fehlgeschlagen',
+    'toast.notion_dbs_reconnect_sub': 'Bitte Notion neu verbinden.',
+    'action.connect_now':            'Jetzt verbinden →',
+    'action.connect_drive':          'Drive verbinden',
+    /* S30 Teil 3 Gruppe 5 — Pairing */
+    'toast.device_paired':           'Gerät gekoppelt',
+    'toast.device_paired_sub':       'Einstellungen übernommen.',
+    'toast.device_detected':         'Gerät erkannt',
+    'toast.device_detected_sub_almost': 'Fast geschafft — noch ein Schritt.',
+    'toast.device_detected_sub_notion': 'Notion kurz verbinden — dann bist du drin.',
+    /* S30 Teil 3 Gruppe 6 — Buchung/KI/Kategorie */
+    'toast.cat_suggested':           'Kategorie vorgeschlagen',
+    'toast.cat_suggested_sub':       '{cat} ({n}× verwendet)',
+    'toast.ai_not_configured':       'KI nicht konfiguriert',
+    'toast.ai_not_configured_sub':   'Aktiviere die KI-Beleganalyse in Einstellungen → Verknüpfungen',
+    'toast.cat_conflict':            'Kategorie-Konflikt',
+    'toast.cat_conflict_sub':        'KI: {ai} vs. Historie: {hist} — bitte wählen',
+    'toast.cat_high_match':          'Hohe Übereinstimmung',
+    'toast.cat_high_match_sub':      '{cat} (KI + Historie)',
+    'toast.fields_applied':          'Felder übernommen',
+    'toast.fields_applied_sub':      'Bitte prüfen bevor speichern',
+    /* S30 Teil 3 Gruppe 7 — Inbox Recur */
+    'toast.transfer_booked':         'Transfer gebucht',
+    /* S30 Teil 3 Gruppe 8 — Erfassen + ZIP */
+    'toast.queue_overflow':          'Beleg-Queue voll',
+    'toast.queue_overflow_sub':      'Ein älterer Beleg-Upload wurde aus der Warteschlange entfernt. Er kann später erneut angehängt werden.',
+    'toast.receipt_loaded':          'Beleg geladen',
+    'toast.receipt_loaded_sub':      'Felder prüfen und speichern',
+    'toast.booking_not_created':     'Buchung nicht erstellt',
+    'toast.booking_not_created_sub': 'Rechnung als bezahlt markiert, aber Buchung konnte nicht erstellt werden. Bitte manuell erfassen.',
+    'toast.no_receipts':             'Keine Belege',
+    'toast.no_receipts_sub':         'Die aktuelle Auswahl enthält keine Belege.',
+    'toast.not_connected':           'Nicht verbunden',
+    'toast.not_connected_sub':       'Verbinde zuerst Google Drive in den Einstellungen.',
+    'toast.receipts_exported':       '{n} Belege exportiert',
+    'toast.receipts_exported_sub':   'ZIP wurde heruntergeladen.',
+    'toast.export_failed':           'Export fehlgeschlagen',
+    'toast.export_failed_sub':       'Versuche es nochmal.',
+    /* S30 Teil 3 Gruppe 9 — Misc */
+    'toast.popup_blocked':           'Popup blockiert',
+    'toast.popup_blocked_sub':       'Popup-Blocker deaktivieren und erneut versuchen',
+    'toast.goal_form_pending':       'Ziel-Formular',
+    'toast.goal_form_pending_sub':   'Kommt nach Kompass-Konzept-Session (DB 9 Schema TBD)',
+    'toast.please_wait':             'Bitte warten',
+    'toast.feedback_throttle':       'Feedback kann alle 60 Sekunden gesendet werden.',
+    'toast.notion_sync':             'Notion-Sync',
+    'toast.notion_sync_sub':         'Key lokal gespeichert. Sync mit Notion später erneut versucht.',
+    'toast.keys_undecryptable':      'Keys nicht entschlüsselbar',
+    'toast.keys_undecryptable_sub':  '{providers}: bitte einmal neu eingeben. Danach wieder auf allen Geräten verfügbar.',
+    'toast.url':                     'URL',
+    'toast.provider_connected':      '{name} verbunden',
+    'toast.country_changed':         'Land geändert',
+    'toast.print_popup_blocked':     'Pop-up blockiert',
+    'toast.print_popup_blocked_sub': 'Bitte Pop-up erlauben',
+    'toast.nothing_to_import':       'Nichts zu importieren',
+    'toast.nothing_to_import_sub':   'Keine gültigen Zeilen gefunden',
   },
   en: {
     'nav.cockpit':       'Cockpit',
@@ -3088,6 +3171,87 @@ const I18N = {
     'toast.skipped':                 'Skipped',
     'toast.reminder_kept':           'Reminder kept',
     'toast.payment_received':        'Payment received',
+    /* S30 Teil 3 Gruppe 1 */
+    'toast.sw_update':               'Update available',
+    'toast.sw_update_sub':           'A new version of FinanceBird is ready.',
+    'toast.sw_updating':             'Updating…',
+    'toast.sw_updating_sub':         'Loading new version.',
+    'action.update_now':             'Update now',
+    /* S30 Teil 3 Gruppe 2 */
+    'toast.oauth_connecting':        'Connecting…',
+    'toast.oauth_sub_opened':        'Notion window opened',
+    'toast.oauth_sub_opening':       'Opening Notion window',
+    'toast.oauth_sub_switchback':    'Notion window opened — switch back when done',
+    'toast.no_token':                'No token',
+    'toast.no_token_sub':            'Please paste a token',
+    /* S30 Teil 3 Gruppe 3 — License */
+    'toast.license_active':          'License active',
+    'toast.license_plan':            'Plan: {plan}',
+    /* S30 Teil 3 Gruppe 4 — DB/Schema */
+    'toast.dbs_ready':               'Databases ready',
+    'toast.dbs_failed_count':        '{n} database(s) not created',
+    'toast.notion_page_missing':     'No Notion page found',
+    'toast.notion_page_missing_sub': 'Please reconnect Notion.',
+    'action.reconnect_notion':       'Reconnect Notion →',
+    'toast.dbs_create_failed':       'Databases could not be created',
+    'toast.dbs_create_failed_sub':   'Make sure you shared at least one Notion page with FinanceBird.',
+    'toast.dbs_repaired':            'Databases repaired',
+    'toast.repair_failed':           'Repair failed',
+    'toast.notion_dbs_reconnect_sub': 'Please reconnect Notion.',
+    'action.connect_now':            'Connect now →',
+    'action.connect_drive':          'Connect Drive',
+    /* S30 Teil 3 Gruppe 5 — Pairing */
+    'toast.device_paired':           'Device paired',
+    'toast.device_paired_sub':       'Settings applied.',
+    'toast.device_detected':         'Device detected',
+    'toast.device_detected_sub_almost': 'Almost there — one more step.',
+    'toast.device_detected_sub_notion': 'Connect Notion briefly — then you\'re in.',
+    /* S30 Teil 3 Gruppe 6 — Buchung/KI/Kategorie */
+    'toast.cat_suggested':           'Category suggested',
+    'toast.cat_suggested_sub':       '{cat} (used {n}×)',
+    'toast.ai_not_configured':       'AI not configured',
+    'toast.ai_not_configured_sub':   'Enable AI receipt analysis in Settings → Connections',
+    'toast.cat_conflict':            'Category conflict',
+    'toast.cat_conflict_sub':        'AI: {ai} vs. history: {hist} — please choose',
+    'toast.cat_high_match':          'Strong match',
+    'toast.cat_high_match_sub':      '{cat} (AI + history)',
+    'toast.fields_applied':          'Fields applied',
+    'toast.fields_applied_sub':      'Please review before saving',
+    /* S30 Teil 3 Gruppe 7 — Inbox Recur */
+    'toast.transfer_booked':         'Transfer booked',
+    /* S30 Teil 3 Gruppe 8 — Erfassen + ZIP */
+    'toast.queue_overflow':          'Receipt queue full',
+    'toast.queue_overflow_sub':      'An older receipt upload was removed from the queue. It can be re-attached later.',
+    'toast.receipt_loaded':          'Receipt loaded',
+    'toast.receipt_loaded_sub':      'Review fields and save',
+    'toast.booking_not_created':     'Booking not created',
+    'toast.booking_not_created_sub': 'Invoice marked as paid, but booking could not be created. Please enter manually.',
+    'toast.no_receipts':             'No receipts',
+    'toast.no_receipts_sub':         'The current selection has no receipts.',
+    'toast.not_connected':           'Not connected',
+    'toast.not_connected_sub':       'Please connect Google Drive in settings first.',
+    'toast.receipts_exported':       '{n} receipts exported',
+    'toast.receipts_exported_sub':   'ZIP downloaded.',
+    'toast.export_failed':           'Export failed',
+    'toast.export_failed_sub':       'Please try again.',
+    /* S30 Teil 3 Gruppe 9 — Misc */
+    'toast.popup_blocked':           'Popup blocked',
+    'toast.popup_blocked_sub':       'Disable popup blocker and try again',
+    'toast.goal_form_pending':       'Goal form',
+    'toast.goal_form_pending_sub':   'Coming after Compass-Concept session (DB 9 schema TBD)',
+    'toast.please_wait':             'Please wait',
+    'toast.feedback_throttle':       'Feedback can be sent every 60 seconds.',
+    'toast.notion_sync':             'Notion sync',
+    'toast.notion_sync_sub':         'Key saved locally. Sync with Notion will be retried later.',
+    'toast.keys_undecryptable':      'Keys cannot be decrypted',
+    'toast.keys_undecryptable_sub':  '{providers}: please re-enter once. Then available on all devices again.',
+    'toast.url':                     'URL',
+    'toast.provider_connected':      '{name} connected',
+    'toast.country_changed':         'Country changed',
+    'toast.print_popup_blocked':     'Pop-up blocked',
+    'toast.print_popup_blocked_sub': 'Please allow pop-ups',
+    'toast.nothing_to_import':       'Nothing to import',
+    'toast.nothing_to_import_sub':   'No valid rows found',
   }
 };
 
@@ -4360,11 +4524,11 @@ async function createMissingDatabases(parentPageId, missingKeys) {
   // PATCH B4: User feedback if some DBs failed
   if (failed.length > 0) {
     // PATCH B9: targeted retry instead of full page reload
-    showToast('error', '⚠️', `${failed.length} Datenbank(en) nicht erstellt`,
+    showToast('error', '⚠️', t('toast.dbs_failed_count', {n: failed.length}),
       failed.join(', '),
-      [], { label: 'Erneut versuchen →', fn: async () => {
+      [], { label: t('action.retry'), fn: async () => {
         const pid = await findSharedParentPage();
-        if (!pid) { showToast('error', '⚠️', 'Keine Notion-Seite gefunden', 'Bitte Notion neu verbinden.', [], { label: 'Notion neu verbinden →', fn: () => Auth.startOAuth() }, 8000); return; }
+        if (!pid) { showToast('error', '⚠️', t('toast.notion_page_missing'), t('toast.notion_page_missing_sub'), [], { label: t('action.reconnect_notion'), fn: () => Auth.startOAuth() }, 8000); return; }
         // Re-discover to get IDs of already-created DBs
         const { missing } = await discoverDatabases(); // PATCH B9b: single call
         if (missing.length === 0) {
@@ -5581,7 +5745,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.26d.2026-04-19';
+const APP_VERSION = '2.27a.2026-04-20';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -5615,8 +5779,8 @@ async function queueAddReceipt(bookingId, file) {
   if (receipts.length >= MAX_ENTRIES) {
     const oldest = receipts.sort((a, b) => a.ts.localeCompare(b.ts))[0];
     queueRemove(oldest.id);
-    showToast('warning', '🗑', 'Beleg-Queue voll',
-      'Ein älterer Beleg-Upload wurde aus der Warteschlange entfernt. Er kann später erneut angehängt werden.');
+    showToast('warning', '🗑', t('toast.queue_overflow'),
+      t('toast.queue_overflow_sub'));
   }
   // File → base64
   const base64 = await _fileToBase64(file);
@@ -6866,7 +7030,7 @@ async function triggerReAuthFlow() {
   try {
     hideReAuthBanner();
     await Auth.startOAuth();
-    showToast('info', '🔗', 'Verbindung läuft…', 'Notion-Fenster wurde geöffnet');
+    showToast('info', '🔗', t('toast.oauth_connecting'), t('toast.oauth_sub_opened'));
   } catch (e) {
     showToast('error', '❌', t('toast.error'), e.message);
   }
@@ -7004,7 +7168,7 @@ async function submitLicenseKey() {
     saveLocal('fb_license_key', key);
     document.getElementById('licenseBanner')?.remove();
     document.getElementById('licenseKeyModal')?.remove();
-    showToast('success', '✓', 'Lizenz aktiv', `Plan: ${result.plan || 'Standard'}`);
+    showToast('success', '✓', t('toast.license_active'), t('toast.license_plan', {plan: result.plan || 'Standard'}));
     // DB-Setup nochmals triggern falls noch nicht konfiguriert
     if (Auth.isAuthenticated && !dbsConfigured()) {
       setTimeout(async () => {
@@ -7015,7 +7179,7 @@ async function submitLicenseKey() {
             const parentPageId = await findSharedParentPage();
             if (parentPageId) {
               await createMissingDatabases(parentPageId, missing);
-              showToast('success', '🗄️', 'Datenbanken bereit', '');
+              showToast('success', '🗄️', t('toast.dbs_ready'), '');
             }
           }
         } catch(e) { console.warn('DB setup after license fix:', e.message); }
@@ -7050,7 +7214,7 @@ async function applyPastedToken() {
   const input = document.getElementById('pastedTokenInput');
   if (!input) return;
   const val = input.value.trim();
-  if (!val) { showToast('error', '⚠️', 'Kein Token', 'Bitte Token einfügen'); return; }
+  if (!val) { showToast('error', '⚠️', t('toast.no_token'), t('toast.no_token_sub')); return; }
   try {
     await Auth.applyManualTokenPayload(val);
   } catch (e) {
@@ -7794,7 +7958,7 @@ function erfSuggestFromMerchant() {
     Erf.cat = top.category;
     Erf.categoryStatus = 'vorgeschlagen';
     erfRenderCatChips();
-    showToast('info', '💡', 'Kategorie vorgeschlagen', `${top.category} (${top.count}× verwendet)`);
+    showToast('info', '💡', t('toast.cat_suggested'), t('toast.cat_suggested_sub', {cat: top.category, n: top.count}));
   }
 }
 
@@ -7837,8 +8001,8 @@ function erfCalcMwstPreview() {
 function openErfassenScan() {
   const hasKi = !!loadLocal('fb_claude_key', '');
   if (!hasKi) {
-    showToast('info', '🤖', 'KI nicht konfiguriert',
-      'Aktiviere die KI-Beleganalyse in Einstellungen → Verknüpfungen');
+    showToast('info', '🤖', t('toast.ai_not_configured'),
+      t('toast.ai_not_configured_sub'));
     openErfassen('buchung');
     return;
   }
@@ -8249,7 +8413,7 @@ async function erfSaveRechnung() {
 async function erfSaveBelegBuchung() {
   // If AI has pre-filled Buchung form fields → switch to Buchung screen
   erfSetMode('buchung');
-  showToast('pending', '📎', 'Beleg geladen', 'Felder prüfen und speichern');
+  showToast('pending', '📎', t('toast.receipt_loaded'), t('toast.receipt_loaded_sub'));
 }
 
 /* ── Dropdown helpers ── */
@@ -8899,8 +9063,8 @@ async function createBookingFromInvoice(inv) {
     showToast('success', '📝', t('toast.booking_created'), t('toast.booking_created_from_invoice', { amt: fmtS(inv.amount), nr: inv.nr }));
   } catch (e) {
     console.warn('Auto-Buchung aus Rechnung fehlgeschlagen:', e.message);
-    showToast('warning', '⚠️', 'Buchung nicht erstellt',
-      'Rechnung als bezahlt markiert, aber Buchung konnte nicht erstellt werden. Bitte manuell erfassen.',
+    showToast('warning', '⚠️', t('toast.booking_not_created'),
+      t('toast.booking_not_created_sub'),
       [], null, 8000);
   }
 }
@@ -9010,7 +9174,7 @@ async function inboxRecurBook(recurId) {
     saveCache('recurrings');
     InboxEngine.updateBadge();
     showToast('success', isTransfer ? '↔' : '💸',
-      isTransfer ? 'Transfer gebucht' : 'Buchung gespeichert',
+      isTransfer ? t('toast.transfer_booked') : t('toast.booking_created'),
       `${esc(r.name)} · CHF ${fmt(r.amt)}`);
     // BL-069: Re-render inbox to recalculate remaining periods
     const inboxEl = document.getElementById('inboxContent');
@@ -10157,7 +10321,7 @@ let _buchSubtab = 'buchungen'; // active sub-tab
 async function exportBelegeZip() {
   const filtered = buchungenFiltered().filter(b => b.receiptLink);
   if (!filtered.length) {
-    showToast('info', '📦', 'Keine Belege', 'Die aktuelle Auswahl enthält keine Belege.');
+    showToast('info', '📦', t('toast.no_receipts'), t('toast.no_receipts_sub'));
     return;
   }
   // Load JSZip dynamically
@@ -10173,8 +10337,8 @@ async function exportBelegeZip() {
   try {
     token = await getGDriveToken(); // S12: aktiver Token-Abruf
   } catch (e) {
-    showToast('error', '📦', 'Nicht verbunden', 'Verbinde zuerst Google Drive in den Einstellungen.',
-      [], { label: 'Drive verbinden', fn: () => nav('einstellungen') });
+    showToast('error', '📦', t('toast.not_connected'), t('toast.not_connected_sub'),
+      [], { label: t('action.connect_drive'), fn: () => nav('einstellungen') });
     return;
   }
   const prog = document.getElementById('belegeZipProgress');
@@ -10215,9 +10379,9 @@ async function exportBelegeZip() {
     a.href = url; a.download = 'FinanceBird_Belege_' + new Date().toISOString().slice(0,10) + '.zip';
     a.click();
     URL.revokeObjectURL(url);
-    showToast('success', '📦', `${done} Belege exportiert`, 'ZIP wurde heruntergeladen.');
+    showToast('success', '📦', t('toast.receipts_exported', {n: done}), t('toast.receipts_exported_sub'));
   } catch(e) {
-    showToast('error', '📦', 'Export fehlgeschlagen', e.message || 'Versuche es nochmal.');
+    showToast('error', '📦', t('toast.export_failed'), e.message || t('toast.export_failed_sub'));
   } finally {
     if (prog) setTimeout(() => { prog.style.display = 'none'; if(progBar) progBar.style.width = '0%'; }, 2000);
     if (btn) btn.disabled = false;
@@ -11307,7 +11471,7 @@ function printJahresabschluss() {
 </html>`;
 
   const win = window.open('', '_blank');
-  if (!win) { showToast('error', '⚠️', 'Popup blockiert', 'Popup-Blocker deaktivieren und erneut versuchen'); return; }
+  if (!win) { showToast('error', '⚠️', t('toast.popup_blocked'), t('toast.popup_blocked_sub')); return; }
   win.document.write(html);
   win.document.close();
   win.focus();
@@ -11440,7 +11604,7 @@ function zielCardHTML(p) {
 }
 
 function openZielForm() {
-  showToast('pending', '🐣', 'Ziel-Formular', 'Kommt nach Kompass-Konzept-Session (DB 9 Schema TBD)');
+  showToast('pending', '🐣', t('toast.goal_form_pending'), t('toast.goal_form_pending_sub'));
 }
 
 function renderAktivitaeten() {
@@ -11887,7 +12051,7 @@ function renderEinstellungen() {
             <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
               <input type="text" id="settingsPairingUrl" class="form-input"
                 readonly style="font-size:11px;flex:1;cursor:text">
-              <button onclick="navigator.clipboard.writeText(document.getElementById('settingsPairingUrl').value).then(()=>showToast('success','✓','Kopiert',''))"
+              <button onclick="navigator.clipboard.writeText(document.getElementById('settingsPairingUrl').value).then(()=>showToast('success','✓',t('toast.copied'),''))"
                 style="padding:8px 12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;font-size:11px;cursor:pointer;white-space:nowrap;color:var(--ink2);font-family:inherit">
                 Kopieren
               </button>
@@ -12087,7 +12251,7 @@ function buildDiagReport() {
 function showFeedbackForm() {
   const lastSent = loadLocal('fb_feedback_cooldown', 0);
   if (Date.now() - lastSent < 60000) {
-    showToast('info', '⏳', 'Bitte warten', 'Feedback kann alle 60 Sekunden gesendet werden.');
+    showToast('info', '⏳', t('toast.please_wait'), t('toast.feedback_throttle'));
     return;
   }
   const overlay = document.createElement('div');
@@ -12687,21 +12851,21 @@ function erfApplyAiFields(data) {
       Erf.cat = merged.options[0].category;
       Erf.categoryStatus = 'vorgeschlagen';
       erfRenderCatChips();
-      showToast('info', '💡', 'Kategorie-Konflikt',
-        `KI: ${merged.options[0].category} vs. Historie: ${merged.options[1].category} — bitte wählen`);
+      showToast('info', '💡', t('toast.cat_conflict'),
+        t('toast.cat_conflict_sub', {ai: merged.options[0].category, hist: merged.options[1].category}));
     } else {
       Erf.cat = merged.category;
       Erf.categoryStatus = 'vorgeschlagen';
       erfRenderCatChips();
       if (merged.confidence === 'high') {
-        showToast('success', '✨', 'Hohe Übereinstimmung', `${merged.category} (KI + Historie)`);
+        showToast('success', '✨', t('toast.cat_high_match'), t('toast.cat_high_match_sub', {cat: merged.category}));
       }
     }
     // Set MWST from merged category
     erfUpdateMwstField();
   }
 
-  showToast('success', '✨', 'Felder übernommen', 'Bitte prüfen bevor speichern');
+  showToast('success', '✨', t('toast.fields_applied'), t('toast.fields_applied_sub'));
   document.getElementById('erfAmt')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   document.getElementById('erfAmt')?.focus();
 }
@@ -12854,8 +13018,8 @@ async function persistProviderKey(providerId, key) {
     await saveSettingsToNotion();
   } catch (e) {
     console.error('[persistProviderKey] Notion-Sync fehlgeschlagen', providerId, e);
-    showToast('warning', '⚠️', 'Notion-Sync',
-      'Key lokal gespeichert. Sync mit Notion später erneut versucht.');
+    showToast('warning', '⚠️', t('toast.notion_sync'),
+      t('toast.notion_sync_sub'));
     // Silent fail auf Notion-Ebene — localStorage hat den Key, App funktioniert weiter.
   }
 }
@@ -12964,8 +13128,8 @@ async function loadSettingsFromNotion() {
         p === 'clockify' ? 'Clockify' : p === 'claude' ? 'Claude' : p === 'toggl' ? 'Toggl' : 'OpenAI'
       ).join(', ');
       setTimeout(() => {
-        showToast('warning', '🔑', 'Keys nicht entschlüsselbar',
-          providerNames + ': bitte einmal neu eingeben. Danach wieder auf allen Geräten verfügbar.', [], null, 0);
+        showToast('warning', '🔑', t('toast.keys_undecryptable'),
+          t('toast.keys_undecryptable_sub', {providers: providerNames}), [], null, 0);
       }, 800); // kleiner Delay, damit der Toast nach App-Start sichtbar ist
     }
     // BUG-071: Sync cockpit layout from Notion (Notion = source of truth)
@@ -13044,7 +13208,7 @@ function showQuizAfterAuth() {
       saveLocal('fb_onboard_complete', true);
       localStorage.removeItem('fb_onboard_step');
       showApp(); restoreTab();
-      setTimeout(() => showToast('success', '🎉', 'Gerät gekoppelt', 'Einstellungen übernommen.'), 500);
+      setTimeout(() => showToast('success', '🎉', t('toast.device_paired'), t('toast.device_paired_sub')), 500);
     }).catch(() => {
       if (!AppState.lang) { AppState.lang = 'de'; }
       if (!AppState.country) { AppState.country = 'CH'; AppState.currency = 'CHF'; }
@@ -13165,7 +13329,7 @@ async function v3RepairLicenseSubmit() {
   if (btn) { btn.textContent = 'Prüfen'; btn.disabled = false; }
   if (result.valid) {
     saveLocal('fb_license_key', key);
-    showToast('success', '✅', 'Lizenz aktiv', '');
+    showToast('success', '✅', t('toast.license_active'), '');
     if (Auth.isAuthenticated) { showApp(); restoreTab(); } else { v3RepairNotion(); }
   } else {
     if (errEl) errEl.textContent = result.reason === 'expired' ? 'Abgelaufen — hello@oswaldkoenig.ch' : 'Key nicht gefunden';
@@ -13173,7 +13337,7 @@ async function v3RepairLicenseSubmit() {
 }
 
 function v3RepairNotion() {
-  showToast('info', '🔗', 'Verbindung läuft…', 'Notion-Fenster wird geöffnet');
+  showToast('info', '🔗', t('toast.oauth_connecting'), t('toast.oauth_sub_opening'));
   Auth.startOAuth();
 }
 
@@ -13199,11 +13363,11 @@ async function v3SubmitPairingCode() {
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
     if (isMobile && !isPWAInstalled()) {
       setTimeout(() => {
-        showToast('success', '📱', 'Gerät erkannt', 'Fast geschafft — noch ein Schritt.');
+        showToast('success', '📱', t('toast.device_detected'), t('toast.device_detected_sub_almost'));
         showPWAInstallScreen();
       }, 900);
     } else {
-      setTimeout(() => { showToast('success', '📱', 'Gerät erkannt', 'Notion kurz verbinden — dann bist du drin.'); Auth.startOAuth(); }, 900);
+      setTimeout(() => { showToast('success', '📱', t('toast.device_detected'), t('toast.device_detected_sub_notion')); Auth.startOAuth(); }, 900);
     }
   } else if (result.error === 'expired') {
     if (btn) { btn.textContent = 'Verbinden'; btn.disabled = false; }
@@ -13306,7 +13470,7 @@ function copyDoneUrl() {
     const btn = document.getElementById('doneCopyUrlBtn');
     if (btn) { btn.textContent = '✓'; setTimeout(() => btn.textContent = 'Kopieren', 1500); }
   }).catch(() => {
-    showToast('info', '📋', 'URL', url);
+    showToast('info', '📋', t('toast.url'), url);
   });
 }
 
@@ -13438,7 +13602,7 @@ async function submitPairingCode() {
     if (errEl) { errEl.style.color = 'var(--green)'; errEl.textContent = '✅ Code korrekt — verbinde jetzt Notion…'; }
     if (btn) btn.textContent = '✅ Weiter';
     setTimeout(() => {
-      showToast('success', '📱', 'Gerät erkannt', 'Notion kurz verbinden — dann bist du drin.');
+      showToast('success', '📱', t('toast.device_detected'), t('toast.device_detected_sub_notion'));
       Auth.startOAuth();
     }, 900);
   } else if (result.error === 'expired') {
@@ -13662,9 +13826,9 @@ async function onboardFinish() {
     } else {
       // DBs still not configured — show actionable error
       saveLocal('fb_onboard_complete', false);
-      showToast('error', '⚠️', 'Datenbanken konnten nicht erstellt werden',
-        'Stelle sicher, dass du in Notion mindestens eine Seite mit FinanceBird geteilt hast.',
-        [], { label: 'Notion neu verbinden →', fn: () => { startOAuth(); } }, 0);
+      showToast('error', '⚠️', t('toast.dbs_create_failed'),
+        t('toast.dbs_create_failed_sub'),
+        [], { label: t('action.reconnect_notion'), fn: () => { startOAuth(); } }, 0);
       setAppStatus('error', 'Datenbanken fehlen');
     }
   } catch (e) {
@@ -13936,7 +14100,7 @@ async function obSaveProviderKey(category, providerId) {
   const w = document.getElementById(wraps[category]);
   if (w) w.style.display = 'none';
   const names = { clockify: 'Clockify', toggl: 'Toggl', claude: 'Claude', openai: 'OpenAI' };
-  showToast('success', '✅', (names[providerId] || providerId) + ' verbunden', '');
+  showToast('success', '✅', t('toast.provider_connected', {name: names[providerId] || providerId}), '');
   obUpdateIntTiles();
 }
 
@@ -14096,7 +14260,7 @@ async function claimPairingCode() {
       if (errEl) { errEl.style.color = 'var(--green)'; errEl.textContent = '✅ Code korrekt — verbinde jetzt Notion…'; }
       if (btn) btn.textContent = '✅ Weiter';
       setTimeout(() => {
-        showToast('success', '📱', 'Gerät erkannt', 'Notion kurz verbinden — dann bist du drin.');
+        showToast('success', '📱', t('toast.device_detected'), t('toast.device_detected_sub_notion'));
         Auth.startOAuth();
       }, 900);
     } else {
@@ -14304,13 +14468,13 @@ async function startOAuth() {
     // Worker-URL setzen (zentraler Proxy)
     AppState.workerUrl = Auth.FB_WORKER_PROXY;
     saveAppState();
-    showToast('info', '🔗', 'Verbindung läuft…', 'Notion-Fenster wurde geöffnet — wechsle zurück wenn fertig');
+    showToast('info', '🔗', t('toast.oauth_connecting'), t('toast.oauth_sub_switchback'));
     // Polling-Status einblenden (Connect-Screen)
     const pollingEl = document.getElementById('onboardConnectPolling');
     if (pollingEl) pollingEl.style.display = '';
     await Auth.startOAuth();
   } catch (e) {
-    showToast('error', '❌', 'OAuth Fehler', e.message);
+    showToast('error', '❌', t('toast.oauth_error'), e.message);
   }
 }
 
@@ -14433,8 +14597,8 @@ function healIssue(action) {
     case 'notion_reauth': Auth.startOAuth(); break;
     case 'db_repair':
       showLoading('Datenbanken reparieren…');
-      discoverAndCreateDatabases().then(() => { hideLoading(); showToast('success', '✅', 'Datenbanken repariert', ''); manualSync(); })
-        .catch(e => { hideLoading(); showToast('error', '❌', 'Reparatur fehlgeschlagen', e.message); });
+      discoverAndCreateDatabases().then(() => { hideLoading(); showToast('success', '✅', t('toast.dbs_repaired'), ''); manualSync(); })
+        .catch(e => { hideLoading(); showToast('error', '❌', t('toast.repair_failed'), e.message); });
       break;
     case 'clockify_rekey': case 'toggl_rekey': case 'time_rekey':
     case 'claude_rekey': case 'openai_rekey': case 'vision_rekey':
@@ -14460,7 +14624,7 @@ function setCountry(country) {
   merchantRules = getDefaultRules(country);
   saveMerchantRules().catch(() => {});
   renderEinstellungen();
-  showToast('success', '✅', 'Land geändert', getRegion().label);
+  showToast('success', '✅', t('toast.country_changed'), getRegion().label);
 }
 
 /** Session 3: Logout with confirmation */
@@ -14814,7 +14978,7 @@ function previewRechnung(invId) {
 
   const win = window.open('', '_blank');
   if (win) { win.document.write(html); win.document.close(); setTimeout(() => win.print(), 300); }
-  else showToast('warning', '🖨', 'Pop-up blockiert', 'Bitte Pop-up erlauben');
+  else showToast('warning', '🖨', t('toast.print_popup_blocked'), t('toast.print_popup_blocked_sub'));
 }
 
 // Rechnungen row: add print button
@@ -14931,7 +15095,7 @@ function migrateLocalStorage() {
 
   // OAuth callback check
   try { const handled = await Auth.handleOAuthCallback(); if (handled) return; }
-  catch (e) { showToast('error', '❌', 'OAuth Fehler', e.message); }
+  catch (e) { showToast('error', '❌', t('toast.oauth_error'), e.message); }
 
   // ═══ v3 THREE-PATH ROUTER ═══
   const urlParams = new URLSearchParams(window.location.search);
@@ -14981,8 +15145,8 @@ function migrateLocalStorage() {
         } catch (e) { console.warn('DB repair failed:', e.message); }
         hideLoading();
         if (!dbsConfigured()) {
-          showToast('error', '⚠️', 'Notion-Datenbanken fehlen', 'Bitte Notion neu verbinden.',
-            [], { label: 'Jetzt verbinden →', fn: () => nav('einstellungen') }, 0);
+          showToast('error', '⚠️', t('toast.notion_dbs_missing'), t('toast.notion_dbs_reconnect_sub'),
+            [], { label: t('action.connect_now'), fn: () => nav('einstellungen') }, 0);
         }
       }
       // Sprint 1: Device-Token sicherstellen vor erstem Notion-Call
@@ -15524,7 +15688,7 @@ function csvBuildParsedRows() {
 /* ── Execute Import ── */
 async function csvExecuteImport() {
   const valid = CSV.parsed.filter(r => r._valid);
-  if (!valid.length) { showToast('error','⚠️','Nichts zu importieren','Keine gültigen Zeilen gefunden'); return; }
+  if (!valid.length) { showToast('error','⚠️',t('toast.nothing_to_import'),t('toast.nothing_to_import_sub')); return; }
 
   csvGoToScreen(4);
   document.getElementById('csvResultIcon').textContent  = '⏳';

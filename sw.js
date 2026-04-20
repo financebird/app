@@ -1,4 +1,4 @@
-const CACHE_NAME = 'financebird-v2.26d-20260419';
+const CACHE_NAME = 'financebird-v2.27a-20260420';
 const ASSETS = [
   './financebird_v2.html',
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap',
