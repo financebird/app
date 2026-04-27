@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.29a.2026-04-26">
+<meta name="fb-version" content="2.30a.2026-04-27">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1480,37 +1480,37 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <div style="position:absolute;top:0;right:0;display:flex;gap:6px">
         <button onclick="obSetLangOnly('de')" id="welcomeLangDe"
           style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:4px 8px;font-size:13px;cursor:pointer;transition:border-color .15s"
-          title="Deutsch">🇨🇭</button>
+          data-i18n-title="ob.welcome.lang_de_title" title="Deutsch">🇨🇭</button>
         <button onclick="obSetLangOnly('en')" id="welcomeLangEn"
           style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:4px 8px;font-size:13px;cursor:pointer;transition:border-color .15s"
-          title="English">🇬🇧</button>
+          data-i18n-title="ob.welcome.lang_en_title" title="English">🇬🇧</button>
       </div>
 
       <!-- Logo -->
       <div class="setup-logo" style="margin-bottom:6px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
-      <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:32px">Persönlicher Finanzcompanion</div>
+      <div data-i18n="ob.welcome.subtitle" style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:32px">Persönlicher Finanzcompanion</div>
 
       <!-- Drei Säulen -->
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
         <div style="display:flex;gap:14px;align-items:flex-start">
           <span style="font-size:22px;flex-shrink:0;margin-top:2px">🦩</span>
           <div>
-            <div style="font-weight:600;font-size:14px;color:var(--ink);margin-bottom:2px">Buchhaltung</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.5">Sauber, robust, intuitiv — volle Übersicht über Einnahmen und Ausgaben.</div>
+            <div data-i18n="ob.welcome.pillar1_title" style="font-weight:600;font-size:14px;color:var(--ink);margin-bottom:2px">Buchhaltung</div>
+            <div data-i18n="ob.welcome.pillar1_body" style="font-size:13px;color:var(--muted);line-height:1.5">Sauber, robust, intuitiv — volle Übersicht über Einnahmen und Ausgaben.</div>
           </div>
         </div>
         <div style="display:flex;gap:14px;align-items:flex-start">
           <span style="font-size:22px;flex-shrink:0;margin-top:2px">🦚</span>
           <div>
-            <div style="font-weight:600;font-size:14px;color:var(--ink);margin-bottom:2px">Aktivitäten</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.5">Wie investierst du deine Zeit? Verbindet dein Zeiterfassungstool und macht es sichtbar.</div>
+            <div data-i18n="ob.welcome.pillar2_title" style="font-weight:600;font-size:14px;color:var(--ink);margin-bottom:2px">Aktivitäten</div>
+            <div data-i18n="ob.welcome.pillar2_body" style="font-size:13px;color:var(--muted);line-height:1.5">Wie investierst du deine Zeit? Verbindet dein Zeiterfassungstool und macht es sichtbar.</div>
           </div>
         </div>
         <div style="display:flex;gap:14px;align-items:flex-start">
           <span style="font-size:22px;flex-shrink:0;margin-top:2px">🦉</span>
           <div>
-            <div style="font-weight:600;font-size:14px;color:var(--ink);margin-bottom:2px">Kompass</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.5">Zum Beispiel: Wie viel bezahlte Arbeit brauche ich um Kosten zu decken — und wie viel Spielraum bleibt für Arbeit die ich aus anderen Gründen mache?</div>
+            <div data-i18n="ob.welcome.pillar3_title" style="font-weight:600;font-size:14px;color:var(--ink);margin-bottom:2px">Kompass</div>
+            <div data-i18n="ob.welcome.pillar3_body" style="font-size:13px;color:var(--muted);line-height:1.5">Zum Beispiel: Wie viel bezahlte Arbeit brauche ich um Kosten zu decken — und wie viel Spielraum bleibt für Arbeit die ich aus anderen Gründen mache?</div>
           </div>
         </div>
       </div>
@@ -1518,21 +1518,21 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <!-- Datenschutz-Versprechen — das einzige was bleibt -->
       <div style="display:flex;align-items:flex-start;gap:10px;background:var(--bg2);border-radius:10px;padding:12px 14px;margin-bottom:28px;font-size:12px;color:var(--muted);line-height:1.6">
         <span style="font-size:16px;flex-shrink:0">🔒</span>
-        <div>Du bekommst nicht einen Account auf unserem Server — du bekommst ein Werkzeug.<br>
+        <div data-i18n-html="ob.welcome.privacy_promise">Du bekommst nicht einen Account auf unserem Server — du bekommst ein Werkzeug.<br>
         <strong style="color:var(--ink2)">Deine Daten gehören dir, leben bei dir, und wir sehen sie nie.</strong><br>
         <span style="font-size:11.5px">Deine Einstellungen und API-Keys werden verschlüsselt in deinem Notion gespeichert, damit du FinanceBird auf mehreren Geräten nutzen kannst.</span></div>
       </div>
 
       <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('welcome','license')">
-        Neu einrichten →
+        <span data-i18n="ob.welcome.cta_setup">Neu einrichten →</span>
       </button>
-      <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px;margin-bottom:4px">
+      <div data-i18n="ob.welcome.cta_meta" style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px;margin-bottom:4px">
         ca. 5 Minuten · einmalig · jederzeit anpassbar
       </div>
       <div style="margin-top:10px;text-align:center">
         <button class="btn btn-outline" style="font-size:13px;padding:10px 20px"
           onclick="onboardNext('welcome','pairing')">
-          Bereits eingerichtet? Gerät koppeln
+          <span data-i18n="ob.welcome.cta_pair">Bereits eingerichtet? Gerät koppeln</span>
         </button>
       </div>
     </div>
@@ -1541,14 +1541,14 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <!-- ── PHASE B: Lizenz-Key (E2) ── -->
   <div id="onboardLicense" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:440px;text-align:center">
-      <button class="onboard-back" onclick="onboardNext('license','welcome')">← Zurück</button>
-      <div class="onboard-step-label">Schritt 1 von 5</div>
+      <button class="onboard-back" onclick="onboardNext('license','welcome')"><span data-i18n="ob.back">← Zurück</span></button>
+      <div class="onboard-step-label" data-i18n="ob.license.step_label">Schritt 1 von 5</div>
 
       <div style="font-size:40px;margin-bottom:12px">🗝</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:8px">
+      <h2 data-i18n="ob.license.title" style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:8px">
         Dein Lizenz-Key
       </h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">
+      <p data-i18n="ob.license.body" style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">
         Du hast einen Key per E-Mail erhalten.
       </p>
 
@@ -1563,13 +1563,13 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <button class="btn btn-primary" id="onboardLicenseBtn"
         style="width:100%;padding:14px;font-size:15px"
         onclick="onboardCheckLicense()">
-        Prüfen
+        <span data-i18n="ob.license.check_btn">Prüfen</span>
       </button>
 
       <div style="margin-top:16px;font-size:12px;color:var(--muted);line-height:1.7">
-        Noch keinen Key?
+        <span data-i18n="ob.license.no_key_label">Noch keinen Key?</span>
         <a href="mailto:hello@oswaldkoenig.ch" style="color:var(--accent);text-decoration:none">hello@oswaldkoenig.ch</a><br>
-        <span style="font-size:11px">Jederzeit in den Einstellungen änderbar.</span>
+        <span data-i18n="ob.license.changeable" style="font-size:11px">Jederzeit in den Einstellungen änderbar.</span>
       </div>
     </div>
   </div>
@@ -1581,66 +1581,66 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <div class="onboard-step-label">Schritt 2 von 3 — Verbinden</div>
 
       <div class="setup-logo" style="font-size:28px;margin-bottom:6px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">Verbinde dein Notion</h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7">
+      <h2 data-i18n="ob.connect.title" style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">Verbinde dein Notion</h2>
+      <p data-i18n="ob.connect.body" style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7">
         Deine Finanzdaten werden bei dir zu Hause sein — in deinem eigenen Notion.
         FinanceBird legt dort Datenbanken an für Buchungen, Konten, Projekte und mehr.
         Einzig Belege werden in deinem Google Drive gespeichert.
       </p>
 
       <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" onclick="startOAuth()">
-        Mit Notion verbinden →
+        <span data-i18n="ob.connect.cta">Mit Notion verbinden →</span>
       </button>
 
-      <div style="margin-top:16px;background:var(--bg2);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--ink2);line-height:1.7">
+      <div style="margin-top:16px;background:var(--bg2);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--ink2);line-height:1.7" data-i18n-html="ob.connect.what_happens">
         <div style="font-weight:600;margin-bottom:6px">📋 Was gleich passiert:</div>
         Notion fragt dich, welche Seiten FinanceBird sehen darf. <strong>Wähle mindestens eine Seite aus</strong> — dort werden deine Datenbanken automatisch angelegt.<br><br>
         <strong>Tipp:</strong> Erstelle in Notion eine leere Seite mit dem Namen <em>„FinanceBird"</em> unter <em>Privat</em> und wähle diese aus — so bleiben deine Finanzdaten übersichtlich an einem Ort.
       </div>
 
       <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--muted)">
-        Noch kein Notion?
+        <span data-i18n="ob.connect.no_notion">Noch kein Notion?</span>
         <a href="https://notion.so" target="_blank" style="color:var(--accent);text-decoration:none">
-          notion.so</a> (kostenlos)
+          notion.so</a> <span data-i18n="ob.connect.free_label">(kostenlos)</span>
       </div>
 
       <!-- Polling-Status (wird eingeblendet nach OAuth-Start) -->
       <div id="onboardConnectPolling" style="display:none;margin-top:20px;text-align:center">
         <div style="font-size:13px;color:var(--muted);margin-bottom:8px">
-          <span id="onboardConnectStatus">Warte auf Notion-Verbindung…</span>
+          <span id="onboardConnectStatus" data-i18n="ob.connect.waiting">Warte auf Notion-Verbindung…</span>
         </div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.6">
+        <div data-i18n-html="ob.connect.tab_hint" style="font-size:11px;color:var(--muted);line-height:1.6">
           Ein Notion-Tab sollte sich geöffnet haben.<br>
           Verbinde FinanceBird dort mit deinem Workspace.
         </div>
         <div style="margin-top:16px;display:flex;gap:8px;justify-content:center">
           <button class="btn btn-outline btn-sm" onclick="startOAuth()" style="font-size:12px">
-            Nochmal versuchen
+            <span data-i18n="ob.connect.retry">Nochmal versuchen</span>
           </button>
           <button class="btn btn-outline btn-sm" onclick="showManualTokenFallback()" style="font-size:12px">
-            Token manuell eingeben
+            <span data-i18n="ob.connect.manual_token">Token manuell eingeben</span>
           </button>
         </div>
       </div>
 
       <!-- Manueller Token Fallback (Weg C) -->
       <div id="onboardManualToken" style="display:none;margin-top:16px">
-        <div style="font-size:11px;font-family:'Courier Prime',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Manueller Token (Fallback)</div>
+        <div data-i18n="ob.connect.manual_label" style="font-size:11px;font-family:'Courier Prime',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Manueller Token (Fallback)</div>
         <input type="password" id="onboardTokenInput" class="form-input"
           placeholder="ntn_…" autocomplete="off"
           style="margin-bottom:8px">
         <button class="btn btn-primary" style="width:100%;padding:12px"
           onclick="onboardSaveManualToken()">
-          Verbinden
+          <span data-i18n="ob.connect.connect_btn">Verbinden</span>
         </button>
         <div id="onboardTokenError" style="color:var(--red);font-size:12px;margin-top:6px;min-height:16px"></div>
       </div>
 
       <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center;line-height:1.6">
-        🔒 Deine Daten bleiben in deinem Notion-Workspace. FinanceBird sieht sie nie.
+        <span data-i18n="ob.connect.privacy_footer">🔒 Deine Daten bleiben in deinem Notion-Workspace. FinanceBird sieht sie nie.</span>
         <span style="display:inline-block;margin-top:4px">
           <a href="#" onclick="showDatenschutz('onboardDatenschutzContainer');return false"
-            style="color:var(--accent);text-decoration:none;font-size:11px">Datenschutzerklärung →</a>
+            style="color:var(--accent);text-decoration:none;font-size:11px" data-i18n="ob.connect.privacy_link">Datenschutzerklärung →</a>
         </span>
       </div>
       <div id="onboardDatenschutzContainer" style="display:none;margin-top:12px"></div>
@@ -1654,25 +1654,25 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <!-- ── Screen 1: Land & Steuern ── -->
   <div id="onboardCountry" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:480px">
-      <button class="onboard-back" onclick="onboardNext('country','license')">← Zurück</button>
-      <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;text-align:center">
+      <button class="onboard-back" onclick="onboardNext('country','license')"><span data-i18n="ob.back">← Zurück</span></button>
+      <div data-i18n="ob.country.setup_meta" style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;text-align:center">
         Das Setup dauert 2 Minuten. Alles ist nachher anpassbar.
       </div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px;text-align:center" id="obCountryTitle">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px;text-align:center" id="obCountryTitle" data-i18n="ob.country.title">
         In welchem Land ist deine Tätigkeit zu Hause?
       </h2>
       <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px;max-width:320px;margin-left:auto;margin-right:auto">
-        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obSetCountry('CH','CHF')">🇨🇭 Schweiz (CHF)</button>
-        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obSetCountry('DE','EUR')">🇩🇪 Deutschland (EUR)</button>
-        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obSetCountry('AT','EUR')">🇦🇹 Österreich (EUR)</button>
-        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obShowOtherCountry()">🌍 Anderes Land</button>
+        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obSetCountry('CH','CHF')"><span data-i18n="ob.country.ch">🇨🇭 Schweiz (CHF)</span></button>
+        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obSetCountry('DE','EUR')"><span data-i18n="ob.country.de">🇩🇪 Deutschland (EUR)</span></button>
+        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obSetCountry('AT','EUR')"><span data-i18n="ob.country.at">🇦🇹 Österreich (EUR)</span></button>
+        <button class="btn btn-outline" style="padding:14px;font-size:15px;text-align:left" onclick="obShowOtherCountry()"><span data-i18n="ob.country.other">🌍 Anderes Land</span></button>
       </div>
       <div id="obOtherCountryWrap" style="display:none;margin-top:14px;max-width:320px;margin-left:auto;margin-right:auto">
-        <input type="text" id="obOtherCountryInput" class="form-input" placeholder="Land" style="margin-bottom:8px">
+        <input type="text" id="obOtherCountryInput" class="form-input" data-i18n-placeholder="ob.country.other_placeholder" placeholder="Land" style="margin-bottom:8px">
         <select id="obOtherCurrencyInput" class="form-input" style="margin-bottom:8px">
           <option value="CHF">CHF</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option>
         </select>
-        <button class="btn btn-primary" style="width:100%;padding:12px" onclick="obSetCountry('OTHER',document.getElementById('obOtherCurrencyInput').value)">Weiter →</button>
+        <button class="btn btn-primary" style="width:100%;padding:12px" onclick="obSetCountry('OTHER',document.getElementById('obOtherCurrencyInput').value)"><span data-i18n="ob.country.continue">Weiter →</span></button>
       </div>
       <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div><div class="onboard-dot"></div><div class="onboard-dot"></div></div>
     </div>
@@ -1681,20 +1681,20 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <!-- ── Screen 2: Konten ── -->
   <div id="onboardAccounts" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:480px">
-      <button class="onboard-back" onclick="onboardNext('accounts','country')">← Zurück</button>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px;text-align:center" id="obAccountsTitle">
+      <button class="onboard-back" onclick="onboardNext('accounts','country')"><span data-i18n="ob.back">← Zurück</span></button>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px;text-align:center" id="obAccountsTitle" data-i18n="ob.accounts.title">
         Welche Konten nutzt du?
       </h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;text-align:center" id="obAccountsSub">Wähle oder tippe eigene Namen ein.<br><span style="font-size:11px">Du kannst Konten später jederzeit anpassen — du brauchst jetzt mindestens 1.</span></p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;text-align:center" id="obAccountsSub" data-i18n-html="ob.accounts.sub">Wähle oder tippe eigene Namen ein.<br><span style="font-size:11px">Du kannst Konten später jederzeit anpassen — du brauchst jetzt mindestens 1.</span></p>
       <div class="onboard-chips" id="obAccountChips" style="margin-bottom:14px"></div>
       <div style="display:flex;gap:8px;margin-bottom:20px">
-        <input type="text" id="obAccountCustom" class="form-input" placeholder="Eigenes Konto…" style="flex:1"
+        <input type="text" id="obAccountCustom" class="form-input" data-i18n-placeholder="ob.accounts.custom_placeholder" placeholder="Eigenes Konto…" style="flex:1"
           onkeydown="if(event.key==='Enter'){obAddCustomAccount();event.preventDefault()}">
-        <button class="btn btn-outline" onclick="obAddCustomAccount()" style="padding:8px 14px;white-space:nowrap">+ Hinzufügen</button>
+        <button class="btn btn-outline" onclick="obAddCustomAccount()" style="padding:8px 14px;white-space:nowrap"><span data-i18n="ob.accounts.add_btn">+ Hinzufügen</span></button>
       </div>
       <div id="obSelectedAccounts" style="font-size:12px;color:var(--muted);margin-bottom:14px"></div>
       <button class="btn btn-primary" id="obAccountsNextBtn" style="width:100%;padding:14px;font-size:15px" onclick="onboardNext('accounts','integrations')" disabled>
-        Weiter →
+        <span data-i18n="ob.accounts.continue">Weiter →</span>
       </button>
       <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div><div class="onboard-dot"></div></div>
     </div>
@@ -1703,91 +1703,91 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <!-- ── Screen 3: Verknüpfungen & Integrationen ── -->
   <div id="onboardIntegrations" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:480px">
-      <button class="onboard-back" onclick="onboardNext('integrations','accounts')">← Zurück</button>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:4px;text-align:center" id="obIntTitle">
+      <button class="onboard-back" onclick="onboardNext('integrations','accounts')"><span data-i18n="ob.back">← Zurück</span></button>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:4px;text-align:center" id="obIntTitle" data-i18n="ob.int.title">
         Verknüpfungen & Integrationen
       </h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;text-align:center" id="obIntSub">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;text-align:center" id="obIntSub" data-i18n="ob.int.sub">
         FinanceBird wird stärker mit jeder Verbindung. Du kannst alles auch später einrichten.
       </p>
       <div class="onboard-grid" id="obIntGrid">
         <div class="onboard-tile required" id="obTileNotion" onclick="obConnectNotion()">
           <div class="tile-icon">📊</div>
-          <div class="tile-label">Datenbank</div>
-          <div class="tile-sub">Wo deine Daten gespeichert werden</div>
+          <div class="tile-label" data-i18n="ob.int.tile_db">Datenbank</div>
+          <div class="tile-sub" data-i18n="ob.int.tile_db_sub">Wo deine Daten gespeichert werden</div>
         </div>
         <div class="onboard-tile" id="obTileDrive" onclick="obSelectProvider('storage')">
           <div class="tile-icon">📁</div>
-          <div class="tile-label">Ablage</div>
-          <div class="tile-sub">Wo deine Belege gespeichert werden</div>
+          <div class="tile-label" data-i18n="ob.int.tile_storage">Ablage</div>
+          <div class="tile-sub" data-i18n="ob.int.tile_storage_sub">Wo deine Belege gespeichert werden</div>
         </div>
         <div class="onboard-tile" id="obTileClock" onclick="obSelectProvider('time')">
           <div class="tile-icon">⏱</div>
-          <div class="tile-label">Zeiterfassung</div>
-          <div class="tile-sub">Buchhaltung im Kontext deiner Zeit</div>
+          <div class="tile-label" data-i18n="ob.int.tile_time">Zeiterfassung</div>
+          <div class="tile-sub" data-i18n="ob.int.tile_time_sub">Buchhaltung im Kontext deiner Zeit</div>
         </div>
         <div class="onboard-tile" id="obTileKi" onclick="obSelectProvider('vision')">
           <div class="tile-icon">🤖</div>
-          <div class="tile-label">KI Features</div>
-          <div class="tile-sub">Belege automatisch auslesen</div>
+          <div class="tile-label" data-i18n="ob.int.tile_ai">KI Features</div>
+          <div class="tile-sub" data-i18n="ob.int.tile_ai_sub">Belege automatisch auslesen</div>
         </div>
       </div>
       <!-- Inline input areas (hidden by default) -->
       <div id="obDriveWrap" style="display:none;margin-top:12px;padding:12px 14px;background:var(--bg2);border-radius:10px;font-size:12.5px;line-height:1.6">
-        <div style="font-weight:600;margin-bottom:8px;font-size:13px">📁 Ordnerstruktur in Google Drive:</div>
+        <div data-i18n="ob.int.drive_struct_label" style="font-weight:600;margin-bottom:8px;font-size:13px">📁 Ordnerstruktur in Google Drive:</div>
         <div style="font-family:'Courier Prime',monospace;font-size:12px;color:var(--ink2);white-space:pre;margin-bottom:10px">📁 FinanceBird
    📁 Business
       📁 Income / ${new Date().getFullYear()}
       📁 Expenses / ${new Date().getFullYear()}</div>
-        <div style="color:var(--muted);font-size:12px">FinanceBird erstellt einen Ordner in deinem Google Drive. Du kannst ihn danach frei verschieben oder umbenennen — die App findet ihn über die Folder-ID trotzdem.</div>
+        <div data-i18n="ob.int.drive_hint" style="color:var(--muted);font-size:12px">FinanceBird erstellt einen Ordner in deinem Google Drive. Du kannst ihn danach frei verschieben oder umbenennen — die App findet ihn über die Folder-ID trotzdem.</div>
       </div>
       <div id="obIntClockifyWrap" style="display:none;margin-top:12px;padding:14px 16px;background:var(--bg2);border-radius:12px">
-        <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Erweiterung</div>
-        <div style="font-size:12.5px;color:var(--ink2);margin-bottom:12px;line-height:1.6"><strong>Clockify</strong> trackt deine Zeit — FinanceBird macht daraus Stundensätze und Projektvergleiche.</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;padding:10px 12px;background:var(--paper);border-radius:8px">
+        <div data-i18n="ob.int.extension_label" style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Erweiterung</div>
+        <div data-i18n-html="ob.int.clockify_intro" style="font-size:12.5px;color:var(--ink2);margin-bottom:12px;line-height:1.6"><strong>Clockify</strong> trackt deine Zeit — FinanceBird macht daraus Stundensätze und Projektvergleiche.</div>
+        <div data-i18n-html="ob.int.clockify_steps" style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;padding:10px 12px;background:var(--paper);border-radius:8px">
           <strong style="color:var(--ink2)">So findest du den Key:</strong><br>
           1. Öffne <a href="https://clockify.me/user/settings" target="_blank" style="color:var(--accent);text-decoration:none">clockify.me/user/settings</a><br>
           2. Scrolle zu «API»<br>
           3. Kopiere den Key
         </div>
-        <label class="form-label" style="font-size:12px">Clockify API Key</label>
-        <input type="password" id="obClockifyKey" class="form-input" placeholder="API Key" style="margin-bottom:6px">
+        <label class="form-label" style="font-size:12px" data-i18n="ob.int.clockify_label">Clockify API Key</label>
+        <input type="password" id="obClockifyKey" class="form-input" data-i18n-placeholder="ob.int.api_key_placeholder" placeholder="API Key" style="margin-bottom:6px">
         <div style="display:flex;gap:8px">
-          <button class="btn btn-primary btn-sm" onclick="obSaveClockify()" style="flex:1">Speichern</button>
-          <button class="btn btn-outline btn-sm" onclick="document.getElementById('obIntClockifyWrap').style.display='none'" style="font-size:12px">Überspringen</button>
+          <button class="btn btn-primary btn-sm" onclick="obSaveClockify()" style="flex:1"><span data-i18n="ob.int.save_btn">Speichern</span></button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('obIntClockifyWrap').style.display='none'" style="font-size:12px"><span data-i18n="ob.int.skip_btn">Überspringen</span></button>
         </div>
       </div>
       <div id="obIntKiWrap" style="display:none;margin-top:12px;padding:14px 16px;background:var(--bg2);border-radius:12px">
-        <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Erweiterung</div>
-        <div style="font-size:12.5px;color:var(--ink2);margin-bottom:8px;line-height:1.6"><strong>KI-Beleganalyse</strong> — liest Belege automatisch: Betrag, Datum, Händler, Kategorie. Kosten: ~0.01 CHF pro Beleg.</div>
-        <div style="font-size:11.5px;color:var(--muted);margin-bottom:12px;line-height:1.5">🔒 Deine Belege gehen nie durch unsere Server.</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;padding:10px 12px;background:var(--paper);border-radius:8px">
+        <div data-i18n="ob.int.extension_label" style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Erweiterung</div>
+        <div data-i18n-html="ob.int.ki_intro" style="font-size:12.5px;color:var(--ink2);margin-bottom:8px;line-height:1.6"><strong>KI-Beleganalyse</strong> — liest Belege automatisch: Betrag, Datum, Händler, Kategorie. Kosten: ~0.01 CHF pro Beleg.</div>
+        <div data-i18n="ob.int.ki_privacy" style="font-size:11.5px;color:var(--muted);margin-bottom:12px;line-height:1.5">🔒 Deine Belege gehen nie durch unsere Server.</div>
+        <div data-i18n-html="ob.int.ki_steps" style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;padding:10px 12px;background:var(--paper);border-radius:8px">
           <strong style="color:var(--ink2)">So findest du den Key:</strong><br>
           1. Öffne <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent);text-decoration:none">console.anthropic.com/settings/keys</a><br>
           2. Klicke «Create Key»<br>
           3. Kopiere den Key (beginnt mit sk-ant-…)
         </div>
-        <label class="form-label" style="font-size:12px">Claude API Key</label>
+        <label class="form-label" style="font-size:12px" data-i18n="ob.int.ki_label">Claude API Key</label>
         <input type="password" id="obKiKey" class="form-input" placeholder="sk-ant-…" style="margin-bottom:6px">
         <div style="display:flex;gap:8px">
-          <button class="btn btn-primary btn-sm" onclick="obSaveKi()" style="flex:1">Speichern</button>
-          <button class="btn btn-outline btn-sm" onclick="document.getElementById('obIntKiWrap').style.display='none'" style="font-size:12px">Überspringen</button>
+          <button class="btn btn-primary btn-sm" onclick="obSaveKi()" style="flex:1"><span data-i18n="ob.int.save_btn">Speichern</span></button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('obIntKiWrap').style.display='none'" style="font-size:12px"><span data-i18n="ob.int.skip_btn">Überspringen</span></button>
         </div>
       </div>
       <button class="btn btn-primary" id="obIntNextBtn" style="width:100%;padding:14px;font-size:15px;margin-top:18px" onclick="obIntNext()">
-        Notion verbinden
+        <span data-i18n="ob.int.connect_notion">Notion verbinden</span>
       </button>
-      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">Notion ist Pflicht · alles andere jederzeit nachholbar</div>
+      <div data-i18n="ob.int.notion_required" style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">Notion ist Pflicht · alles andere jederzeit nachholbar</div>
       <!-- Polling status (shown after OAuth) -->
       <div id="obIntPolling" style="display:none;margin-top:14px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
           <div style="width:16px;height:16px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>
-          <span id="obIntPollingStatus" style="font-size:12.5px;color:var(--ink2)">Warte auf Notion-Verbindung…</span>
+          <span id="obIntPollingStatus" data-i18n="ob.int.polling_status" style="font-size:12.5px;color:var(--ink2)">Warte auf Notion-Verbindung…</span>
         </div>
         <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden">
           <div id="obIntPollingBar" style="height:100%;width:0%;background:var(--accent);transition:width 1s ease;animation:obPollProgress 30s linear forwards"></div>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4">
+        <div data-i18n="ob.int.polling_hint" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4">
           Notion öffnet sich in einem neuen Tab oder Fenster. Schliesse es nach der Verbindung nicht — kehre hier zurück.
         </div>
       </div>
@@ -1798,13 +1798,13 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <!-- ── Screen 5: Overview (v3 — mit Health-Checks) ── -->
   <div id="onboardOverview" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:480px">
-      <button class="onboard-back" onclick="onboardNext('overview','integrations')">← Zurück</button>
+      <button class="onboard-back" onclick="onboardNext('overview','integrations')"><span data-i18n="ob.back">← Zurück</span></button>
       <div style="font-size:40px;margin-bottom:8px;text-align:center">🎉</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:6px;text-align:center" id="overviewTitle">System wird geprüft…</h2>
-      <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px">Alles jederzeit in den Einstellungen anpassbar.</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:6px;text-align:center" id="overviewTitle" data-i18n="ob.overview.checking">System wird geprüft…</h2>
+      <div data-i18n="ob.overview.subtitle" style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px">Alles jederzeit in den Einstellungen anpassbar.</div>
       <div id="overviewChecks" style="background:var(--bg2);border-radius:12px;padding:14px 18px;margin-bottom:16px"></div>
-      <button class="btn btn-primary" id="overviewFinishBtn" style="width:100%;padding:14px;font-size:15px" onclick="onboardFinish()" disabled>System wird geprüft…</button>
-      <div style="font-size:12px;color:var(--muted);margin-top:12px;text-align:center">
+      <button class="btn btn-primary" id="overviewFinishBtn" style="width:100%;padding:14px;font-size:15px" onclick="onboardFinish()" disabled data-i18n="ob.overview.checking">System wird geprüft…</button>
+      <div data-i18n="ob.overview.feedback" style="font-size:12px;color:var(--muted);margin-top:12px;text-align:center">
         📬 Feedback jederzeit über das Menü → Feedback
       </div>
       <div class="onboard-dots"><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot done"></div><div class="onboard-dot active"></div></div>
@@ -1814,17 +1814,17 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <!-- ── Pfad B: Pairing (v3) ── -->
   <div id="onboardPairing" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:400px;text-align:center">
-      <button class="onboard-back" onclick="onboardNext('pairing','welcome')">← Zurück</button>
+      <button class="onboard-back" onclick="onboardNext('pairing','welcome')"><span data-i18n="ob.back">← Zurück</span></button>
       <div class="setup-logo" style="font-size:24px;margin-bottom:16px">Finance<em style="color:var(--nav-active);font-style:italic">Bird</em></div>
       <div style="font-size:40px;margin-bottom:12px">🔗</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">Gerät koppeln</h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">Den 6-stelligen Code findest du auf deinem anderen Gerät unter Einstellungen → Weiteres Gerät.</p>
+      <h2 data-i18n="ob.pairing.title" style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">Gerät koppeln</h2>
+      <p data-i18n="ob.pairing.body" style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">Den 6-stelligen Code findest du auf deinem anderen Gerät unter Einstellungen → Weiteres Gerät.</p>
       <input type="text" id="pairingInput" class="form-input" placeholder="A8F3X9" maxlength="6" style="text-align:center;font-family:'Courier Prime',monospace;font-size:28px;letter-spacing:.25em;text-transform:uppercase;padding:16px;margin-bottom:8px" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" autocomplete="off" autocorrect="off" spellcheck="false">
       <div id="pairingError" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:16px"></div>
-      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" id="pairingBtn" onclick="v3SubmitPairingCode()">Verbinden</button>
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">Keinen Code? <a href="#" onclick="v3PairingFallback();return false" style="color:var(--accent);text-decoration:none">Lizenz-Key direkt eingeben →</a></div>
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px" id="pairingBtn" onclick="v3SubmitPairingCode()"><span data-i18n="ob.pairing.connect">Verbinden</span></button>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)"><span data-i18n="ob.pairing.no_code">Keinen Code?</span> <a href="#" onclick="v3PairingFallback();return false" style="color:var(--accent);text-decoration:none" data-i18n="ob.pairing.fallback_link">Lizenz-Key direkt eingeben →</a></div>
       <!-- BL-106: Klare Kommunikation dass GDrive gerätelokal ist -->
-      <div style="margin-top:14px;padding:10px 12px;background:var(--bg2);border-radius:8px;font-size:11.5px;color:var(--muted);line-height:1.5;text-align:left">
+      <div data-i18n-html="ob.pairing.gdrive_note" style="margin-top:14px;padding:10px 12px;background:var(--bg2);border-radius:8px;font-size:11.5px;color:var(--muted);line-height:1.5;text-align:left">
         <strong style="color:var(--ink2)">Hinweis:</strong> Google Drive wird aus Sicherheitsgründen auf jedem Gerät neu verbunden.
       </div>
     </div>
@@ -1834,14 +1834,14 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
   <div id="onboardRepair" class="onboard-screen" style="display:none">
     <div class="onboard-card" style="max-width:440px;text-align:center">
       <div style="font-size:40px;margin-bottom:12px">🔧</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">Verbindung wiederherstellen</h2>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Etwas muss repariert werden — das geht schnell.</p>
+      <h2 data-i18n="ob.repair.title" style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px">Verbindung wiederherstellen</h2>
+      <p data-i18n="ob.repair.body" style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">Etwas muss repariert werden — das geht schnell.</p>
       <div id="repairChecks" style="background:var(--bg2);border-radius:12px;padding:14px 18px;margin-bottom:16px;text-align:left"></div>
       <div id="repairLicenseWrap" style="display:none;margin-bottom:16px;text-align:left">
-        <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block">Lizenz-Key</label>
+        <label data-i18n="ob.repair.license_label" style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block">Lizenz-Key</label>
         <input type="text" id="repairLicenseInput" class="form-input" placeholder="LK-XXXXXXXX" style="text-align:center;font-family:'Courier Prime',monospace;font-size:18px;letter-spacing:.1em;text-transform:uppercase;padding:12px;margin-bottom:6px" oninput="this.value=this.value.toUpperCase()" autocomplete="off" autocorrect="off" spellcheck="false">
         <div id="repairLicenseError" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:8px"></div>
-        <button class="btn btn-primary" id="repairLicenseBtn" style="width:100%;padding:12px" onclick="v3RepairLicenseSubmit()">Prüfen</button>
+        <button class="btn btn-primary" id="repairLicenseBtn" style="width:100%;padding:12px" onclick="v3RepairLicenseSubmit()"><span data-i18n="ob.repair.check_btn">Prüfen</span></button>
       </div>
     </div>
   </div>
@@ -2788,7 +2788,7 @@ const I18N = {
     'toast.not_ready_action':      'Setup',
     /* Toasts Gruppe A · Sync + DBs + Notion-Fehler (S28 Teil 2a) */
     'toast.dbs_count_ready':       '{n} Datenbanken bereit',
-    'toast.dbs_ready':             'Alle Datenbanken bereit',
+    /* BUG-079 S35: Duplikat-Definition 'toast.dbs_ready' entfernt — dominant ist Gruppe 4 (S30) mit 'Datenbanken bereit' */
     'toast.dbs_ready_sub':         'Deine Notion-Datenbanken sind vollständig eingerichtet.',
     'toast.notion_error':          'Notion-Fehler',
     'toast.recurrings_migrated':   '{n} Recurrings migriert',
@@ -3506,6 +3506,371 @@ const I18N = {
     'health.warn.cache_empty_action':'Sync starten',
     'health.warn.no_konten':         'Keine Konten',
     'health.warn.no_konten_action':  'In Notion konfigurieren',
+
+    /* S35 Sprint 6.5c Gruppe 16 — FIELD_HELP (8 × title+body) */
+    'field_help.gdrive_root.title':     'Root-Ordner',
+    'field_help.gdrive_root.body':      'Dieser Ordner wird in deinem Google Drive erstellt und enthält alle Belege. Du kannst ihn nach der Verbindung frei verschieben oder umbenennen — die App merkt sich die ID.',
+    'field_help.gdrive_income.title':   'Einnahmen-Ordner',
+    'field_help.gdrive_income.body':    'Belege für Einnahmen (z.B. Rechnungskopien) landen hier. Jahresordner (2025, 2026…) werden automatisch erstellt.',
+    'field_help.gdrive_expenses.title': 'Ausgaben-Ordner',
+    'field_help.gdrive_expenses.body':  'Belege für Ausgaben (Quittungen, Rechnungen) landen hier. Jahresordner werden automatisch erstellt.',
+    'field_help.clockify_key.title':    'Clockify API Key',
+    'field_help.clockify_key.body':     'Den Key findest du unter: clockify.me → Profil-Icon → Profile Settings → API → Generieren. Wird nur lokal gespeichert.',
+    'field_help.claude_key.title':      'Claude API Key',
+    'field_help.claude_key.body':       'Den Key findest du unter: console.anthropic.com → API Keys → Create Key. Wird nur lokal gespeichert und nie an unsere Server gesendet.',
+    'field_help.mwst_pflichtig.title':  'MWST-Pflicht',
+    'field_help.mwst_pflichtig.body':   'In der Schweiz gilt MWST-Pflicht ab CHF 100’000 Jahresumsatz. Wenn du nicht pflichtig bist, werden MWST-Felder ausgeblendet.',
+    'field_help.ob_accounts.title':     'Bankkonten',
+    'field_help.ob_accounts.body':      'Gib deine Geschäftskonten an (z.B. UBS Geschäftskonto, PostFinance). Sie erscheinen beim Erfassen als Auswahlfeld. Mindestens 1 Konto empfohlen.',
+    'field_help.ob_country.title':      'Land & Steuern',
+    'field_help.ob_country.body':       'Das Land bestimmt die MWST-Sätze und das Steuerformular-Mapping deiner Buchungen. Wählbar: Schweiz (CH), Deutschland (DE), Österreich (AT).',
+
+    /* S35 Sprint 6.5c Gruppe 14 — GDrive-Einstellungen-Card */
+    'gdrive.field.root_name':        'Root-Ordnername',
+    'gdrive.field.business_in':      'Business · Einnahmen',
+    'gdrive.field.business_out':     'Business · Ausgaben',
+    'gdrive.field.private_in':       'Private · Einnahmen',
+    'gdrive.field.private_out':      'Private · Ausgaben',
+    'gdrive.hint.configured':        'Belege landen in deinem Google Drive. Du kannst Ordnernamen anpassen — die App merkt sich die Folder-IDs, nicht die Namen.',
+    'gdrive.hint.not_connected':     'Verbinde Google Drive in der Verbindungen-Karte oben, danach kannst du hier die Ordnerstruktur anpassen.',
+    'gdrive.preview.label':          'Vorschau:',
+    'gdrive.preview.business':       'Business',
+    'gdrive.preview.private':        'Private',
+    'gdrive.preview.private_optional':'(bei Bedarf)',
+    'gdrive.footer.year_auto':       'Jahresordner werden automatisch erstellt.',
+    'gdrive.footer.move_rename':     'Du kannst Ordner in Google Drive frei verschieben oder umbenennen — die App findet sie über die Folder-ID trotzdem.',
+    'gdrive.footer.no_rename':       'Bestehende Ordner werden nicht umbenannt, wenn du den Namen hier änderst.',
+
+    /* S35 Sprint 6.5c Gruppe 13 — Settings (renderEinstellungen) */
+    /* Sections */
+    'settings.section.connections':            'Verbindungen',
+    'settings.section.profile':                'Profil & Region',
+    'settings.section.thresholds':             'Schwellenwerte',
+    'settings.section.country_tax':            'Land & Steuern',
+    'settings.section.receipts_storage':       'Belege-Ablage',
+    'settings.section.collaboration':          'Zusammenarbeit',
+    'settings.section.license_devices':        'Lizenz & Geräte',
+    'settings.section.privacy':                'Datenschutz',
+    'settings.section.diagnostics':            'Diagnose & Daten',
+    'settings.section.danger_zone':            'Gefahrenzone',
+    /* Buttons (re-used across sections) */
+    'settings.btn.sync':                       'Sync',
+    'settings.btn.logout':                     'Abmelden',
+    'settings.btn.connect':                    'Verbinden',
+    'settings.btn.open':                       'Öffnen',
+    /* Connections */
+    'settings.connections.encrypted_hint':     'Verschlüsselt synchronisiert via Notion',
+    'settings.connections.integration':        'Integration',
+    'settings.connections.connected_via':      'Verbunden via {mode}',
+    'settings.connections.sync_at':            'Sync: {ts}',
+    'settings.connections.never_synced':       'noch nie sync',
+    'settings.connections.decrypt_failed':     'Key konnte nicht entschlüsselt werden — bitte neu eingeben',
+    'settings.connections.gdrive_label':       'Google Drive (Belege)',
+    'settings.connections.gdrive_connected':   'Verbunden — Belege werden automatisch abgelegt',
+    'settings.connections.vision_suffix':      '(Beleganalyse)',
+    'settings.connections.api_key_set':        'API Key gesetzt',
+    'settings.connections.api_key_missing':    'Nicht gesetzt',
+    /* Profile */
+    'settings.profile.language':               'Sprache',
+    'settings.profile.lang_de':                'Deutsch',
+    'settings.profile.lang_en':                'English',
+    'settings.profile.currency':               'Währung',
+    'settings.profile.dark_mode':              'Dark Mode',
+    'settings.profile.dark_on':                'An',
+    'settings.profile.dark_off':               'Aus',
+    /* Thresholds */
+    'settings.thresholds.intro':               'Werte für Berechnungen und Warnungen.',
+    'settings.thresholds.buffer_label':        'Puffer-Ziel (CHF)',
+    'settings.thresholds.buffer_hint':         'Zielgrösse Liquiditätspuffer',
+    'settings.thresholds.target_rate_label':   'Ziel-Stundensatz (CHF/h)',
+    'settings.thresholds.target_rate_hint':    'Standard für neue Projekte',
+    'settings.thresholds.categories_label':    'Kategorien',
+    'settings.thresholds.categories_hint':     '20 Standard-Kategorien · Steuerformular-Mapping automatisch',
+    'settings.thresholds.standard_badge':      'STANDARD',
+    'settings.thresholds.mwst_label':          'MWST-pflichtig',
+    'settings.thresholds.mwst_visible':        'MWST-Felder beim Erfassen sichtbar',
+    'settings.thresholds.mwst_hidden':         'MWST-Felder beim Erfassen ausgeblendet',
+    /* Country & Tax */
+    'settings.country_tax.country_label':      'Land',
+    'settings.country_tax.country_hint':       'Bestimmt MWST-Sätze und Steuerformular-Mapping',
+    'settings.country_tax.mwst_method_label':  'MWST-Methode',
+    'settings.country_tax.mwst_method_options':'Effektiv oder Saldosteuersatz',
+    'settings.country_tax.mwst_method_default':'Standardmethode',
+    'settings.country_tax.mwst_method_default_badge':'Standard',
+    /* Collaboration */
+    'settings.collaboration.intro':            'Arbeite mit einer Treuhänder:in oder Buchhalter:in zusammen. Sie können Buchungen prüfen und Korrekturen vorschlagen.',
+    'settings.collaboration.add_btn':          '+ Person hinzufügen',
+    /* License */
+    'settings.license.title':                  'Lizenz-Key',
+    'settings.license.no_key':                 'Kein Key gespeichert',
+    'settings.license.changeable_hint':        'Jederzeit änderbar',
+    'settings.license.change_btn':             'Ändern',
+    /* Devices (Pairing) */
+    'settings.devices.add_title':              'Weiteres Gerät einrichten',
+    'settings.devices.add_intro':              'Installiere FinanceBird auf einem anderen Gerät und verbinde es mit deinem bestehenden Account.',
+    'settings.devices.pairing_code_label':     'Kopplungscode',
+    'settings.devices.copy_btn':               'Kopieren',
+    'settings.devices.qr_hint':                'Scanne den QR-Code oder öffne die URL. Installiere die App auf dem Homescreen und gib den Code ein.',
+    'settings.devices.generate_btn':           'Kopplungscode generieren',
+    /* Privacy */
+    'settings.privacy.label':                  'Datenschutzerklärung',
+    'settings.privacy.show_btn':               'Anzeigen',
+    /* Diagnostics */
+    'settings.diagnostics.health':             'App-Gesundheit',
+    'settings.diagnostics.sync_now':           'Sync jetzt',
+    'settings.diagnostics.queue_send':         'Queue senden',
+    /* Danger zone */
+    'settings.danger.queue_clear_label':       'Queue leeren',
+    'settings.danger.queue_clear_hint':        'Fehlgeschlagene Einträge entfernen',
+    'settings.danger.queue_clear_btn':         'Queue leeren',
+    'settings.danger.reset_label':             'Alle lokalen Daten löschen',
+    'settings.danger.reset_hint':              'Keys, Cache, Queue — Notion bleibt erhalten',
+    'settings.danger.reset_btn':               'Reset',
+    /* Error fallback */
+    'settings.error.load_failed':              'Einstellungen konnten nicht geladen werden',
+    'settings.error.unknown':                  'Unbekannter Fehler',
+    'settings.error.retry':                    'Nochmal versuchen',
+
+    /* S35 Sprint 6.5c Gruppe 15 — CSV-Import-Modal + Logik */
+    'csv.subtitle.step1':           'Schritt 1 — Datei wählen',
+    'csv.subtitle.step2':           'Schritt 2 — Spalten zuordnen',
+    'csv.subtitle.step3':           'Schritt 3 — Vorschau',
+    'csv.subtitle.step4':           'Fertig',
+    'csv.drop.title':               'CSV-Datei hierher ziehen',
+    'csv.drop.hint':                'oder klicken zum Auswählen — .csv, .txt',
+    'csv.formats.label':            'Unterstützte Formate:',
+    'csv.formats.value':            'Bankauszug CSV, Kreditkarten-Export, eigene Tabellen.',
+    'csv.formats.separator':        'Trennzeichen: Komma, Semikolon oder Tab. Erste Zeile = Spaltenköpfe.',
+    'csv.formats.ai_mapping_hint':  '<span style="color:var(--accent)">AI-Mapping</span> erkennt automatisch welche Spalte was bedeutet.',
+    'csv.preview.label':            'Vorschau (erste 5 Zeilen)',
+    'csv.ai.title':                 'AI-Spalten-Mapping',
+    'csv.ai.subtitle':              'Claude analysiert deine Spalten und ordnet sie zu',
+    'csv.ai.btn':                   '✨ Mapping analysieren',
+    'csv.ai.running':               'Claude analysiert deine Spalten…',
+    'csv.ai.success':               '✓ AI-Mapping erfolgreich — bitte prüfen und anpassen',
+    'csv.ai.failed':                '⚠️ AI-Mapping fehlgeschlagen — manuelle Zuordnung',
+    /* S35 Sprint 6.5c Gruppe 15 — CSV-Import Reste */
+    'csv.ai.no_key':                '⚠️ Kein Claude API Key — manuelle Zuordnung nutzen',
+    'csv.ai.btn_retry':             '✨ Erneut analysieren',
+    'csv.mapping.title':            'Spalten-Zuordnung (anpassbar)',
+    'csv.mapping.unmapped':         'nicht zuordnen',
+    'csv.btn.back':                 '← Zurück',
+    'csv.btn.next':                 'Weiter → Vorschau',
+    'csv.btn.import':               'Importieren →',
+    'csv.btn.done':                 'Zu den Buchungen →',
+    'csv.screen3.title':            'So werden deine Buchungen aussehen',
+    'csv.col.date':                 'Datum',
+    'csv.col.desc':                 'Beschreibung',
+    'csv.col.amount':               'Betrag',
+    'csv.col.type':                 'Typ',
+    'csv.col.category':             'Kategorie',
+    'csv.field.date':               'Datum',
+    'csv.field.amount':             'Betrag',
+    'csv.field.desc':               'Beschreibung',
+    'csv.field.type':               'Typ (Ein/Aus)',
+    'csv.field.counterparty':       'Gegenpartei',
+    'csv.field.category':           'Kategorie',
+    'csv.field.domain':             'Bereich',
+    'csv.field.paid':               'Bezahlt',
+    'csv.field.note':               'Notiz',
+    'csv.result.success':           'Import abgeschlossen',
+    'csv.result.partial':           'Import mit Fehlern',
+    'csv.result.importing':         'Importiere…',
+    'csv.error.too_few_rows':       'CSV hat zu wenig Zeilen',
+
+    /* S35 Sprint 6.5c Gruppe 17 — REGION_CONFIG Display-Layer */
+    /* Region labels */
+    'region.CH':                                 '🇨🇭 Schweiz',
+    'region.DE':                                 '🇩🇪 Deutschland',
+    'region.AT':                                 '🇦🇹 Österreich',
+    'region.OTHER':                              '🌍 Anderes',
+    /* Categories — Income */
+    'category.umsatzerloese':                    'Umsatzerlöse',
+    'category.uebrige_betriebliche_ertraege':    'Übrige betriebliche Erträge',
+    'category.zins_finanzertraege':              'Zins- & Finanzerträge',
+    /* Categories — Expense */
+    'category.material_waren':                   'Material & Waren',
+    'category.fremdleistungen':                  'Fremdleistungen',
+    'category.loehne_gehaelter':                 'Löhne & Gehälter',
+    'category.sozialabgaben_mitarbeitende':      'Sozialabgaben (Mitarbeitende)',
+    'category.eigene_sozialversicherung':        'Eigene Sozialversicherung',
+    'category.abschreibungen_gwg':               'Abschreibungen & GWG',
+    'category.miete_pacht':                      'Miete & Pacht',
+    'category.nebenkosten_liegenschaft':         'Nebenkosten & Liegenschaft',
+    'category.fahrzeug_transport':               'Fahrzeug & Transport',
+    'category.reise_spesen':                     'Reise & Spesen',
+    'category.kommunikation':                    'Kommunikation',
+    'category.buero_it':                         'Büro & IT',
+    'category.versicherungen':                   'Versicherungen',
+    'category.werbung_marketing':                'Werbung & Marketing',
+    'category.beratung_recht':                   'Beratung & Recht',
+    'category.zins_bankgebuehren':               'Zins- & Bankgebühren',
+    'category.uebriger_betriebsaufwand':         'Übriger Betriebsaufwand',
+    /* Categories — Private */
+    'category.einkauf_lebensmittel':             'Einkauf & Lebensmittel',
+    'category.essen_auswaerts':                  'Essen auswärts',
+    'category.kleider':                          'Kleider',
+    'category.reisen':                           'Reisen',
+    'category.gesundheit':                       'Gesundheit',
+    'category.sport':                            'Sport',
+    'category.schuldenrueckzahlung':             'Schuldenrückzahlung',
+    'category.3_saeule':                         '3. Säule',
+    'category.riester_ruerup':                   'Riester / Rürup',
+    'category.zukunftsvorsorge':                 'Zukunftsvorsorge',
+    'category.baby':                             'Baby',
+    'category.wohnen':                           'Wohnen',
+    'category.uebriges_privat':                  'Übriges Privat',
+    /* Tax categories — CH (DE/AT taxMapping values are official codes EÜR/E1a → Anker) */
+    'tax_cat.umsatz_ertrag':                     'Umsatz / Ertrag',
+    'tax_cat.uebrige_ertraege':                  'Übrige Erträge',
+    'tax_cat.finanzertraege':                    'Finanzerträge',
+    'tax_cat.direkter_aufwand':                  'Direkter Aufwand',
+    'tax_cat.personalaufwand':                   'Personalaufwand',
+    'tax_cat.ahv_iv_eo_beitraege':               'AHV/IV/EO-Beiträge',
+    'tax_cat.abschreibungen':                    'Abschreibungen',
+    'tax_cat.raumaufwand':                       'Raumaufwand',
+    'tax_cat.fahrzeugaufwand':                   'Fahrzeugaufwand',
+    'tax_cat.reisespesen':                       'Reisespesen',
+    'tax_cat.verwaltungsaufwand':                'Verwaltungsaufwand',
+    'tax_cat.versicherungen':                    'Versicherungen',
+    'tax_cat.werbeaufwand':                      'Werbeaufwand',
+    'tax_cat.finanzaufwand':                     'Finanzaufwand',
+    'tax_cat.uebriger_betriebsaufwand':          'Übriger Betriebsaufwand',
+    /* Invoice types */
+    'invoice_type.dienstleistung':               'Dienstleistung',
+    'invoice_type.beratung':                     'Beratung',
+    'invoice_type.produkt':                      'Produkt',
+    'invoice_type.lizenz':                       'Lizenz',
+    'invoice_type.vermietung':                   'Vermietung',
+    'invoice_type.sonstiges':                    'Sonstiges',
+    /* S35 Sprint 6.5c Gruppe 17 — Invoice-Type Custom-Add Strings (Logik außerhalb REGION_CONFIG) */
+    'invoice_type.add_custom_option':            'Eigene hinzufügen…',
+    'invoice_type.add_custom_prompt':            'Neuen Rechnungstyp eingeben:',
+    /* MWST methods (CH only) */
+    'mwst_method.effektiv':                      'Effektiv',
+    'mwst_method.saldo':                         'Saldo',
+    /* Region tax-form labels — display side */
+    'region_label.tax_category':                 'Steuerkategorie',
+    /* S35 Sprint 6.5c Gruppe 12 — Onboarding (Welcome, License, Connect, Country, Accounts, Integrations, Overview, Pairing, Repair) */
+    /* Generic */
+    'ob.back':                                   '← Zurück',
+    /* Welcome screen */
+    'ob.welcome.lang_de_title':                  'Deutsch',
+    'ob.welcome.lang_en_title':                  'English',
+    'ob.welcome.subtitle':                       'Persönlicher Finanzcompanion',
+    'ob.welcome.pillar1_title':                  'Buchhaltung',
+    'ob.welcome.pillar1_body':                   'Sauber, robust, intuitiv — volle Übersicht über Einnahmen und Ausgaben.',
+    'ob.welcome.pillar2_title':                  'Aktivitäten',
+    'ob.welcome.pillar2_body':                   'Wie investierst du deine Zeit? Verbindet dein Zeiterfassungstool und macht es sichtbar.',
+    'ob.welcome.pillar3_title':                  'Kompass',
+    'ob.welcome.pillar3_body':                   'Zum Beispiel: Wie viel bezahlte Arbeit brauche ich um Kosten zu decken — und wie viel Spielraum bleibt für Arbeit die ich aus anderen Gründen mache?',
+    'ob.welcome.privacy_promise':                'Du bekommst nicht einen Account auf unserem Server — du bekommst ein Werkzeug.<br><strong style="color:var(--ink2)">Deine Daten gehören dir, leben bei dir, und wir sehen sie nie.</strong><br><span style="font-size:11.5px">Deine Einstellungen und API-Keys werden verschlüsselt in deinem Notion gespeichert, damit du FinanceBird auf mehreren Geräten nutzen kannst.</span>',
+    'ob.welcome.cta_setup':                      'Neu einrichten →',
+    'ob.welcome.cta_meta':                       'ca. 5 Minuten · einmalig · jederzeit anpassbar',
+    'ob.welcome.cta_pair':                       'Bereits eingerichtet? Gerät koppeln',
+    /* License screen */
+    'ob.license.step_label':                     'Schritt 1 von 5',
+    'ob.license.title':                          'Dein Lizenz-Key',
+    'ob.license.body':                           'Du hast einen Key per E-Mail erhalten.',
+    'ob.license.check_btn':                      'Prüfen',
+    'ob.license.no_key_label':                   'Noch keinen Key?',
+    'ob.license.changeable':                     'Jederzeit in den Einstellungen änderbar.',
+    /* Connect screen */
+    'ob.connect.title':                          'Verbinde dein Notion',
+    'ob.connect.body':                           'Deine Finanzdaten werden bei dir zu Hause sein — in deinem eigenen Notion. FinanceBird legt dort Datenbanken an für Buchungen, Konten, Projekte und mehr. Einzig Belege werden in deinem Google Drive gespeichert.',
+    'ob.connect.cta':                            'Mit Notion verbinden →',
+    'ob.connect.what_happens':                   '<div style="font-weight:600;margin-bottom:6px">📋 Was gleich passiert:</div>Notion fragt dich, welche Seiten FinanceBird sehen darf. <strong>Wähle mindestens eine Seite aus</strong> — dort werden deine Datenbanken automatisch angelegt.<br><br><strong>Tipp:</strong> Erstelle in Notion eine leere Seite mit dem Namen <em>„FinanceBird"</em> unter <em>Privat</em> und wähle diese aus — so bleiben deine Finanzdaten übersichtlich an einem Ort.',
+    'ob.connect.no_notion':                      'Noch kein Notion?',
+    'ob.connect.free_label':                     '(kostenlos)',
+    'ob.connect.waiting':                        'Warte auf Notion-Verbindung…',
+    'ob.connect.tab_hint':                       'Ein Notion-Tab sollte sich geöffnet haben.<br>Verbinde FinanceBird dort mit deinem Workspace.',
+    'ob.connect.retry':                          'Nochmal versuchen',
+    'ob.connect.manual_token':                   'Token manuell eingeben',
+    'ob.connect.manual_label':                   'Manueller Token (Fallback)',
+    'ob.connect.connect_btn':                    'Verbinden',
+    'ob.connect.privacy_footer':                 '🔒 Deine Daten bleiben in deinem Notion-Workspace. FinanceBird sieht sie nie.',
+    'ob.connect.privacy_link':                   'Datenschutzerklärung →',
+    /* Country screen */
+    'ob.country.setup_meta':                     'Das Setup dauert 2 Minuten. Alles ist nachher anpassbar.',
+    'ob.country.title':                          'In welchem Land ist deine Tätigkeit zu Hause?',
+    'ob.country.ch':                             '🇨🇭 Schweiz (CHF)',
+    'ob.country.de':                             '🇩🇪 Deutschland (EUR)',
+    'ob.country.at':                             '🇦🇹 Österreich (EUR)',
+    'ob.country.other':                          '🌍 Anderes Land',
+    'ob.country.other_placeholder':              'Land',
+    'ob.country.continue':                       'Weiter →',
+    /* Accounts screen */
+    'ob.accounts.title':                         'Welche Konten nutzt du?',
+    'ob.accounts.sub':                           'Wähle oder tippe eigene Namen ein.<br><span style="font-size:11px">Du kannst Konten später jederzeit anpassen — du brauchst jetzt mindestens 1.</span>',
+    'ob.accounts.custom_placeholder':            'Eigenes Konto…',
+    'ob.accounts.add_btn':                       '+ Hinzufügen',
+    'ob.accounts.continue':                      'Weiter →',
+    /* Integrations screen */
+    'ob.int.title':                              'Verknüpfungen & Integrationen',
+    'ob.int.sub':                                'FinanceBird wird stärker mit jeder Verbindung. Du kannst alles auch später einrichten.',
+    'ob.int.tile_db':                            'Datenbank',
+    'ob.int.tile_db_sub':                        'Wo deine Daten gespeichert werden',
+    'ob.int.tile_storage':                       'Ablage',
+    'ob.int.tile_storage_sub':                   'Wo deine Belege gespeichert werden',
+    'ob.int.tile_time':                          'Zeiterfassung',
+    'ob.int.tile_time_sub':                      'Buchhaltung im Kontext deiner Zeit',
+    'ob.int.tile_ai':                            'KI Features',
+    'ob.int.tile_ai_sub':                        'Belege automatisch auslesen',
+    'ob.int.drive_struct_label':                 '📁 Ordnerstruktur in Google Drive:',
+    'ob.int.drive_hint':                         'FinanceBird erstellt einen Ordner in deinem Google Drive. Du kannst ihn danach frei verschieben oder umbenennen — die App findet ihn über die Folder-ID trotzdem.',
+    'ob.int.extension_label':                    'Erweiterung',
+    'ob.int.clockify_intro':                     '<strong>Clockify</strong> trackt deine Zeit — FinanceBird macht daraus Stundensätze und Projektvergleiche.',
+    'ob.int.clockify_steps':                     '<strong style="color:var(--ink2)">So findest du den Key:</strong><br>1. Öffne <a href="https://clockify.me/user/settings" target="_blank" style="color:var(--accent);text-decoration:none">clockify.me/user/settings</a><br>2. Scrolle zu «API»<br>3. Kopiere den Key',
+    'ob.int.clockify_label':                     'Clockify API Key',
+    'ob.int.api_key_placeholder':                'API Key',
+    'ob.int.save_btn':                           'Speichern',
+    'ob.int.skip_btn':                           'Überspringen',
+    'ob.int.ki_intro':                           '<strong>KI-Beleganalyse</strong> — liest Belege automatisch: Betrag, Datum, Händler, Kategorie. Kosten: ~0.01 CHF pro Beleg.',
+    'ob.int.ki_privacy':                         '🔒 Deine Belege gehen nie durch unsere Server.',
+    'ob.int.ki_steps':                           '<strong style="color:var(--ink2)">So findest du den Key:</strong><br>1. Öffne <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent);text-decoration:none">console.anthropic.com/settings/keys</a><br>2. Klicke «Create Key»<br>3. Kopiere den Key (beginnt mit sk-ant-…)',
+    'ob.int.ki_label':                           'Claude API Key',
+    'ob.int.connect_notion':                     'Notion verbinden',
+    'ob.int.notion_required':                    'Notion ist Pflicht · alles andere jederzeit nachholbar',
+    'ob.int.polling_status':                     'Warte auf Notion-Verbindung…',
+    'ob.int.polling_hint':                       'Notion öffnet sich in einem neuen Tab oder Fenster. Schliesse es nach der Verbindung nicht — kehre hier zurück.',
+    /* Overview screen */
+    'ob.overview.checking':                      'System wird geprüft…',
+    'ob.overview.subtitle':                      'Alles jederzeit in den Einstellungen anpassbar.',
+    'ob.overview.feedback':                      '📬 Feedback jederzeit über das Menü → Feedback',
+    /* Pairing screen */
+    'ob.pairing.title':                          'Gerät koppeln',
+    'ob.pairing.body':                           'Den 6-stelligen Code findest du auf deinem anderen Gerät unter Einstellungen → Weiteres Gerät.',
+    'ob.pairing.connect':                        'Verbinden',
+    'ob.pairing.no_code':                        'Keinen Code?',
+    'ob.pairing.fallback_link':                  'Lizenz-Key direkt eingeben →',
+    'ob.pairing.gdrive_note':                    '<strong style="color:var(--ink2)">Hinweis:</strong> Google Drive wird aus Sicherheitsgründen auf jedem Gerät neu verbunden.',
+    /* S35 Sprint 6.5c Gruppe 18 — Datenschutzerklärung (renderDatenschutz) + QR-Fallbacks */
+    'privacy.header':                            'Datenschutzerklärung',
+    'privacy.date_label':                        'Stand',
+    'privacy.responsible_label':                 'Verantwortlich',
+    'privacy.s1_title':                          '1. Was ist FinanceBird?',
+    'privacy.s1_body':                           'FinanceBird ist eine Web-App (Progressive Web App) für persönliche Finanzverwaltung. Die App läuft vollständig in deinem Browser — es gibt keinen Account auf unserem Server.',
+    'privacy.s2_title':                          '2. Wo leben deine Daten?',
+    'privacy.s2_body':                           'Deine Finanzdaten leben ausschliesslich in deinem eigenen Notion-Workspace. Belegfotos werden in deinem eigenen Google Drive gespeichert. Wir haben keinen Zugriff auf diese Daten.',
+    'privacy.s3_title':                          '3. Was fliesst durch unseren Server?',
+    'privacy.s3_body':                           'FinanceBird nutzt einen Proxy-Server (Cloudflare Workers), damit dein Browser mit der Notion-API kommunizieren kann. Dein Notion-Zugriffstoken wird dabei durchgeleitet, aber nicht gespeichert, nicht gelesen und nicht geloggt. Der Proxy ist technisch so gebaut, dass er den Inhalt deiner Requests nicht sieht.',
+    'privacy.s4_title':                          '4. Was wird gespeichert?',
+    'privacy.s4_body':                           '<em>Auf unserem Server:</em> Dein Lizenz-Key (zur Prüfung deines Abonnements), temporäre OAuth-Tokens (10 Min TTL), temporäre Kopplungscodes (10 Min TTL).<br><em>Nicht gespeichert:</em> Keine Buchungen, Beträge, Belege, Kontoinformationen oder Nutzungsprofile.',
+    'privacy.s5_title':                          '5. Wer sieht was?',
+    'privacy.s5_body':                           'Du: Alles. Wir (Oswald H. König): Deinen Lizenz-Status. Sonst nichts. Cloudflare (Infrastruktur): Standard-Server-Logs. Notion + Google: Deine Daten gemäss deiner jeweiligen Vereinbarung.',
+    'privacy.s6_title':                          '6. Lokale Speicherung',
+    'privacy.s6_body':                           'FinanceBird verwendet keine Cookies. Die App speichert Konfigurationsdaten im lokalen Speicher deines Browsers (localStorage). Diese Daten verlassen dein Gerät nicht.',
+    'privacy.s7_title':                          '7. Deine Rechte',
+    'privacy.s7_body':                           'Du kannst jederzeit: Notion-Zugang widerrufen (Notion → Einstellungen → Integrationen), Google-Drive-Zugang widerrufen, Lizenz-Key deaktivieren lassen (hello@oswaldkoenig.ch), alle lokalen Daten löschen (Einstellungen → Zurücksetzen). Gemäss DSG + DSGVO hast du das Recht auf Auskunft, Berichtigung und Löschung.',
+    'privacy.close_btn':                         'Schliessen ×',
+    /* QR-Code Fallbacks */
+    'qr.unavailable':                            'QR-Code nicht verfügbar',
+    'qr.unavailable_offline':                    'QR-Code nicht verfügbar (offline)',
+    /* Repair screen */
+    'ob.repair.title':                           'Verbindung wiederherstellen',
+    'ob.repair.body':                            'Etwas muss repariert werden — das geht schnell.',
+    'ob.repair.license_label':                   'Lizenz-Key',
+    'ob.repair.check_btn':                       'Prüfen',
   },
   en: {
     'nav.cockpit':       'Cockpit',
@@ -3611,7 +3976,7 @@ const I18N = {
     'toast.not_ready_sub':         'Please finish setup first (connect Notion).',
     'toast.not_ready_action':      'Setup',
     'toast.dbs_count_ready':       '{n} databases ready',
-    'toast.dbs_ready':             'All databases ready',
+    /* BUG-079 S35: Duplicate definition removed — dominant is group 4 (S30) with 'Databases ready' */
     'toast.dbs_ready_sub':         'Your Notion databases are fully set up.',
     'toast.notion_error':          'Notion error',
     'toast.recurrings_migrated':   '{n} recurrings migrated',
@@ -4328,6 +4693,371 @@ const I18N = {
     'health.warn.cache_empty_action':'Start sync',
     'health.warn.no_konten':         'No accounts',
     'health.warn.no_konten_action':  'Configure in Notion',
+
+    /* S35 Sprint 6.5c Gruppe 16 — FIELD_HELP (8 × title+body) */
+    'field_help.gdrive_root.title':     'Root folder',
+    'field_help.gdrive_root.body':      'This folder is created in your Google Drive and contains all your receipts. You can move or rename it freely after connecting — the app remembers the folder ID.',
+    'field_help.gdrive_income.title':   'Income folder',
+    'field_help.gdrive_income.body':    'Receipts for income (e.g. invoice copies) land here. Yearly subfolders (2025, 2026…) are created automatically.',
+    'field_help.gdrive_expenses.title': 'Expense folder',
+    'field_help.gdrive_expenses.body':  'Receipts for expenses (invoices, bills) land here. Yearly subfolders are created automatically.',
+    'field_help.clockify_key.title':    'Clockify API key',
+    'field_help.clockify_key.body':     'Find your key at: clockify.me → profile icon → Profile Settings → API → Generate. Stored locally only.',
+    'field_help.claude_key.title':      'Claude API key',
+    'field_help.claude_key.body':       'Find your key at: console.anthropic.com → API Keys → Create Key. Stored locally only — never sent to our servers.',
+    'field_help.mwst_pflichtig.title':  'VAT registration',
+    'field_help.mwst_pflichtig.body':   'In Switzerland, VAT registration is mandatory above CHF 100,000 annual turnover. If you’re not registered, VAT fields are hidden.',
+    'field_help.ob_accounts.title':     'Bank accounts',
+    'field_help.ob_accounts.body':      'Enter your business accounts (e.g. UBS business account, PostFinance). They appear as a dropdown when recording transactions. At least 1 account recommended.',
+    'field_help.ob_country.title':      'Country & taxes',
+    'field_help.ob_country.body':       'The country determines VAT rates and the tax form mapping of your transactions. Available: Switzerland (CH), Germany (DE), Austria (AT).',
+
+    /* S35 Sprint 6.5c Gruppe 14 — GDrive-Einstellungen-Card */
+    'gdrive.field.root_name':        'Root folder name',
+    'gdrive.field.business_in':      'Business · Income',
+    'gdrive.field.business_out':     'Business · Expenses',
+    'gdrive.field.private_in':       'Private · Income',
+    'gdrive.field.private_out':      'Private · Expenses',
+    'gdrive.hint.configured':        'Receipts land in your Google Drive. You can rename folders — the app remembers folder IDs, not names.',
+    'gdrive.hint.not_connected':     'Connect Google Drive in the Connections card above, then you can configure the folder structure here.',
+    'gdrive.preview.label':          'Preview:',
+    'gdrive.preview.business':       'Business',
+    'gdrive.preview.private':        'Private',
+    'gdrive.preview.private_optional':'(if needed)',
+    'gdrive.footer.year_auto':       'Yearly subfolders are created automatically.',
+    'gdrive.footer.move_rename':     'You can move or rename folders in Google Drive freely — the app finds them via folder ID anyway.',
+    'gdrive.footer.no_rename':       'Existing folders are not renamed when you change the name here.',
+
+    /* S35 Sprint 6.5c Gruppe 13 — Settings (renderEinstellungen) */
+    /* Sections */
+    'settings.section.connections':            'Connections',
+    'settings.section.profile':                'Profile & Region',
+    'settings.section.thresholds':             'Thresholds',
+    'settings.section.country_tax':            'Country & Taxes',
+    'settings.section.receipts_storage':       'Receipt storage',
+    'settings.section.collaboration':          'Collaboration',
+    'settings.section.license_devices':        'License & Devices',
+    'settings.section.privacy':                'Privacy',
+    'settings.section.diagnostics':            'Diagnostics & Data',
+    'settings.section.danger_zone':            'Danger zone',
+    /* Buttons (re-used across sections) */
+    'settings.btn.sync':                       'Sync',
+    'settings.btn.logout':                     'Sign out',
+    'settings.btn.connect':                    'Connect',
+    'settings.btn.open':                       'Open',
+    /* Connections */
+    'settings.connections.encrypted_hint':     'Encrypted sync via Notion',
+    'settings.connections.integration':        'Integration',
+    'settings.connections.connected_via':      'Connected via {mode}',
+    'settings.connections.sync_at':            'Sync: {ts}',
+    'settings.connections.never_synced':       'never synced',
+    'settings.connections.decrypt_failed':     'Could not decrypt key — please re-enter',
+    'settings.connections.gdrive_label':       'Google Drive (receipts)',
+    'settings.connections.gdrive_connected':   'Connected — receipts uploaded automatically',
+    'settings.connections.vision_suffix':      '(receipt analysis)',
+    'settings.connections.api_key_set':        'API key set',
+    'settings.connections.api_key_missing':    'Not set',
+    /* Profile */
+    'settings.profile.language':               'Language',
+    'settings.profile.lang_de':                'Deutsch',
+    'settings.profile.lang_en':                'English',
+    'settings.profile.currency':               'Currency',
+    'settings.profile.dark_mode':              'Dark Mode',
+    'settings.profile.dark_on':                'On',
+    'settings.profile.dark_off':               'Off',
+    /* Thresholds */
+    'settings.thresholds.intro':               'Values for calculations and alerts.',
+    'settings.thresholds.buffer_label':        'Buffer target (CHF)',
+    'settings.thresholds.buffer_hint':         'Target size of liquidity buffer',
+    'settings.thresholds.target_rate_label':   'Target hourly rate (CHF/h)',
+    'settings.thresholds.target_rate_hint':    'Default for new projects',
+    'settings.thresholds.categories_label':    'Categories',
+    'settings.thresholds.categories_hint':     '20 default categories · automatic tax form mapping',
+    'settings.thresholds.standard_badge':      'STANDARD',
+    'settings.thresholds.mwst_label':          'VAT registered',
+    'settings.thresholds.mwst_visible':        'VAT fields visible when recording',
+    'settings.thresholds.mwst_hidden':         'VAT fields hidden when recording',
+    /* Country & Tax */
+    'settings.country_tax.country_label':      'Country',
+    'settings.country_tax.country_hint':       'Determines VAT rates and tax form mapping',
+    'settings.country_tax.mwst_method_label':  'VAT method',
+    'settings.country_tax.mwst_method_options':'Effective or flat rate',
+    'settings.country_tax.mwst_method_default':'Standard method',
+    'settings.country_tax.mwst_method_default_badge':'Standard',
+    /* Collaboration */
+    'settings.collaboration.intro':            'Work together with an Accountant. They can review transactions and suggest corrections.',
+    'settings.collaboration.add_btn':          '+ Add person',
+    /* License */
+    'settings.license.title':                  'License key',
+    'settings.license.no_key':                 'No key stored',
+    'settings.license.changeable_hint':        'Editable anytime',
+    'settings.license.change_btn':             'Change',
+    /* Devices (Pairing) */
+    'settings.devices.add_title':              'Set up another device',
+    'settings.devices.add_intro':              'Install FinanceBird on another device and connect it to your existing account.',
+    'settings.devices.pairing_code_label':     'Pairing code',
+    'settings.devices.copy_btn':               'Copy',
+    'settings.devices.qr_hint':                'Scan the QR code or open the URL. Install the app on the home screen and enter the code.',
+    'settings.devices.generate_btn':           'Generate pairing code',
+    /* Privacy */
+    'settings.privacy.label':                  'Privacy policy',
+    'settings.privacy.show_btn':               'View',
+    /* Diagnostics */
+    'settings.diagnostics.health':             'App health',
+    'settings.diagnostics.sync_now':           'Sync now',
+    'settings.diagnostics.queue_send':         'Send queue',
+    /* Danger zone */
+    'settings.danger.queue_clear_label':       'Clear queue',
+    'settings.danger.queue_clear_hint':        'Remove failed entries',
+    'settings.danger.queue_clear_btn':         'Clear queue',
+    'settings.danger.reset_label':             'Delete all local data',
+    'settings.danger.reset_hint':              'Keys, cache, queue — Notion remains intact',
+    'settings.danger.reset_btn':               'Reset',
+    /* Error fallback */
+    'settings.error.load_failed':              'Could not load settings',
+    'settings.error.unknown':                  'Unknown error',
+    'settings.error.retry':                    'Try again',
+
+    /* S35 Sprint 6.5c Gruppe 15 — CSV-Import-Modal + Logik */
+    'csv.subtitle.step1':           'Step 1 — Choose file',
+    'csv.subtitle.step2':           'Step 2 — Map columns',
+    'csv.subtitle.step3':           'Step 3 — Preview',
+    'csv.subtitle.step4':           'Done',
+    'csv.drop.title':               'Drag CSV file here',
+    'csv.drop.hint':                'or click to select — .csv, .txt',
+    'csv.formats.label':            'Supported formats:',
+    'csv.formats.value':            'Bank statement CSV, credit card export, your own spreadsheets.',
+    'csv.formats.separator':        'Separator: comma, semicolon or tab. First row = column headers.',
+    'csv.formats.ai_mapping_hint':  '<span style="color:var(--accent)">AI mapping</span> automatically detects what each column means.',
+    'csv.preview.label':            'Preview (first 5 rows)',
+    'csv.ai.title':                 'AI column mapping',
+    'csv.ai.subtitle':              'Claude analyzes your columns and maps them',
+    'csv.ai.btn':                   '✨ Analyze mapping',
+    'csv.ai.running':               'Claude is analyzing your columns…',
+    'csv.ai.success':               '✓ AI mapping succeeded — please review and adjust',
+    'csv.ai.failed':                '⚠️ AI mapping failed — manual mapping required',
+    /* S35 Sprint 6.5c Gruppe 15 — CSV-Import Reste */
+    'csv.ai.no_key':                '⚠️ No Claude API key — use manual mapping',
+    'csv.ai.btn_retry':             '✨ Re-analyze',
+    'csv.mapping.title':            'Column mapping (adjustable)',
+    'csv.mapping.unmapped':         'not mapped',
+    'csv.btn.back':                 '← Back',
+    'csv.btn.next':                 'Next → Preview',
+    'csv.btn.import':               'Import →',
+    'csv.btn.done':                 'Go to transactions →',
+    'csv.screen3.title':            'This is how your transactions will look',
+    'csv.col.date':                 'Date',
+    'csv.col.desc':                 'Description',
+    'csv.col.amount':               'Amount',
+    'csv.col.type':                 'Type',
+    'csv.col.category':             'Category',
+    'csv.field.date':               'Date',
+    'csv.field.amount':             'Amount',
+    'csv.field.desc':               'Description',
+    'csv.field.type':               'Type (in/out)',
+    'csv.field.counterparty':       'Counterparty',
+    'csv.field.category':           'Category',
+    'csv.field.domain':             'Domain',
+    'csv.field.paid':               'Paid',
+    'csv.field.note':               'Note',
+    'csv.result.success':           'Import complete',
+    'csv.result.partial':           'Import finished with errors',
+    'csv.result.importing':         'Importing…',
+    'csv.error.too_few_rows':       'CSV has too few rows',
+
+    /* S35 Sprint 6.5c Gruppe 17 — REGION_CONFIG Display-Layer */
+    /* Region labels */
+    'region.CH':                                 '🇨🇭 Switzerland',
+    'region.DE':                                 '🇩🇪 Germany',
+    'region.AT':                                 '🇦🇹 Austria',
+    'region.OTHER':                              '🌍 Other',
+    /* Categories — Income */
+    'category.umsatzerloese':                    'Sales revenue',
+    'category.uebrige_betriebliche_ertraege':    'Other operating income',
+    'category.zins_finanzertraege':              'Interest & financial income',
+    /* Categories — Expense */
+    'category.material_waren':                   'Materials & goods',
+    'category.fremdleistungen':                  'Subcontracting',
+    'category.loehne_gehaelter':                 'Wages & salaries',
+    'category.sozialabgaben_mitarbeitende':      'Social contributions (employees)',
+    'category.eigene_sozialversicherung':        'Own social insurance',
+    'category.abschreibungen_gwg':               'Depreciation & low-value assets',
+    'category.miete_pacht':                      'Rent & lease',
+    'category.nebenkosten_liegenschaft':         'Utilities & property',
+    'category.fahrzeug_transport':               'Vehicles & transport',
+    'category.reise_spesen':                     'Travel & expenses',
+    'category.kommunikation':                    'Communication',
+    'category.buero_it':                         'Office & IT',
+    'category.versicherungen':                   'Insurance',
+    'category.werbung_marketing':                'Advertising & marketing',
+    'category.beratung_recht':                   'Consulting & legal',
+    'category.zins_bankgebuehren':               'Interest & bank fees',
+    'category.uebriger_betriebsaufwand':         'Other operating expenses',
+    /* Categories — Private */
+    'category.einkauf_lebensmittel':             'Groceries',
+    'category.essen_auswaerts':                  'Eating out',
+    'category.kleider':                          'Clothing',
+    'category.reisen':                           'Travel',
+    'category.gesundheit':                       'Health',
+    'category.sport':                            'Sports',
+    'category.schuldenrueckzahlung':             'Debt repayment',
+    'category.3_saeule':                         '3. Säule',
+    'category.riester_ruerup':                   'Riester / Rürup',
+    'category.zukunftsvorsorge':                 'Pension provision',
+    'category.baby':                             'Baby',
+    'category.wohnen':                           'Housing',
+    'category.uebriges_privat':                  'Other private',
+    /* Tax categories — CH */
+    'tax_cat.umsatz_ertrag':                     'Revenue / Income',
+    'tax_cat.uebrige_ertraege':                  'Other income',
+    'tax_cat.finanzertraege':                    'Financial income',
+    'tax_cat.direkter_aufwand':                  'Direct costs',
+    'tax_cat.personalaufwand':                   'Personnel costs',
+    'tax_cat.ahv_iv_eo_beitraege':               'AHV/IV/EO contributions',
+    'tax_cat.abschreibungen':                    'Depreciation',
+    'tax_cat.raumaufwand':                       'Property costs',
+    'tax_cat.fahrzeugaufwand':                   'Vehicle costs',
+    'tax_cat.reisespesen':                       'Travel expenses',
+    'tax_cat.verwaltungsaufwand':                'Administrative costs',
+    'tax_cat.versicherungen':                    'Insurance',
+    'tax_cat.werbeaufwand':                      'Advertising costs',
+    'tax_cat.finanzaufwand':                     'Finance costs',
+    'tax_cat.uebriger_betriebsaufwand':          'Other operating expenses',
+    /* Invoice types */
+    'invoice_type.dienstleistung':               'Service',
+    'invoice_type.beratung':                     'Consulting',
+    'invoice_type.produkt':                      'Product',
+    'invoice_type.lizenz':                       'License',
+    'invoice_type.vermietung':                   'Rental',
+    'invoice_type.sonstiges':                    'Other',
+    /* S35 Sprint 6.5c Gruppe 17 — Invoice-Type Custom-Add Strings (Logik außerhalb REGION_CONFIG) */
+    'invoice_type.add_custom_option':            'Add custom…',
+    'invoice_type.add_custom_prompt':            'Enter new invoice type:',
+    /* MWST methods (CH only) */
+    'mwst_method.effektiv':                      'Effective',
+    'mwst_method.saldo':                         'Flat rate',
+    /* Region tax-form labels — display side */
+    'region_label.tax_category':                 'Tax category',
+    /* S35 Sprint 6.5c Gruppe 12 — Onboarding (Welcome, License, Connect, Country, Accounts, Integrations, Overview, Pairing, Repair) */
+    /* Generic */
+    'ob.back':                                   '← Back',
+    /* Welcome screen */
+    'ob.welcome.lang_de_title':                  'German',
+    'ob.welcome.lang_en_title':                  'English',
+    'ob.welcome.subtitle':                       'Personal finance companion',
+    'ob.welcome.pillar1_title':                  'Bookkeeping',
+    'ob.welcome.pillar1_body':                   'Clean, robust, intuitive — full overview of income and expenses.',
+    'ob.welcome.pillar2_title':                  'Activities',
+    'ob.welcome.pillar2_body':                   'How are you investing your time? Connects your time-tracking tool and makes it visible.',
+    'ob.welcome.pillar3_title':                  'Compass',
+    'ob.welcome.pillar3_body':                   'For example: how much paid work do I need to cover costs — and how much room is left for work I do for other reasons?',
+    'ob.welcome.privacy_promise':                'You don\'t get an account on our server — you get a tool.<br><strong style="color:var(--ink2)">Your data belongs to you, lives with you, and we never see it.</strong><br><span style="font-size:11.5px">Your settings and API keys are encrypted in your Notion so you can use FinanceBird across devices.</span>',
+    'ob.welcome.cta_setup':                      'Set up new →',
+    'ob.welcome.cta_meta':                       'about 5 minutes · one-time · adjustable any time',
+    'ob.welcome.cta_pair':                       'Already set up? Pair device',
+    /* License screen */
+    'ob.license.step_label':                     'Step 1 of 5',
+    'ob.license.title':                          'Your license key',
+    'ob.license.body':                           'You received a key by email.',
+    'ob.license.check_btn':                      'Check',
+    'ob.license.no_key_label':                   'No key yet?',
+    'ob.license.changeable':                     'Changeable any time in Settings.',
+    /* Connect screen */
+    'ob.connect.title':                          'Connect your Notion',
+    'ob.connect.body':                           'Your finance data lives at home — in your own Notion. FinanceBird creates databases there for transactions, accounts, projects and more. Only receipts are stored in your Google Drive.',
+    'ob.connect.cta':                            'Connect to Notion →',
+    'ob.connect.what_happens':                   '<div style="font-weight:600;margin-bottom:6px">📋 What happens next:</div>Notion asks which pages FinanceBird may see. <strong>Pick at least one page</strong> — your databases will be created there automatically.<br><br><strong>Tip:</strong> Create an empty page in Notion called <em>„FinanceBird"</em> under <em>Private</em> and select it — keeps your finance data tidy in one place.',
+    'ob.connect.no_notion':                      'No Notion yet?',
+    'ob.connect.free_label':                     '(free)',
+    'ob.connect.waiting':                        'Waiting for Notion connection…',
+    'ob.connect.tab_hint':                       'A Notion tab should have opened.<br>Connect FinanceBird there to your workspace.',
+    'ob.connect.retry':                          'Try again',
+    'ob.connect.manual_token':                   'Enter token manually',
+    'ob.connect.manual_label':                   'Manual token (fallback)',
+    'ob.connect.connect_btn':                    'Connect',
+    'ob.connect.privacy_footer':                 '🔒 Your data stays in your Notion workspace. FinanceBird never sees it.',
+    'ob.connect.privacy_link':                   'Privacy policy →',
+    /* Country screen */
+    'ob.country.setup_meta':                     'Setup takes 2 minutes. Everything is adjustable later.',
+    'ob.country.title':                          'Where is your work based?',
+    'ob.country.ch':                             '🇨🇭 Switzerland (CHF)',
+    'ob.country.de':                             '🇩🇪 Germany (EUR)',
+    'ob.country.at':                             '🇦🇹 Austria (EUR)',
+    'ob.country.other':                          '🌍 Other country',
+    'ob.country.other_placeholder':              'Country',
+    'ob.country.continue':                       'Continue →',
+    /* Accounts screen */
+    'ob.accounts.title':                         'Which accounts do you use?',
+    'ob.accounts.sub':                           'Pick from suggestions or type your own.<br><span style="font-size:11px">You can adjust accounts any time — you need at least 1 now.</span>',
+    'ob.accounts.custom_placeholder':            'Custom account…',
+    'ob.accounts.add_btn':                       '+ Add',
+    'ob.accounts.continue':                      'Continue →',
+    /* Integrations screen */
+    'ob.int.title':                              'Connections & integrations',
+    'ob.int.sub':                                'FinanceBird gets stronger with every connection. You can set up everything later too.',
+    'ob.int.tile_db':                            'Database',
+    'ob.int.tile_db_sub':                        'Where your data is stored',
+    'ob.int.tile_storage':                       'Storage',
+    'ob.int.tile_storage_sub':                   'Where your receipts are stored',
+    'ob.int.tile_time':                          'Time tracking',
+    'ob.int.tile_time_sub':                      'Bookkeeping in the context of your time',
+    'ob.int.tile_ai':                            'AI features',
+    'ob.int.tile_ai_sub':                        'Read receipts automatically',
+    'ob.int.drive_struct_label':                 '📁 Folder structure in Google Drive:',
+    'ob.int.drive_hint':                         'FinanceBird creates a folder in your Google Drive. You can move or rename it freely afterwards — the app finds it via folder ID.',
+    'ob.int.extension_label':                    'Extension',
+    'ob.int.clockify_intro':                     '<strong>Clockify</strong> tracks your time — FinanceBird turns it into hourly rates and project comparisons.',
+    'ob.int.clockify_steps':                     '<strong style="color:var(--ink2)">Where to find the key:</strong><br>1. Open <a href="https://clockify.me/user/settings" target="_blank" style="color:var(--accent);text-decoration:none">clockify.me/user/settings</a><br>2. Scroll to «API»<br>3. Copy the key',
+    'ob.int.clockify_label':                     'Clockify API key',
+    'ob.int.api_key_placeholder':                'API key',
+    'ob.int.save_btn':                           'Save',
+    'ob.int.skip_btn':                           'Skip',
+    'ob.int.ki_intro':                           '<strong>AI receipt analysis</strong> — reads receipts automatically: amount, date, merchant, category. Cost: ~0.01 CHF per receipt.',
+    'ob.int.ki_privacy':                         '🔒 Your receipts never go through our servers.',
+    'ob.int.ki_steps':                           '<strong style="color:var(--ink2)">Where to find the key:</strong><br>1. Open <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent);text-decoration:none">console.anthropic.com/settings/keys</a><br>2. Click «Create Key»<br>3. Copy the key (starts with sk-ant-…)',
+    'ob.int.ki_label':                           'Claude API key',
+    'ob.int.connect_notion':                     'Connect Notion',
+    'ob.int.notion_required':                    'Notion is required · everything else can be added later',
+    'ob.int.polling_status':                     'Waiting for Notion connection…',
+    'ob.int.polling_hint':                       'Notion opens in a new tab or window. Don\'t close it after connecting — return here.',
+    /* Overview screen */
+    'ob.overview.checking':                      'Checking your setup…',
+    'ob.overview.subtitle':                      'Adjustable any time in Settings.',
+    'ob.overview.feedback':                      '📬 Feedback any time via Menu → Feedback',
+    /* Pairing screen */
+    'ob.pairing.title':                          'Pair device',
+    'ob.pairing.body':                           'Find the 6-character code on your other device under Settings → Another device.',
+    'ob.pairing.connect':                        'Connect',
+    'ob.pairing.no_code':                        'No code?',
+    'ob.pairing.fallback_link':                  'Enter license key directly →',
+    'ob.pairing.gdrive_note':                    '<strong style="color:var(--ink2)">Note:</strong> For security reasons, Google Drive is reconnected on each device.',
+    /* S35 Sprint 6.5c Gruppe 18 — Datenschutzerklärung (renderDatenschutz) + QR-Fallbacks */
+    'privacy.header':                            'Privacy policy',
+    'privacy.date_label':                        'As of',
+    'privacy.responsible_label':                 'Controller',
+    'privacy.s1_title':                          '1. What is FinanceBird?',
+    'privacy.s1_body':                           'FinanceBird is a web app (Progressive Web App) for personal finance management. The app runs entirely in your browser — there is no account on our server.',
+    'privacy.s2_title':                          '2. Where does your data live?',
+    'privacy.s2_body':                           'Your finance data lives exclusively in your own Notion workspace. Receipt photos are stored in your own Google Drive. We have no access to this data.',
+    'privacy.s3_title':                          '3. What flows through our server?',
+    'privacy.s3_body':                           'FinanceBird uses a proxy server (Cloudflare Workers) so your browser can talk to the Notion API. Your Notion access token passes through but is not stored, not read, and not logged. The proxy is built so it cannot see the content of your requests.',
+    'privacy.s4_title':                          '4. What is stored?',
+    'privacy.s4_body':                           '<em>On our server:</em> Your license key (to verify your subscription), temporary OAuth tokens (10 min TTL), temporary pairing codes (10 min TTL).<br><em>Not stored:</em> No transactions, amounts, receipts, account info, or usage profiles.',
+    'privacy.s5_title':                          '5. Who sees what?',
+    'privacy.s5_body':                           'You: everything. We (Oswald H. König): your license status. Nothing else. Cloudflare (infrastructure): standard server logs. Notion + Google: your data per your respective agreements with them.',
+    'privacy.s6_title':                          '6. Local storage',
+    'privacy.s6_body':                           'FinanceBird does not use cookies. The app stores configuration data in your browser\'s local storage (localStorage). This data does not leave your device.',
+    'privacy.s7_title':                          '7. Your rights',
+    'privacy.s7_body':                           'You can at any time: revoke Notion access (Notion → Settings → Integrations), revoke Google Drive access, deactivate your license key (hello@oswaldkoenig.ch), delete all local data (Settings → Reset). Per DSG + GDPR you have the right to access, rectify, and delete.',
+    'privacy.close_btn':                         'Close ×',
+    /* QR-Code Fallbacks */
+    'qr.unavailable':                            'QR code unavailable',
+    'qr.unavailable_offline':                    'QR code unavailable (offline)',
+    /* Repair screen */
+    'ob.repair.title':                           'Restore connection',
+    'ob.repair.body':                            'Something needs fixing — this is quick.',
+    'ob.repair.license_label':                   'License key',
+    'ob.repair.check_btn':                       'Check',
   }
 };
 
@@ -5208,42 +5938,42 @@ function renderGDriveEinstellungenCard() {
   const yr = new Date().getFullYear();
   const gdriveConfigured = !!loadLocal('fb_gdrive_parent', null); // S12 BUG-035: localStorage statt sessionStorage
   const fields = [
-    { key: 'rootName',               label: 'Root-Ordnername',     val: cfg.rootName || 'FinanceBird', flat: true, help: 'gdrive-root' },
-    { key: 'folders.business_in.name',  label: 'Business · Einnahmen', val: cfg.folders.business_in?.name || 'Income',   help: 'gdrive-income' },
-    { key: 'folders.business_out.name', label: 'Business · Ausgaben',  val: cfg.folders.business_out?.name || 'Expenses', help: 'gdrive-expenses' },
-    { key: 'folders.private_in.name',   label: 'Private · Einnahmen',  val: cfg.folders.private_in?.name || 'Income',    help: 'gdrive-income' },
-    { key: 'folders.private_out.name',  label: 'Private · Ausgaben',   val: cfg.folders.private_out?.name || 'Expenses', help: 'gdrive-expenses' },
+    { key: 'rootName',               labelKey: 'gdrive.field.root_name',    val: cfg.rootName || 'FinanceBird', flat: true, help: 'gdrive-root' },
+    { key: 'folders.business_in.name',  labelKey: 'gdrive.field.business_in',  val: cfg.folders.business_in?.name || 'Income',   help: 'gdrive-income' },
+    { key: 'folders.business_out.name', labelKey: 'gdrive.field.business_out', val: cfg.folders.business_out?.name || 'Expenses', help: 'gdrive-expenses' },
+    { key: 'folders.private_in.name',   labelKey: 'gdrive.field.private_in',   val: cfg.folders.private_in?.name || 'Income',    help: 'gdrive-income' },
+    { key: 'folders.private_out.name',  labelKey: 'gdrive.field.private_out',  val: cfg.folders.private_out?.name || 'Expenses', help: 'gdrive-expenses' },
   ];
   return `
     <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.5">
       ${gdriveConfigured
-        ? 'Belege landen in deinem Google Drive. Du kannst Ordnernamen anpassen — die App merkt sich die Folder-IDs, nicht die Namen.'
-        : 'Verbinde Google Drive in der Verbindungen-Karte oben, danach kannst du hier die Ordnerstruktur anpassen.'}
+        ? t('gdrive.hint.configured')
+        : t('gdrive.hint.not_connected')}
     </div>
     <div style="padding:14px 0;border-bottom:1px solid var(--border);${gdriveConfigured ? '' : 'opacity:0.5;pointer-events:none;'}">
       ${fields.map(f => `
       <div style="display:grid;grid-template-columns:1fr 140px;gap:8px;align-items:center;margin-bottom:8px">
-        <label style="font-size:13px;color:var(--ink2)">${esc(f.label)}${f.help ? helpBtn(f.help) : ''}</label>
+        <label style="font-size:13px;color:var(--ink2)">${esc(t(f.labelKey))}${f.help ? helpBtn(f.help) : ''}</label>
         <input class="form-input" style="padding:7px 10px;font-size:13px" value="${esc(f.val)}"
           onchange="gdriveUpdateConfig('${f.key}', this.value)">
       </div>`).join('')}
     </div>
     <div style="padding:12px 0;border-bottom:1px solid var(--border)">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600">Vorschau:</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600">${t('gdrive.preview.label')}</div>
       <div style="font-family:'Courier Prime',monospace;font-size:11.5px;color:var(--ink2);line-height:1.8">
         📁 ${esc(cfg.rootName || 'FinanceBird')}<br>
-        &nbsp;&nbsp;&nbsp;📁 Business<br>
+        &nbsp;&nbsp;&nbsp;📁 ${t('gdrive.preview.business')}<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📁 ${esc(cfg.folders.business_in?.name || 'Income')} / ${yr}<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📁 ${esc(cfg.folders.business_out?.name || 'Expenses')} / ${yr}<br>
-        &nbsp;&nbsp;&nbsp;📁 Private <span style="color:var(--muted)">(bei Bedarf)</span><br>
+        &nbsp;&nbsp;&nbsp;📁 ${t('gdrive.preview.private')} <span style="color:var(--muted)">${t('gdrive.preview.private_optional')}</span><br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📁 ${esc(cfg.folders.private_in?.name || 'Income')} / ${yr}<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📁 ${esc(cfg.folders.private_out?.name || 'Expenses')} / ${yr}
       </div>
     </div>
     <div style="padding:10px 0;font-size:11.5px;color:var(--muted);line-height:1.6">
-      ℹ️ Jahresordner werden automatisch erstellt.<br>
-      ℹ️ Du kannst Ordner in Google Drive frei verschieben oder umbenennen — die App findet sie über die Folder-ID trotzdem.<br>
-      ℹ️ Bestehende Ordner werden nicht umbenannt, wenn du den Namen hier änderst.
+      ℹ️ ${t('gdrive.footer.year_auto')}<br>
+      ℹ️ ${t('gdrive.footer.move_rename')}<br>
+      ℹ️ ${t('gdrive.footer.no_rename')}
     </div>`;
 }
 
@@ -6821,7 +7551,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.29a.2026-04-26';
+const APP_VERSION = '2.30a.2026-04-27';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -8641,6 +9371,68 @@ const REGION_CONFIG = {
 /** Returns REGION_CONFIG for current country. Never returns null (fallback CH). */
 function getRegion() { return REGION_CONFIG[AppState.country] || REGION_CONFIG.CH; }
 
+/* ── S35 Sprint 6.5c Gruppe 17 — Display-Layer für REGION_CONFIG (DB-Anker bleibt DE) ── */
+
+/** Deterministic slug from DE-string for i18n key generation.
+ *  Examples:
+ *    'Umsatzerlöse'       → 'umsatzerloese'
+ *    'Material & Waren'   → 'material_waren'
+ *    'AHV/IV/EO-Beiträge' → 'ahv_iv_eo_beitraege'
+ *    '3. Säule'           → '3_saeule'
+ */
+function _slugifyDe(s) {
+  return String(s).toLowerCase()
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+    .replace(/\s*[&\/]\s*/g, '_')   // & / → _
+    .replace(/[\s\-:.,()]+/g, '_')  // whitespace, dashes, punctuation → _
+    .replace(/[^a-z0-9_]/g, '')      // strip remaining non-alnum
+    .replace(/_+/g, '_').replace(/^_|_$/g, '');
+}
+
+/** Display label for a category (DE-source). Falls back to original if no translation. */
+function categoryLabel(deStr) {
+  if (!deStr) return '';
+  const k = 'category.' + _slugifyDe(deStr);
+  const v = t(k);
+  return (v === k) ? deStr : v;
+}
+
+/** Display label for a tax category (DE-source). Falls back to original.
+ *  Used for CH taxMapping values. DE/AT tax codes (EÜR Z.xx, E1a KZ xxxx) are anchors. */
+function taxCategoryLabel(deStr) {
+  if (!deStr) return '';
+  // DE/AT codes start with 'EÜR ' or 'E1a ' — return as-is (Behörden-Anker)
+  if (/^(EÜR|E1a)\s/.test(deStr)) return deStr;
+  const k = 'tax_cat.' + _slugifyDe(deStr);
+  const v = t(k);
+  return (v === k) ? deStr : v;
+}
+
+/** Display label for invoice type (DE-source). */
+function invoiceTypeLabel(deStr) {
+  if (!deStr) return '';
+  const k = 'invoice_type.' + _slugifyDe(deStr);
+  const v = t(k);
+  return (v === k) ? deStr : v;
+}
+
+/** Display label for region (CH/DE/AT). Fallback: REGION_CONFIG label. */
+function regionLabel(code) {
+  const k = 'region.' + code;
+  const v = t(k);
+  if (v !== k) return v;
+  return (REGION_CONFIG[code] && REGION_CONFIG[code].label) || code;
+}
+
+/** Display label for MWST method ('effektiv' / 'saldo'). */
+function mwstMethodLabel(method) {
+  if (!method) return '';
+  const k = 'mwst_method.' + method;
+  const v = t(k);
+  if (v !== k) return v;
+  return method.charAt(0).toUpperCase() + method.slice(1);
+}
+
 // ── Category Accessors (Funktionen, reagieren auf setCountry) ──
 function getCatsIncome()   { return getRegion().categories.income; }
 function getCatsExpense()  { return getRegion().categories.expense; }
@@ -8668,13 +9460,13 @@ function renderInvoiceTypeDropdown(selectId, selectedValue) {
   const types = getInvoiceTypes();
   const allTypes = selectedValue && !types.includes(selectedValue)
     ? [selectedValue, ...types] : types;
-  el.innerHTML = allTypes.map(t =>
-    `<option value="${esc(t)}" ${t === selectedValue ? 'selected' : ''}>${esc(t)}</option>`
-  ).join('') + '<option value="__custom__">Eigene hinzufügen…</option>';
+  el.innerHTML = allTypes.map(typ =>
+    `<option value="${esc(typ)}" ${typ === selectedValue ? 'selected' : ''}>${esc(invoiceTypeLabel(typ))}</option>`
+  ).join('') + `<option value="__custom__">${esc(t('invoice_type.add_custom_option'))}</option>`;
   el.onchange = function() { if (this.value === '__custom__') erfAddCustomInvoiceType(selectId); };
 }
 function erfAddCustomInvoiceType(selectId) {
-  const name = prompt('Neuen Rechnungstyp eingeben:');
+  const name = prompt(t('invoice_type.add_custom_prompt'));
   if (!name || !name.trim()) {
     const el = document.getElementById(selectId);
     if (el) el.value = getInvoiceTypes()[0];
@@ -8891,7 +9683,7 @@ function erfSetMode(mode) {
     if (steuerkatEl) {
       const cats = getCatsIncome();
       steuerkatEl.innerHTML = cats.map(c =>
-        `<option value="${esc(c)}" ${c === cats[0] ? 'selected' : ''}>${esc(c)}</option>`
+        `<option value="${esc(c)}" ${c === cats[0] ? 'selected' : ''}>${esc(categoryLabel(c))}</option>`
       ).join('');
     }
   }
@@ -8979,7 +9771,7 @@ function erfRenderCatChips() {
     let chipsHtml = cats.map(c => `
       <div class="chip ${Erf.cat === c ? 'active' + (isPrv ? ' priv' : '') : ''}"
         onclick="erfSelectCat('${c.replace(/'/g,"\\'")}')">
-        ${c}
+        ${esc(categoryLabel(c))}
       </div>`).join('');
     // Freitext option for private categories
     if (isPrv) {
@@ -10027,7 +10819,7 @@ function inboxRecurCard(r) {
       <div class="inbox-card-header">
         <div>
           <div class="inbox-card-name">${esc(r.name)}</div>
-          <div class="inbox-card-meta">${freqLabel}${r.cat ? ' · ' + r.cat : ''}${r.account ? ' · ' + r.account : ''}</div>
+          <div class="inbox-card-meta">${freqLabel}${r.cat ? ' · ' + esc(categoryLabel(r.cat)) : ''}${r.account ? ' · ' + r.account : ''}</div>
           <div class="inbox-card-due">${dueLabel}</div>
         </div>
         <div class="inbox-card-amt ${isIncome ? 'pos' : 'neg'}">${isIncome ? '+' : '−'}${fmtS(r.amt)}</div>
@@ -10511,6 +11303,23 @@ function applyStaticI18n() {
     const el = document.getElementById(id);
     if (el) el.setAttribute(attr, t(key));
   };
+  // S35 Sprint 6.5c Gruppe 12 — Generic data-i18n attribute scanner
+  // Usage: <div data-i18n="key">           → sets textContent
+  //        <div data-i18n-html="key">      → sets innerHTML (for nested markup)
+  //        <input data-i18n-placeholder="key"> → sets placeholder
+  //        <button data-i18n-title="key">  → sets title
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    el.innerHTML = t(el.getAttribute('data-i18n-html'));
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    el.title = t(el.getAttribute('data-i18n-title'));
+  });
   _setText('saldoModalAmtLabel',  'saldo.modal.balance_label');
   _setText('saldoModalDateLabel', 'saldo.modal.date_label');
   _setText('saldoModalCancelBtn', 'saldo.modal.cancel');
@@ -10610,6 +11419,37 @@ function applyStaticI18n() {
   _setLoading('emptyLoadCockpit',    'loading.data');
   _setLoading('emptyLoadActivities', 'loading.data');
   _setLoading('emptyLoadSettings',   'loading.einstellungen');
+
+  // ── S35 Sprint 6.5c Gruppe 15 — CSV-Import-Modal Statics ──
+  _setText('csvDropTitle',         'csv.drop.title');
+  _setText('csvDropHint',          'csv.drop.hint');
+  _setText('csvFormatsLabel',      'csv.formats.label');
+  _setText('csvFormatsValue',      'csv.formats.value');
+  _setText('csvSeparatorHint',     'csv.formats.separator');
+  // csvAiMappingHint contains nested <span> — innerHTML
+  _setHTML('csvAiMappingHint',     t('csv.formats.ai_mapping_hint'));
+  _setText('csvPreviewLabel',      'csv.preview.label');
+  _setText('csvAiTitle',           'csv.ai.title');
+  _setText('csvAiSubtitle',        'csv.ai.subtitle');
+  _setText('csvAiBtn',             'csv.ai.btn');
+  _setText('csvMappingTitle',      'csv.mapping.title');
+  _setText('csvScreen2BackBtn',    'csv.btn.back');
+  _setText('csvToStep3Btn',        'csv.btn.next');
+  _setText('csvScreen3Title',      'csv.screen3.title');
+  _setText('csvCol_date',          'csv.col.date');
+  _setText('csvCol_desc',          'csv.col.desc');
+  _setText('csvCol_amount',        'csv.col.amount');
+  _setText('csvCol_type',          'csv.col.type');
+  _setText('csvCol_category',      'csv.col.category');
+  _setText('csvScreen3BackBtn',    'csv.btn.back');
+  _setText('csvImportBtn',         'csv.btn.import');
+  _setText('csvDoneBtn',           'csv.btn.done');
+  // csvImportSubtitle: initial step 1, dynamisch via csvGoToScreen
+  const _csvSubtitle = document.getElementById('csvImportSubtitle');
+  if (_csvSubtitle) {
+    const _csvStep = (typeof CSV !== 'undefined' && CSV && CSV.screen) ? CSV.screen : 1;
+    _csvSubtitle.textContent = t('csv.subtitle.step' + _csvStep);
+  }
 }
 
 function renderAll() {
@@ -11490,7 +12330,7 @@ function renderRecentBookingsHTML() {
       <td style="color:var(--muted);font-size:12px">${fmtDate(b.date)}</td>
       <td><a href="${esc(b._url)}" target="_blank" style="color:inherit;text-decoration:none">${esc(b.desc)}</a></td>
       <td style="font-size:12px;color:var(--muted)">${b.counterpart || '—'}</td>
-      <td><span class="tag ${b.type === 'Einnahme' ? 'income' : 'expense'}">${b.type}</span></td>
+      <td><span class="tag ${b.type === 'Einnahme' ? 'income' : 'expense'}">${esc(buchTypeLabel(b.type))}</span></td>
       <td class="amt ${b.type === 'Einnahme' ? 'pos' : 'neg'}">${b.type === 'Einnahme' ? '+' : '−'}${fmt(b.amount)}</td>
     </tr>`).join('')}</tbody>
   </table>`;
@@ -11667,7 +12507,7 @@ function renderBuchungenHTML() {
       <select class="form-input" style="width:auto;padding:7px 10px;font-size:13px"
         onchange="BuchFilter.cat=this.value;renderBuchSubtab()">
         <option value="">${t('buch.filter.cat_all')}</option>
-        ${cats.map(c => `<option value="${c}" ${BuchFilter.cat===c?'selected':''}>${c}</option>`).join('')}
+        ${cats.map(c => `<option value="${c}" ${BuchFilter.cat===c?'selected':''}>${esc(categoryLabel(c))}</option>`).join('')}
       </select>
       <input class="form-input" type="text" placeholder="${t('buch.filter.search_placeholder')}" style="min-width:140px;padding:7px 10px;font-size:13px"
         value="${BuchFilter.search}"
@@ -12094,7 +12934,7 @@ function openRechnungEdit(id) {
     if (steuerkatEl) {
       const cats = getCatsIncome();
       steuerkatEl.innerHTML = cats.map(c =>
-        `<option value="${esc(c)}">${esc(c)}</option>`
+        `<option value="${esc(c)}">${esc(categoryLabel(c))}</option>`
       ).join('');
       steuerkatEl.value = r.taxCat || cats[0];
     }
@@ -12359,7 +13199,7 @@ function openRecurringForm(prefill = {}) {
             <label class="form-label">${t('rec.form.category')}</label>
             <select id="rfCat" class="form-input">
               <option value="">—</option>
-              ${cats.map(c=>`<option value="${c}" ${prefill.cat===c?'selected':''}>${c}</option>`).join('')}
+              ${cats.map(c=>`<option value="${c}" ${prefill.cat===c?'selected':''}>${esc(categoryLabel(c))}</option>`).join('')}
             </select>
           </div>
           <div class="form-group">
@@ -12504,7 +13344,7 @@ function renderRecurringsHTML() {
         <div style="flex:1">
           <div style="font-size:13.5px;font-weight:500">${esc(r.name)}${r.paused?` <span style="font-size:10px;color:var(--muted)">${t('rec.tag.paused')}</span>`:''}
             ${isIncome?`<span style="font-size:10px;color:var(--green)"> ${t('rec.tag.income')}</span>`:''}</div>
-          <div style="font-size:11px;color:var(--muted)">${r.cat||''}${r.account?' · '+r.account:''}</div>
+          <div style="font-size:11px;color:var(--muted)">${r.cat?esc(categoryLabel(r.cat)):''}${r.account?' · '+r.account:''}</div>
         </div>
         <div style="text-align:right">
           <div style="font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:${isIncome?'var(--green)':'var(--red)'}">${fmtS(r.amt)}</div>
@@ -12542,13 +13382,13 @@ function renderAbschluesseHTML() {
   // Tax mapping editor
   const mappingRows = getCatsExpense().map(c => `
     <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13.5px">
-      <div style="flex:1;font-weight:500">${c}</div>
+      <div style="flex:1;font-weight:500">${esc(categoryLabel(c))}</div>
       <span style="color:var(--muted)">→</span>
       <select style="padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:12.5px;
         font-family:inherit;color:var(--ink);background:var(--paper);cursor:pointer"
         onchange="updateTaxMapping('${c.replace(/'/g,"\\'")}',this.value)">
         ${getTaxCats().map(tc =>
-          `<option value="${tc}" ${(tm[c]||getDefaultTaxMapping()[c])===tc?'selected':''}>${tc}</option>`
+          `<option value="${tc}" ${(tm[c]||getDefaultTaxMapping()[c])===tc?'selected':''}>${esc(taxCategoryLabel(tc))}</option>`
         ).join('')}
       </select>
     </div>`).join('');
@@ -12673,8 +13513,8 @@ function printJahresabschluss() {
       <td>${b.date}</td>
       <td>${b.desc||''}${b.counterpart?' ('+b.counterpart+')':''}</td>
       <td style="text-align:right;color:${b.type==='Einnahme'?'#2d6a35':'#c4441a'}">${b.type==='Einnahme'?'+':'-'} ${fmt(b.amount)}</td>
-      <td>${b.cat||'—'}</td>
-      <td style="color:#666">${taxCat||'—'}</td>
+      <td>${b.cat?esc(categoryLabel(b.cat)):'—'}</td>
+      <td style="color:#666">${taxCat?esc(taxCategoryLabel(taxCat)):'—'}</td>
     </tr>`;
   }).join('');
 
@@ -12715,7 +13555,7 @@ function printJahresabschluss() {
 
   <h2>${t('abs.pdf.h2_expenses')}</h2>
   ${getTaxCats().map(c => taxGroups[c] > 0 ? `
-    <div class="summary-row"><span>${c}</span><span>CHF ${fmt(taxGroups[c])}</span></div>` : '').join('')}
+    <div class="summary-row"><span>${esc(taxCategoryLabel(c))}</span><span>CHF ${fmt(taxGroups[c])}</span></div>` : '').join('')}
   <div class="summary-row total"><span>${t('abs.pdf.total_expenses')}</span><span>CHF ${fmt(totalExp)}</span></div>
 
   <div class="summary-row profit"><span>${t('abs.pdf.profit_loss')}</span><span>CHF ${fmt(profit)}</span></div>
@@ -13008,39 +13848,16 @@ function renderAktivitaeten() {
 }
 
 /** BL-030: Kontextuelle Hilfe für konfigurierbare Felder */
+/* S35 Sprint 6.5c Gruppe 16 — FIELD_HELP: title/body als i18n-Keys (analog Widget-Pattern) */
 const FIELD_HELP = {
-  'gdrive-root': {
-    title: 'Root-Ordner',
-    body: 'Dieser Ordner wird in deinem Google Drive erstellt und enthält alle Belege. Du kannst ihn nach der Verbindung frei verschieben oder umbenennen — die App merkt sich die ID.'
-  },
-  'gdrive-income': {
-    title: 'Einnahmen-Ordner',
-    body: 'Belege für Einnahmen (z.B. Rechnungskopien) landen hier. Jahresordner (2025, 2026…) werden automatisch erstellt.'
-  },
-  'gdrive-expenses': {
-    title: 'Ausgaben-Ordner',
-    body: 'Belege für Ausgaben (Quittungen, Rechnungen) landen hier. Jahresordner werden automatisch erstellt.'
-  },
-  'clockify-key': {
-    title: 'Clockify API Key',
-    body: 'Den Key findest du unter: clockify.me → Profil-Icon → Profile Settings → API → Generieren. Wird nur lokal gespeichert.'
-  },
-  'claude-key': {
-    title: 'Claude API Key',
-    body: 'Den Key findest du unter: console.anthropic.com → API Keys → Create Key. Wird nur lokal gespeichert und nie an unsere Server gesendet.'
-  },
-  'mwst-pflichtig': {
-    title: 'MWST-Pflicht',
-    body: 'In der Schweiz gilt MWST-Pflicht ab CHF 100’000 Jahresumsatz. Wenn du nicht pflichtig bist, werden MWST-Felder ausgeblendet.'
-  },
-  'ob-accounts': {
-    title: 'Bankkonten',
-    body: 'Gib deine Geschäftskonten an (z.B. UBS Geschäftskonto, PostFinance). Sie erscheinen beim Erfassen als Auswahlfeld. Mindestens 1 Konto empfohlen.'
-  },
-  'ob-country': {
-    title: 'Land & Steuern',
-    body: 'Das Land bestimmt die MWST-Sätze und das Steuerformular-Mapping deiner Buchungen. Wählbar: Schweiz (CH), Deutschland (DE), Österreich (AT).'
-  },
+  'gdrive-root':    { title: 'field_help.gdrive_root.title',    body: 'field_help.gdrive_root.body' },
+  'gdrive-income':  { title: 'field_help.gdrive_income.title',  body: 'field_help.gdrive_income.body' },
+  'gdrive-expenses':{ title: 'field_help.gdrive_expenses.title',body: 'field_help.gdrive_expenses.body' },
+  'clockify-key':   { title: 'field_help.clockify_key.title',   body: 'field_help.clockify_key.body' },
+  'claude-key':     { title: 'field_help.claude_key.title',     body: 'field_help.claude_key.body' },
+  'mwst-pflichtig': { title: 'field_help.mwst_pflichtig.title', body: 'field_help.mwst_pflichtig.body' },
+  'ob-accounts':    { title: 'field_help.ob_accounts.title',    body: 'field_help.ob_accounts.body' },
+  'ob-country':     { title: 'field_help.ob_country.title',     body: 'field_help.ob_country.body' },
 };
 
 function showFieldHelp(key, anchorEl) {
@@ -13055,8 +13872,8 @@ function showFieldHelp(key, anchorEl) {
     popup.addEventListener('click', hideFieldHelp);
     document.body.appendChild(popup);
   }
-  document.getElementById('fhTitle').textContent = info.title;
-  document.getElementById('fhBody').textContent = info.body;
+  document.getElementById('fhTitle').textContent = t(info.title);
+  document.getElementById('fhBody').textContent = t(info.body);
   const rect = anchorEl.getBoundingClientRect();
   const left = Math.min(rect.left, window.innerWidth - 280);
   const top  = rect.bottom + 6;
@@ -13096,64 +13913,64 @@ function renderEinstellungen() {
   el.innerHTML = `
     <div style="padding:0 0 20px">
       <!-- Notion & Auth -->
-      <div class="section-head"><h3>Verbindungen</h3></div>
+      <div class="section-head"><h3>${t('settings.section.connections')}</h3></div>
       <div style="font-size:11px;color:var(--muted);margin:-8px 0 10px 0;font-family:'Courier Prime',monospace;letter-spacing:.02em">
-        🔒 Verschlüsselt synchronisiert via Notion
+        🔒 ${t('settings.connections.encrypted_hint')}
       </div>
       <div class="card" style="margin-bottom:14px">
         <div class="card-title">Notion</div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
           <div>
-            <div style="font-weight:600;font-size:14px">Integration</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.connections.integration')}</div>
             <div style="font-size:12px;color:var(--muted)">
               ${Auth.isAuthenticated
-                ? '✅ Verbunden via ' + (AppState.authMode === 'oauth' ? 'OAuth' : 'Token')
-                : '❌ Nicht verbunden'}
+                ? '✅ ' + t('settings.connections.connected_via', { mode: AppState.authMode === 'oauth' ? 'OAuth' : 'Token' })
+                : '❌ ' + t('toast.not_connected')}
             </div>
             ${AppState.workerUrl ? '<div style="font-size:10px;color:var(--muted);font-family:monospace;margin-top:3px">' + AppState.workerUrl + '</div>' : ''}
           </div>
           <div style="display:flex;gap:8px">
             ${Auth.isAuthenticated
-              ? '<button class="btn btn-outline btn-sm" onclick="manualSync()">🔄 Sync</button><button class="btn btn-danger btn-sm" onclick="logout()">Abmelden</button>'
-              : '<button class="btn btn-primary btn-sm" onclick="showSetup()">Verbinden</button>'}
+              ? '<button class="btn btn-outline btn-sm" onclick="manualSync()">🔄 ' + t('settings.btn.sync') + '</button><button class="btn btn-danger btn-sm" onclick="logout()">' + t('settings.btn.logout') + '</button>'
+              : '<button class="btn btn-primary btn-sm" onclick="showSetup()">' + t('settings.btn.connect') + '</button>'}
           </div>
         </div>
         <div style="padding:12px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)">
           <div>
             <div style="font-weight:600;font-size:14px">${esc(_timeName)} ${helpBtn('clockify-key')}</div>
             <div style="font-size:12px;color:var(--muted)">
-              ${cfKey ? '✅ Verbunden' + (cfLastSync ? ' · Sync: '+cfLastSync : ' · noch nie sync') : '❌ Nicht verbunden'}
+              ${cfKey ? '✅ ' + t('app.status.connected') + (cfLastSync ? ' · ' + t('settings.connections.sync_at', { ts: cfLastSync }) : ' · ' + t('settings.connections.never_synced')) : '❌ ' + t('toast.not_connected')}
             </div>
             ${(AppState._decryptFailed && AppState._decryptFailed.includes(_timeId))
-              ? '<div style="font-size:11.5px;color:var(--red);margin-top:3px">🔑 Key konnte nicht entschlüsselt werden — bitte neu eingeben</div>'
+              ? '<div style="font-size:11.5px;color:var(--red);margin-top:3px">🔑 ' + t('settings.connections.decrypt_failed') + '</div>'
               : ''}
           </div>
           <div style="display:flex;gap:8px">
             ${cfKey
-              ? '<button class="btn btn-outline btn-sm" onclick="syncTimeTracker()">🔄 Sync</button><button class="btn btn-danger btn-sm" onclick="clearTimeTrackerKey()">✕</button>'
-              : '<button class="btn btn-primary btn-sm" onclick="changeTimeTrackerKey()">Verbinden</button>'}
+              ? '<button class="btn btn-outline btn-sm" onclick="syncTimeTracker()">🔄 ' + t('settings.btn.sync') + '</button><button class="btn btn-danger btn-sm" onclick="clearTimeTrackerKey()">✕</button>'
+              : '<button class="btn btn-primary btn-sm" onclick="changeTimeTrackerKey()">' + t('settings.btn.connect') + '</button>'}
           </div>
         </div>
         <!-- Sprint 5 BUG-041: GDrive als 4. Provider in der Verbindungen-Card -->
         <div style="padding:12px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)">
           <div>
-            <div style="font-weight:600;font-size:14px">Google Drive (Belege) ${helpBtn('gdrive-root')}</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.connections.gdrive_label')} ${helpBtn('gdrive-root')}</div>
             <div style="font-size:12px;color:var(--muted)">
-              ${GDriveAdapter.isConnected() ? '✅ Verbunden — Belege werden automatisch abgelegt' : '❌ Nicht verbunden'}
+              ${GDriveAdapter.isConnected() ? '✅ ' + t('settings.connections.gdrive_connected') : '❌ ' + t('toast.not_connected')}
             </div>
           </div>
           <div style="display:flex;gap:8px">
             ${GDriveAdapter.isConnected()
-              ? '<button class="btn btn-outline btn-sm" onclick="openGDriveFolder()">📁 Öffnen</button><button class="btn btn-danger btn-sm" onclick="settingsDisconnectGDrive()">✕</button>'
-              : '<button class="btn btn-primary btn-sm" onclick="settingsConnectGDrive()">Verbinden</button>'}
+              ? '<button class="btn btn-outline btn-sm" onclick="openGDriveFolder()">📁 ' + t('settings.btn.open') + '</button><button class="btn btn-danger btn-sm" onclick="settingsDisconnectGDrive()">✕</button>'
+              : '<button class="btn btn-primary btn-sm" onclick="settingsConnectGDrive()">' + t('settings.btn.connect') + '</button>'}
           </div>
         </div>
         <div style="padding:12px 0;display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">${esc(_visionName)} (Beleganalyse) ${helpBtn('claude-key')}</div>
-            <div style="font-size:12px;color:var(--muted)">${claudeKey ? '✅ API Key gesetzt' : '❌ Nicht gesetzt'}</div>
+            <div style="font-weight:600;font-size:14px">${esc(_visionName)} ${t('settings.connections.vision_suffix')} ${helpBtn('claude-key')}</div>
+            <div style="font-size:12px;color:var(--muted)">${claudeKey ? '✅ ' + t('settings.connections.api_key_set') : '❌ ' + t('settings.connections.api_key_missing')}</div>
             ${(AppState._decryptFailed && AppState._decryptFailed.includes(_visionId))
-              ? '<div style="font-size:11.5px;color:var(--red);margin-top:3px">🔑 Key konnte nicht entschlüsselt werden — bitte neu eingeben</div>'
+              ? '<div style="font-size:11.5px;color:var(--red);margin-top:3px">🔑 ' + t('settings.connections.decrypt_failed') + '</div>'
               : ''}
           </div>
           <div style="display:flex;gap:8px">
@@ -13164,17 +13981,17 @@ function renderEinstellungen() {
       </div>
 
       <!-- Profil & Lokalisierung -->
-      <div class="section-head"><h3>Profil & Region</h3></div>
+      <div class="section-head"><h3>${t('settings.section.profile')}</h3></div>
       <div class="card" style="margin-bottom:14px">
         <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:600;font-size:14px">Sprache</div>
+          <div style="font-weight:600;font-size:14px">${t('settings.profile.language')}</div>
           <select class="form-input" style="width:auto;padding:7px 10px" onchange="setLang(this.value)">
-            <option value="de" ${AppState.lang==='de'?'selected':''}>🇨🇭 Deutsch</option>
-            <option value="en" ${AppState.lang==='en'?'selected':''}>🇬🇧 English</option>
+            <option value="de" ${AppState.lang==='de'?'selected':''}>🇨🇭 ${t('settings.profile.lang_de')}</option>
+            <option value="en" ${AppState.lang==='en'?'selected':''}>🇬🇧 ${t('settings.profile.lang_en')}</option>
           </select>
         </div>
         <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:600;font-size:14px">Währung</div>
+          <div style="font-weight:600;font-size:14px">${t('settings.profile.currency')}</div>
           <select class="form-input" style="width:auto;padding:7px 10px" onchange="setCurrency(this.value)">
             <option value="CHF" ${AppState.currency==='CHF'?'selected':''}>CHF</option>
             <option value="EUR" ${AppState.currency==='EUR'?'selected':''}>EUR</option>
@@ -13182,23 +13999,23 @@ function renderEinstellungen() {
         </div>
         <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">Dark Mode</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.profile.dark_mode')}</div>
           </div>
           <div class="dark-toggle" onclick="toggleDarkMode()" style="color:var(--muted)">
-            <span id="settingsDarkLabel">${AppState.darkMode ? '◑ An' : '☀ Aus'}</span>
+            <span id="settingsDarkLabel">${AppState.darkMode ? '◑ ' + t('settings.profile.dark_on') : '☀ ' + t('settings.profile.dark_off')}</span>
             <div class="toggle-track"><div class="toggle-thumb"></div></div>
           </div>
         </div>
       </div>
 
       <!-- Schwellenwerte -->
-      <div class="section-head"><h3>Schwellenwerte</h3></div>
+      <div class="section-head"><h3>${t('settings.section.thresholds')}</h3></div>
       <div class="card" style="margin-bottom:14px">
-        <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Werte für Berechnungen und Warnungen.</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">${t('settings.thresholds.intro')}</div>
         <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">Puffer-Ziel (CHF)</div>
-            <div style="font-size:12px;color:var(--muted)">Zielgrösse Liquiditätspuffer</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.thresholds.buffer_label')}</div>
+            <div style="font-size:12px;color:var(--muted)">${t('settings.thresholds.buffer_hint')}</div>
           </div>
           <input type="number" class="form-input" style="width:120px;padding:7px 10px;text-align:right"
             value="${loadLocal('fb_puffer_goal', 5000)}"
@@ -13206,8 +14023,8 @@ function renderEinstellungen() {
         </div>
         <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">Ziel-Stundensatz (CHF/h)</div>
-            <div style="font-size:12px;color:var(--muted)">Standard für neue Projekte</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.thresholds.target_rate_label')}</div>
+            <div style="font-size:12px;color:var(--muted)">${t('settings.thresholds.target_rate_hint')}</div>
           </div>
           <input type="number" class="form-input" style="width:120px;padding:7px 10px;text-align:right"
             value="${loadLocal('fb_target_rate', 150)}"
@@ -13215,15 +14032,15 @@ function renderEinstellungen() {
         </div>
         <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">Kategorien</div>
-            <div style="font-size:12px;color:var(--muted)">20 Standard-Kategorien · Steuerformular-Mapping automatisch</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.thresholds.categories_label')}</div>
+            <div style="font-size:12px;color:var(--muted)">${t('settings.thresholds.categories_hint')}</div>
           </div>
-          <span style="font-size:13px;color:var(--muted);font-family:var(--font-label)">STANDARD</span>
+          <span style="font-size:13px;color:var(--muted);font-family:var(--font-label)">${t('settings.thresholds.standard_badge')}</span>
         </div>
         <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border)">
           <div>
-            <div style="font-weight:600;font-size:14px">MWST-pflichtig ${helpBtn('mwst-pflichtig')}</div>
-            <div style="font-size:12px;color:var(--muted)">MWST-Felder beim Erfassen ${AppState.mwstPflichtig ? 'sichtbar' : 'ausgeblendet'}</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.thresholds.mwst_label')} ${helpBtn('mwst-pflichtig')}</div>
+            <div style="font-size:12px;color:var(--muted)">${AppState.mwstPflichtig ? t('settings.thresholds.mwst_visible') : t('settings.thresholds.mwst_hidden')}</div>
           </div>
           <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
             <input type="checkbox" ${AppState.mwstPflichtig ? 'checked' : ''}
@@ -13236,77 +14053,77 @@ function renderEinstellungen() {
       </div>
 
       <!-- Session 3: Land/Region -->
-      <div class="section-head"><h3>Land & Steuern</h3></div>
+      <div class="section-head"><h3>${t('settings.section.country_tax')}</h3></div>
       <div class="card" style="margin-bottom:14px">
         <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">Land</div>
-            <div style="font-size:12px;color:var(--muted)">Bestimmt MWST-Sätze und Steuerformular-Mapping</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.country_tax.country_label')}</div>
+            <div style="font-size:12px;color:var(--muted)">${t('settings.country_tax.country_hint')}</div>
           </div>
           <select class="form-input" style="width:auto;padding:7px 10px" onchange="setCountry(this.value)">
-            <option value="CH" ${AppState.country==='CH'?'selected':''}>🇨🇭 Schweiz</option>
-            <option value="DE" ${AppState.country==='DE'?'selected':''}>🇩🇪 Deutschland</option>
-            <option value="AT" ${AppState.country==='AT'?'selected':''}>🇦🇹 Österreich</option>
-            <option value="OTHER" ${AppState.country==='OTHER'?'selected':''}>🌍 Anderes</option>
+            <option value="CH" ${AppState.country==='CH'?'selected':''}>${regionLabel('CH')}</option>
+            <option value="DE" ${AppState.country==='DE'?'selected':''}>${regionLabel('DE')}</option>
+            <option value="AT" ${AppState.country==='AT'?'selected':''}>${regionLabel('AT')}</option>
+            <option value="OTHER" ${AppState.country==='OTHER'?'selected':''}>${regionLabel('OTHER')}</option>
           </select>
         </div>
         ${AppState.mwstPflichtig ? `
         <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">MWST-Methode</div>
-            <div style="font-size:12px;color:var(--muted)">${getRegion().mwst.methods ? 'Effektiv oder Saldosteuersatz' : 'Standardmethode'}</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.country_tax.mwst_method_label')}</div>
+            <div style="font-size:12px;color:var(--muted)">${getRegion().mwst.methods ? t('settings.country_tax.mwst_method_options') : t('settings.country_tax.mwst_method_default')}</div>
           </div>
           ${getRegion().mwst.methods ? `
           <select class="form-input" style="width:auto;padding:7px 10px" onchange="saveLocal('fb_mwst_method',this.value)">
-            ${getRegion().mwst.methods.map(m => `<option value="${m}" ${loadLocal('fb_mwst_method','effektiv')===m?'selected':''}>${m.charAt(0).toUpperCase()+m.slice(1)}</option>`).join('')}
-          </select>` : `<span style="font-size:13px;color:var(--muted)">Standard</span>`}
+            ${getRegion().mwst.methods.map(m => `<option value="${m}" ${loadLocal('fb_mwst_method','effektiv')===m?'selected':''}>${mwstMethodLabel(m)}</option>`).join('')}
+          </select>` : `<span style="font-size:13px;color:var(--muted)">${t('settings.country_tax.mwst_method_default_badge')}</span>`}
         </div>` : ''}
       </div>
 
       <!-- BL-029: Belege-Ablage -->
-      <div class="section-head"><h3>Belege-Ablage</h3></div>
+      <div class="section-head"><h3>${t('settings.section.receipts_storage')}</h3></div>
       <div class="card" style="margin-bottom:14px" id="settingsGDriveCard">
         ${renderGDriveEinstellungenCard()}
       </div>
 
       <!-- Session 3: Zusammenarbeit -->
-      <div class="section-head"><h3>Zusammenarbeit</h3></div>
+      <div class="section-head"><h3>${t('settings.section.collaboration')}</h3></div>
       <div class="card" style="margin-bottom:14px">
         <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.5">
-          Arbeite mit einer Treuhänder:in oder Buchhalter:in zusammen. Sie können Buchungen prüfen und Korrekturen vorschlagen.
+          ${t('settings.collaboration.intro')}
         </div>
         <div id="settingsCollabList"></div>
         <button class="btn btn-outline btn-sm" onclick="addCollaborator()" style="width:100%;margin-top:8px">
-          + Person hinzufügen
+          ${t('settings.collaboration.add_btn')}
         </button>
       </div>
 
       <!-- Lizenz & Weiteres Gerät -->
-      <div class="section-head"><h3>Lizenz & Geräte</h3></div>
+      <div class="section-head"><h3>${t('settings.section.license_devices')}</h3></div>
       <div class="card" style="margin-bottom:14px">
-        <div class="card-title">Lizenz-Key</div>
+        <div class="card-title">${t('settings.license.title')}</div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
           <div>
             <div style="font-size:13px;color:var(--ink2)">
               ${(function(){
                 const lk = loadLocal('fb_license_key', null);
-                if (!lk) return '<span style="color:var(--muted)">Kein Key gespeichert</span>';
+                if (!lk) return '<span style="color:var(--muted)">' + t('settings.license.no_key') + '</span>';
                 return '<span style="font-family:\'Courier Prime\',monospace;font-size:13px">' + lk.slice(0,-4).replace(/[A-Z0-9]/g,'•') + lk.slice(-4) + '</span>';
               })()}
             </div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px">Jederzeit änderbar</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">${t('settings.license.changeable_hint')}</div>
           </div>
-          <button class="btn btn-outline btn-sm" onclick="showLicenseKeyScreen()">Ändern</button>
+          <button class="btn btn-outline btn-sm" onclick="showLicenseKeyScreen()">${t('settings.license.change_btn')}</button>
         </div>
 
         <div style="padding:12px 0">
-          <div style="font-weight:600;font-size:14px;margin-bottom:4px">Weiteres Gerät einrichten</div>
+          <div style="font-weight:600;font-size:14px;margin-bottom:4px">${t('settings.devices.add_title')}</div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
-            Installiere FinanceBird auf einem anderen Gerät und verbinde es mit deinem bestehenden Account.
+            ${t('settings.devices.add_intro')}
           </div>
           <div id="settingsPairingBlock" style="display:none">
             <div style="background:var(--bg2);border-radius:12px;padding:14px 16px;text-align:center;margin-bottom:10px">
-              <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Kopplungscode</div>
+              <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">${t('settings.devices.pairing_code_label')}</div>
               <div id="settingsPairingCode" style="font-family:'Courier Prime',monospace;font-size:32px;letter-spacing:.2em;font-weight:700;color:var(--ink);margin-bottom:6px">······</div>
               <div id="settingsPairingCountdown" style="font-size:11px;color:var(--muted)"></div>
             </div>
@@ -13315,66 +14132,66 @@ function renderEinstellungen() {
                 readonly style="font-size:11px;flex:1;cursor:text">
               <button onclick="navigator.clipboard.writeText(document.getElementById('settingsPairingUrl').value).then(()=>showToast('success','✓',t('toast.copied'),''))"
                 style="padding:8px 12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;font-size:11px;cursor:pointer;white-space:nowrap;color:var(--ink2);font-family:inherit">
-                Kopieren
+                ${t('settings.devices.copy_btn')}
               </button>
             </div>
             <div id="settingsQrCode" style="display:flex;justify-content:center;margin-bottom:8px"></div>
             <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.5">
-              Scanne den QR-Code oder öffne die URL. Installiere die App auf dem Homescreen und gib den Code ein.
+              ${t('settings.devices.qr_hint')}
             </div>
           </div>
           <button class="btn btn-outline btn-sm" id="settingsGeneratePairingBtn"
             onclick="settingsGeneratePairing()" style="width:100%">
-            Kopplungscode generieren
+            ${t('settings.devices.generate_btn')}
           </button>
         </div>
         <div style="padding:12px 0;border-top:1px solid var(--border);text-align:center">
           <a href="#" onclick="logoutWithConfirm();return false" style="font-size:12px;color:var(--muted);text-decoration:none">
-            Abmelden
+            ${t('settings.btn.logout')}
           </a>
         </div>
       </div>
 
       <!-- Datenschutz -->
-      <div class="section-head"><h3>Datenschutz</h3></div>
+      <div class="section-head"><h3>${t('settings.section.privacy')}</h3></div>
       <div class="card" style="margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-size:13px;color:var(--ink2)">Datenschutzerklärung</div>
+          <div style="font-size:13px;color:var(--ink2)">${t('settings.privacy.label')}</div>
           <button class="btn btn-outline btn-sm"
-            onclick="showDatenschutz('settingsDatenschutzContainer')">Anzeigen</button>
+            onclick="showDatenschutz('settingsDatenschutzContainer')">${t('settings.privacy.show_btn')}</button>
         </div>
         <div id="settingsDatenschutzContainer" style="display:none;margin-top:10px"></div>
       </div>
 
       <!-- Diagnose -->
-      <div class="section-head"><h3>Diagnose & Daten</h3></div>
+      <div class="section-head"><h3>${t('settings.section.diagnostics')}</h3></div>
       <div class="card" style="margin-bottom:14px">
-        <div class="card-title">App-Gesundheit</div>
+        <div class="card-title">${t('settings.diagnostics.health')}</div>
         ${diagReport}
         <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-outline btn-sm" onclick="manualSync()">🔄 Sync jetzt</button>
-          <button class="btn btn-outline btn-sm" onclick="flushQueue()">📤 Queue senden</button>
-          <button class="btn btn-outline btn-sm" onclick="showFeedbackForm()">💬 Feedback</button>
+          <button class="btn btn-outline btn-sm" onclick="manualSync()">🔄 ${t('settings.diagnostics.sync_now')}</button>
+          <button class="btn btn-outline btn-sm" onclick="flushQueue()">📤 ${t('settings.diagnostics.queue_send')}</button>
+          <button class="btn btn-outline btn-sm" onclick="showFeedbackForm()">💬 ${t('sidebar.feedback')}</button>
         </div>
       </div>
 
       <!-- Gefahrenzone -->
-      <div class="section-head"><h3>Gefahrenzone</h3></div>
+      <div class="section-head"><h3>${t('settings.section.danger_zone')}</h3></div>
       <div class="card">
         <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">Queue leeren</div>
-            <div style="font-size:12px;color:var(--muted)">Fehlgeschlagene Einträge entfernen</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.danger.queue_clear_label')}</div>
+            <div style="font-size:12px;color:var(--muted)">${t('settings.danger.queue_clear_hint')}</div>
           </div>
           <button class="btn btn-sm" style="border:1.5px solid var(--amber);color:var(--amber);background:none"
-            onclick="clearQueue()">⚠️ Queue leeren</button>
+            onclick="clearQueue()">⚠️ ${t('settings.danger.queue_clear_btn')}</button>
         </div>
         <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:600;font-size:14px">Alle lokalen Daten löschen</div>
-            <div style="font-size:12px;color:var(--muted)">Keys, Cache, Queue — Notion bleibt erhalten</div>
+            <div style="font-weight:600;font-size:14px">${t('settings.danger.reset_label')}</div>
+            <div style="font-size:12px;color:var(--muted)">${t('settings.danger.reset_hint')}</div>
           </div>
-          <button class="btn btn-danger btn-sm" onclick="clearAllLocal()">🗑 Reset</button>
+          <button class="btn btn-danger btn-sm" onclick="clearAllLocal()">🗑 ${t('settings.danger.reset_btn')}</button>
         </div>
       </div>
 
@@ -13387,9 +14204,9 @@ function renderEinstellungen() {
     console.error('renderEinstellungen error:', e);
     el.innerHTML = `<div style="padding:40px;text-align:center">
       <div style="font-size:28px;margin-bottom:12px">⚠️</div>
-      <div style="font-size:15px;font-weight:600;margin-bottom:8px">Einstellungen konnten nicht geladen werden</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:16px">${e.message || 'Unbekannter Fehler'}</div>
-      <button class="btn btn-outline" onclick="renderEinstellungen()">Nochmal versuchen</button>
+      <div style="font-size:15px;font-weight:600;margin-bottom:8px">${t('settings.error.load_failed')}</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px">${e.message || t('settings.error.unknown')}</div>
+      <button class="btn btn-outline" onclick="renderEinstellungen()">${t('settings.error.retry')}</button>
     </div>`;
   }
 }
@@ -14890,31 +15707,32 @@ function showDatenschutz(containerId) {
 function renderDatenschutz(containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  const today = new Date().toLocaleDateString('de-CH', { year:'numeric', month:'long', day:'numeric' });
+  // Locale-aware date formatting
+  const _locale = (AppState.lang === 'en') ? 'en-US' : 'de-CH';
+  const today = new Date().toLocaleDateString(_locale, { year:'numeric', month:'long', day:'numeric' });
   el.innerHTML = `
     <div style="background:var(--bg2);border-radius:12px;padding:16px 18px;font-size:11.5px;color:var(--ink2);line-height:1.7;text-align:left;max-height:60vh;overflow-y:auto">
       <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">
-        Datenschutzerklärung · Stand: ${today}
+        ${t('privacy.header')} · ${t('privacy.date_label')}: ${today}
       </div>
-      <p><strong>Verantwortlich:</strong> Oswald H. König, Zürich, Schweiz · <a href="mailto:hello@oswaldkoenig.ch" style="color:var(--accent)">hello@oswaldkoenig.ch</a></p>
-      <p><strong>1. Was ist FinanceBird?</strong><br>
-      FinanceBird ist eine Web-App (Progressive Web App) für persönliche Finanzverwaltung. Die App läuft vollständig in deinem Browser — es gibt keinen Account auf unserem Server.</p>
-      <p><strong>2. Wo leben deine Daten?</strong><br>
-      Deine Finanzdaten leben ausschliesslich in deinem eigenen Notion-Workspace. Belegfotos werden in deinem eigenen Google Drive gespeichert. Wir haben keinen Zugriff auf diese Daten.</p>
-      <p><strong>3. Was fliesst durch unseren Server?</strong><br>
-      FinanceBird nutzt einen Proxy-Server (Cloudflare Workers), damit dein Browser mit der Notion-API kommunizieren kann. Dein Notion-Zugriffstoken wird dabei durchgeleitet, aber nicht gespeichert, nicht gelesen und nicht geloggt. Der Proxy ist technisch so gebaut, dass er den Inhalt deiner Requests nicht sieht.</p>
-      <p><strong>4. Was wird gespeichert?</strong><br>
-      <em>Auf unserem Server:</em> Dein Lizenz-Key (zur Prüfung deines Abonnements), temporäre OAuth-Tokens (10 Min TTL), temporäre Kopplungscodes (10 Min TTL).<br>
-      <em>Nicht gespeichert:</em> Keine Buchungen, Beträge, Belege, Kontoinformationen oder Nutzungsprofile.</p>
-      <p><strong>5. Wer sieht was?</strong><br>
-      Du: Alles. Wir (Oswald H. König): Deinen Lizenz-Status. Sonst nichts. Cloudflare (Infrastruktur): Standard-Server-Logs. Notion + Google: Deine Daten gemäss deiner jeweiligen Vereinbarung.</p>
-      <p><strong>6. Lokale Speicherung</strong><br>
-      FinanceBird verwendet keine Cookies. Die App speichert Konfigurationsdaten im lokalen Speicher deines Browsers (localStorage). Diese Daten verlassen dein Gerät nicht.</p>
-      <p><strong>7. Deine Rechte</strong><br>
-      Du kannst jederzeit: Notion-Zugang widerrufen (Notion → Einstellungen → Integrationen), Google-Drive-Zugang widerrufen, Lizenz-Key deaktivieren lassen (hello@oswaldkoenig.ch), alle lokalen Daten löschen (Einstellungen → Zurücksetzen). Gemäss DSG + DSGVO hast du das Recht auf Auskunft, Berichtigung und Löschung.</p>
+      <p><strong>${t('privacy.responsible_label')}:</strong> Oswald H. König, Zürich, Schweiz · <a href="mailto:hello@oswaldkoenig.ch" style="color:var(--accent)">hello@oswaldkoenig.ch</a></p>
+      <p><strong>${t('privacy.s1_title')}</strong><br>
+      ${t('privacy.s1_body')}</p>
+      <p><strong>${t('privacy.s2_title')}</strong><br>
+      ${t('privacy.s2_body')}</p>
+      <p><strong>${t('privacy.s3_title')}</strong><br>
+      ${t('privacy.s3_body')}</p>
+      <p><strong>${t('privacy.s4_title')}</strong><br>
+      ${t('privacy.s4_body')}</p>
+      <p><strong>${t('privacy.s5_title')}</strong><br>
+      ${t('privacy.s5_body')}</p>
+      <p><strong>${t('privacy.s6_title')}</strong><br>
+      ${t('privacy.s6_body')}</p>
+      <p><strong>${t('privacy.s7_title')}</strong><br>
+      ${t('privacy.s7_body')}</p>
       <button onclick="document.getElementById('${containerId}').style.display='none'"
         style="margin-top:10px;background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;display:block;width:100%;text-align:center">
-        Schliessen ×
+        ${t('privacy.close_btn')}
       </button>
     </div>
   `;
@@ -14932,16 +15750,16 @@ function renderQrCodeSvg(url, container) {
   script.onload = () => {
     try {
       new QRCode(inner, { text: url, width: 140, height: 140, correctLevel: QRCode.CorrectLevel.M });
-    } catch { inner.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:10px">QR-Code nicht verfügbar</div>'; }
+    } catch { inner.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:10px">' + t('qr.unavailable') + '</div>'; }
   };
   script.onerror = () => {
-    inner.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:10px">QR-Code nicht verfügbar (offline)</div>';
+    inner.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:10px">' + t('qr.unavailable_offline') + '</div>';
   };
   // Nur einmal laden
   if (!document.querySelector('script[src*="qrcodejs"]')) document.head.appendChild(script);
   else if (window.QRCode) {
     try { new QRCode(inner, { text: url, width: 140, height: 140, correctLevel: QRCode.CorrectLevel.M }); }
-    catch { inner.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:10px">QR-Code nicht verfügbar</div>'; }
+    catch { inner.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:10px">' + t('qr.unavailable') + '</div>'; }
   }
 }
 
@@ -15886,7 +16704,7 @@ function setCountry(country) {
   merchantRules = getDefaultRules(country);
   saveMerchantRules().catch(() => {});
   renderEinstellungen();
-  showToast('success', '✅', t('toast.country_changed'), getRegion().label);
+  showToast('success', '✅', t('toast.country_changed'), regionLabel(AppState.country));
 }
 
 /** Session 3: Logout with confirmation */
@@ -16556,14 +17374,14 @@ window.fbDebugNotion = async function() {
         ondragleave="this.style.borderColor='';this.style.background=''"
         ondrop="csvHandleDrop(event)">
         <div style="font-size:36px;margin-bottom:10px">📂</div>
-        <div style="font-weight:600;font-size:15px;margin-bottom:4px">CSV-Datei hierher ziehen</div>
-        <div style="font-size:13px;color:var(--muted)">oder klicken zum Auswählen — .csv, .txt</div>
+        <div id="csvDropTitle" style="font-weight:600;font-size:15px;margin-bottom:4px">CSV-Datei hierher ziehen</div>
+        <div id="csvDropHint" style="font-size:13px;color:var(--muted)">oder klicken zum Auswählen — .csv, .txt</div>
         <input id="csvFileInput" type="file" accept=".csv,.txt,text/csv" style="display:none" onchange="csvHandleFile(this.files[0])">
       </div>
       <div style="margin-top:16px;background:var(--bg2);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--muted);line-height:1.7">
-        <strong style="color:var(--ink2)">Unterstützte Formate:</strong> Bankauszug CSV, Kreditkarten-Export, eigene Tabellen.<br>
-        Trennzeichen: Komma, Semikolon oder Tab. Erste Zeile = Spaltenköpfe.<br>
-        <span style="color:var(--accent)">AI-Mapping</span> erkennt automatisch welche Spalte was bedeutet.
+        <strong id="csvFormatsLabel" style="color:var(--ink2)">Unterstützte Formate:</strong> <span id="csvFormatsValue">Bankauszug CSV, Kreditkarten-Export, eigene Tabellen.</span><br>
+        <span id="csvSeparatorHint">Trennzeichen: Komma, Semikolon oder Tab. Erste Zeile = Spaltenköpfe.</span><br>
+        <span id="csvAiMappingHint"><span style="color:var(--accent)">AI-Mapping</span> erkennt automatisch welche Spalte was bedeutet.</span>
       </div>
     </div>
 
@@ -16572,7 +17390,7 @@ window.fbDebugNotion = async function() {
       <div style="font-size:13px;color:var(--muted);margin-bottom:12px" id="csvFileInfo"></div>
 
       <!-- Preview table -->
-      <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Vorschau (erste 5 Zeilen)</div>
+      <div id="csvPreviewLabel" style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Vorschau (erste 5 Zeilen)</div>
       <div style="overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin-bottom:20px">
         <table id="csvPreviewTable" style="width:100%;border-collapse:collapse;font-size:12px">
           <thead id="csvPreviewHead" style="background:var(--bg2)"></thead>
@@ -16583,8 +17401,8 @@ window.fbDebugNotion = async function() {
       <!-- AI Mapping -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
         <div style="flex:1">
-          <div style="font-weight:600;font-size:14px;margin-bottom:2px">AI-Spalten-Mapping</div>
-          <div style="font-size:12px;color:var(--muted)">Claude analysiert deine Spalten und ordnet sie zu</div>
+          <div id="csvAiTitle" style="font-weight:600;font-size:14px;margin-bottom:2px">AI-Spalten-Mapping</div>
+          <div id="csvAiSubtitle" style="font-size:12px;color:var(--muted)">Claude analysiert deine Spalten und ordnet sie zu</div>
         </div>
         <button id="csvAiBtn" class="btn btn-primary btn-sm" onclick="csvRunAIMapping()">
           ✨ Mapping analysieren
@@ -16594,12 +17412,12 @@ window.fbDebugNotion = async function() {
 
       <!-- Mapping Editor -->
       <div id="csvMappingEditor" style="display:none">
-        <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Spalten-Zuordnung (anpassbar)</div>
+        <div id="csvMappingTitle" style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Spalten-Zuordnung (anpassbar)</div>
         <div id="csvMappingRows"></div>
       </div>
 
       <div style="display:flex;gap:8px;margin-top:20px">
-        <button class="btn btn-outline" style="flex:1" onclick="csvGoToScreen(1)">← Zurück</button>
+        <button id="csvScreen2BackBtn" class="btn btn-outline" style="flex:1" onclick="csvGoToScreen(1)">← Zurück</button>
         <button id="csvToStep3Btn" class="btn btn-primary" style="flex:1;opacity:.4;pointer-events:none" onclick="csvGoToScreen(3)">Weiter → Vorschau</button>
       </div>
     </div>
@@ -16607,16 +17425,16 @@ window.fbDebugNotion = async function() {
     <!-- Screen 3: Import Preview -->
     <div id="csvScreen3" style="display:none;padding:24px">
       <div style="font-size:13px;color:var(--muted);margin-bottom:4px" id="csvPreviewCount"></div>
-      <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">So werden deine Buchungen aussehen</div>
+      <div id="csvScreen3Title" style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">So werden deine Buchungen aussehen</div>
       <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px">
         <table style="width:100%;border-collapse:collapse;font-size:12px">
           <thead style="background:var(--bg2)">
             <tr>
-              <th style="padding:8px 10px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Datum</th>
-              <th style="padding:8px 10px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Beschreibung</th>
-              <th style="padding:8px 10px;text-align:right;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Betrag</th>
-              <th style="padding:8px 10px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Typ</th>
-              <th style="padding:8px 10px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Kategorie</th>
+              <th id="csvCol_date" style="padding:8px 10px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Datum</th>
+              <th id="csvCol_desc" style="padding:8px 10px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Beschreibung</th>
+              <th id="csvCol_amount" style="padding:8px 10px;text-align:right;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Betrag</th>
+              <th id="csvCol_type" style="padding:8px 10px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Typ</th>
+              <th id="csvCol_category" style="padding:8px 10px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase">Kategorie</th>
             </tr>
           </thead>
           <tbody id="csvImportPreviewBody"></tbody>
@@ -16624,8 +17442,8 @@ window.fbDebugNotion = async function() {
       </div>
       <div id="csvSkipNote" style="font-size:12px;color:var(--amber);margin-bottom:16px"></div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-outline" style="flex:1" onclick="csvGoToScreen(2)">← Zurück</button>
-        <button class="btn btn-primary" style="flex:2;padding:13px" onclick="csvExecuteImport()">
+        <button id="csvScreen3BackBtn" class="btn btn-outline" style="flex:1" onclick="csvGoToScreen(2)">← Zurück</button>
+        <button id="csvImportBtn" class="btn btn-primary" style="flex:2;padding:13px" onclick="csvExecuteImport()">
           Importieren →
         </button>
       </div>
@@ -16636,7 +17454,7 @@ window.fbDebugNotion = async function() {
       <div id="csvResultIcon" style="font-size:52px;margin-bottom:16px">✅</div>
       <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:8px" id="csvResultTitle">Import abgeschlossen</h3>
       <div style="font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.7" id="csvResultBody"></div>
-      <button class="btn btn-primary" style="padding:12px 32px" onclick="closeCSVImport();renderBuchhaltung()">
+      <button id="csvDoneBtn" class="btn btn-primary" style="padding:12px 32px" onclick="closeCSVImport();renderBuchhaltung()">
         Zu den Buchungen →
       </button>
     </div>
@@ -16659,15 +17477,15 @@ const CSV = {
 
 /* Target fields FinanceBird expects */
 const CSV_FIELDS = [
-  { id:'datum',       label:'Datum',        required:true  },
-  { id:'betrag',      label:'Betrag',       required:true  },
-  { id:'beschreibung',label:'Beschreibung', required:false },
-  { id:'typ',         label:'Typ (Ein/Aus)',required:false },
-  { id:'gegenpartei', label:'Gegenpartei',  required:false },
-  { id:'kategorie',   label:'Kategorie',    required:false },
-  { id:'bereich',     label:'Bereich',      required:false },
-  { id:'bezahlt',     label:'Bezahlt',      required:false },
-  { id:'notiz',       label:'Notiz',        required:false },
+  { id:'datum',       labelKey:'csv.field.date',         required:true  },
+  { id:'betrag',      labelKey:'csv.field.amount',       required:true  },
+  { id:'beschreibung',labelKey:'csv.field.desc',         required:false },
+  { id:'typ',         labelKey:'csv.field.type',         required:false },
+  { id:'gegenpartei', labelKey:'csv.field.counterparty', required:false },
+  { id:'kategorie',   labelKey:'csv.field.category',     required:false },
+  { id:'bereich',     labelKey:'csv.field.domain',       required:false },
+  { id:'bezahlt',     labelKey:'csv.field.paid',         required:false },
+  { id:'notiz',       labelKey:'csv.field.note',         required:false },
 ];
 
 function openCSVImport() {
@@ -16690,7 +17508,12 @@ function csvGoToScreen(n) {
     const dot = document.getElementById('csvDot'+i);
     if (dot) dot.style.background = i <= n ? 'var(--accent)' : 'var(--border)';
   });
-  const subtitles = {1:'Schritt 1 — Datei wählen', 2:'Schritt 2 — Spalten zuordnen', 3:'Schritt 3 — Vorschau', 4:'Fertig'};
+  const subtitles = {
+    1: t('csv.subtitle.step1'),
+    2: t('csv.subtitle.step2'),
+    3: t('csv.subtitle.step3'),
+    4: t('csv.subtitle.step4'),
+  };
   document.getElementById('csvImportSubtitle').textContent = subtitles[n] || '';
 }
 
@@ -16721,7 +17544,7 @@ function csvParseText(text, filename, size) {
 
   // Simple RFC 4180-ish parser
   const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l => l.trim());
-  if (lines.length < 2) { showToast('error','⚠️',t('toast.error'),'CSV hat zu wenig Zeilen'); return; }
+  if (lines.length < 2) { showToast('error','⚠️',t('toast.error'),t('csv.error.too_few_rows')); return; }
 
   function parseLine(line) {
     const cells = []; let cur = ''; let inQ = false;
@@ -16790,14 +17613,14 @@ async function csvRunAIMapping() {
   const vision = getActiveVisionAdapter();
   if (!vision || !vision.isConfigured()) {
     document.getElementById('csvAiStatus').innerHTML =
-      '<span style="color:var(--amber)">⚠️ Kein Claude API Key — manuelle Zuordnung nutzen</span>';
+      '<span style="color:var(--amber)">' + t('csv.ai.no_key') + '</span>';
     csvRenderMappingEditor();
     return;
   }
 
   const btn = document.getElementById('csvAiBtn');
   btn.textContent = '…'; btn.disabled = true;
-  document.getElementById('csvAiStatus').innerHTML = '<span style="color:var(--muted)">Claude analysiert deine Spalten…</span>';
+  document.getElementById('csvAiStatus').innerHTML = '<span style="color:var(--muted)">' + t('csv.ai.running') + '</span>';
 
   // Sample: first 3 rows as context
   const sample = CSV.raw.slice(0,3).map(r =>
@@ -16832,11 +17655,11 @@ Regeln: Nur exakte Spaltennamen verwenden. Leerer String wenn keine passende Spa
       if (mapping[k] && !CSV.headers.includes(mapping[k])) mapping[k] = '';
     });
     CSV.mapping = { ...CSV.mapping, ...mapping };
-    document.getElementById('csvAiStatus').innerHTML = '<span style="color:var(--green)">✓ AI-Mapping erfolgreich — bitte prüfen und anpassen</span>';
+    document.getElementById('csvAiStatus').innerHTML = '<span style="color:var(--green)">' + t('csv.ai.success') + '</span>';
   } catch (e) {
-    document.getElementById('csvAiStatus').innerHTML = '<span style="color:var(--amber)">⚠️ AI-Mapping fehlgeschlagen — manuelle Zuordnung</span>';
+    document.getElementById('csvAiStatus').innerHTML = '<span style="color:var(--amber)">' + t('csv.ai.failed') + '</span>';
   } finally {
-    btn.textContent = '✨ Erneut analysieren'; btn.disabled = false;
+    btn.textContent = t('csv.ai.btn_retry'); btn.disabled = false;
   }
 
   csvRenderMappingEditor();
@@ -16845,13 +17668,13 @@ Regeln: Nur exakte Spaltennamen verwenden. Leerer String wenn keine passende Spa
 /* ── Mapping Editor ── */
 function csvRenderMappingEditor() {
   const colOptions = ['', ...CSV.headers].map(h =>
-    `<option value="${h}">${h || '— nicht zuordnen —'}</option>`
+    `<option value="${h}">${h || '— ' + t('csv.mapping.unmapped') + ' —'}</option>`
   ).join('');
 
   const rows = CSV_FIELDS.map(f => `
     <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">
       <div style="flex:1;font-weight:${f.required?'600':'400'};color:var(--ink)">
-        ${f.label}${f.required?' <span style="color:var(--accent)">*</span>':''}
+        ${t(f.labelKey)}${f.required?' <span style="color:var(--accent)">*</span>':''}
       </div>
       <select style="padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;
         font-family:inherit;color:var(--ink2);background:var(--paper);min-width:160px"
@@ -16949,7 +17772,7 @@ function csvBuildParsedRows() {
       <td style="padding:6px 10px;border-top:1px solid var(--border);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.beschreibung||r.gegenpartei||'—'}</td>
       <td style="padding:6px 10px;border-top:1px solid var(--border);font-size:12px;text-align:right;font-family:'Libre Baskerville',serif;color:${r.typ==='Einnahme'?'var(--green)':'var(--red)'}">${r.typ==='Einnahme'?'+':'-'} ${fmt(r.betrag)}</td>
       <td style="padding:6px 10px;border-top:1px solid var(--border);font-size:12px">${r.typ}</td>
-      <td style="padding:6px 10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">${r.cat||'—'}</td>
+      <td style="padding:6px 10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">${r.cat?esc(categoryLabel(r.cat)):'—'}</td>
     </tr>`).join('');
   document.getElementById('csvImportPreviewBody').innerHTML = previewRows +
     (valid.length > 8 ? `<tr><td colspan="5" style="padding:8px 10px;font-size:12px;color:var(--muted);text-align:center">... und ${valid.length-8} weitere</td></tr>` : '');
@@ -16962,7 +17785,7 @@ async function csvExecuteImport() {
 
   csvGoToScreen(4);
   document.getElementById('csvResultIcon').textContent  = '⏳';
-  document.getElementById('csvResultTitle').textContent = 'Importiere…';
+  document.getElementById('csvResultTitle').textContent = t('csv.result.importing');
   document.getElementById('csvResultBody').textContent  = `0 / ${valid.length}`;
 
   let done = 0; let failed = 0;
@@ -16992,7 +17815,7 @@ async function csvExecuteImport() {
   try { await deltaSync(); renderAll(); } catch(_) {}
 
   document.getElementById('csvResultIcon').textContent  = failed === 0 ? '✅' : '⚠️';
-  document.getElementById('csvResultTitle').textContent = failed === 0 ? 'Import abgeschlossen' : 'Import mit Fehlern';
+  document.getElementById('csvResultTitle').textContent = failed === 0 ? t('csv.result.success') : t('csv.result.partial');
   document.getElementById('csvResultBody').innerHTML    =
     `<strong style="color:var(--green)">${done} Buchungen</strong> erfolgreich importiert.` +
     (failed ? `<br><span style="color:var(--amber)">${failed} konnten nicht importiert werden.</span>` : '') +
