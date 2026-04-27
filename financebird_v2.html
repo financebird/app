@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<meta name="fb-version" content="2.28a.2026-04-26">
+<meta name="fb-version" content="2.29a.2026-04-26">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1859,21 +1859,21 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
      ═══════════════════════════════════════════════ -->
 <div id="collabModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(44,31,14,0.55);backdrop-filter:blur(3px);align-items:center;justify-content:center">
   <div style="background:var(--paper);border-radius:20px;padding:28px 24px;width:100%;max-width:380px;margin:20px;box-shadow:0 20px 60px rgba(44,31,14,0.25)">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:6px">Treuhänder:in oder Buchhalter:in hinzufügen</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+    <div id="collabModalTitle" style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:6px">Treuhänder:in oder Buchhalter:in hinzufügen</div>
+    <div id="collabModalBody" style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6">
       Nach dem Hinzufügen erhältst du eine Einladungsnachricht, die du direkt per E-Mail oder Messenger weiterschicken kannst.
     </div>
     <div style="margin-bottom:12px">
-      <label style="font-size:11px;font-family:'Courier Prime',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Name</label>
+      <label id="collabModalLabelName" style="font-size:11px;font-family:'Courier Prime',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Name</label>
       <input type="text" id="collabNameInput" class="form-input" placeholder="z.B. Maria Muster" autocomplete="off">
     </div>
     <div style="margin-bottom:20px">
-      <label style="font-size:11px;font-family:'Courier Prime',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">E-Mail (optional)</label>
+      <label id="collabModalLabelEmail" style="font-size:11px;font-family:'Courier Prime',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">E-Mail (optional)</label>
       <input type="email" id="collabEmailInput" class="form-input" placeholder="maria@muster.ch" autocomplete="off">
     </div>
     <div style="display:flex;gap:10px">
-      <button class="btn btn-outline" style="flex:1" onclick="closeCollabModal()">Abbrechen</button>
-      <button class="btn btn-primary" style="flex:2" onclick="confirmAddCollaborator()">Einladung erstellen →</button>
+      <button id="collabModalCancelBtn" class="btn btn-outline" style="flex:1" onclick="closeCollabModal()">Abbrechen</button>
+      <button id="collabModalCreateBtn" class="btn btn-primary" style="flex:2" onclick="confirmAddCollaborator()">Einladung erstellen →</button>
     </div>
   </div>
 </div>
@@ -1881,15 +1881,15 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
 <!-- COLLABORATOR INVITE SHEET — PATCH B-COLLAB -->
 <div id="collabInviteSheet" style="display:none;position:fixed;inset:0;z-index:9001;background:rgba(44,31,14,0.55);backdrop-filter:blur(3px);align-items:center;justify-content:center">
   <div style="background:var(--paper);border-radius:20px;padding:28px 24px;width:100%;max-width:400px;margin:20px;box-shadow:0 20px 60px rgba(44,31,14,0.25)">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:6px">Einladung bereit</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+    <div id="collabInviteTitle" style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:6px">Einladung bereit</div>
+    <div id="collabInviteBody" style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
       Schicke diese Nachricht an deine Treuhänder:in / Buchhalter:in — per E-Mail, WhatsApp oder wie es einfacher ist.
     </div>
     <div id="collabInviteText" style="background:var(--bg2);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--ink2);line-height:1.7;margin-bottom:16px;white-space:pre-wrap;word-break:break-word"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-outline" style="flex:1;min-width:120px" onclick="copyCollabInvite()">📋 Kopieren</button>
-      <button id="collabMailBtn" class="btn btn-outline" style="flex:1;min-width:120px" onclick="mailCollabInvite()">✉️ E-Mail öffnen</button>
-      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="closeCollabInviteSheet()">Fertig</button>
+      <button id="collabInviteCopyBtn" class="btn btn-outline" style="flex:1;min-width:120px" onclick="copyCollabInvite()">📋 Kopieren</button>
+      <button id="collabMailBtn" class="btn btn-outline" style="flex:1;min-width:120px" onclick="mailCollabInvite()"><span id="collabInviteMailBtn">✉️ E-Mail öffnen</span></button>
+      <button id="collabInviteDoneBtn" class="btn btn-primary" style="width:100%;margin-top:4px" onclick="closeCollabInviteSheet()">Fertig</button>
     </div>
   </div>
 </div>
@@ -1980,7 +1980,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
         <!-- fab-desktop moved to header (PATCH B-FAB2) -->
       </div>
       <div id="cockpitContent">
-        <div class="empty"><div class="ico">🦅</div><p>Lade Daten…</p></div>
+        <div class="empty" id="emptyLoadCockpit"><div class="ico">🦅</div><p>Lade Daten…</p></div>
       </div>
     </div>
 
@@ -1989,7 +1989,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
          ═══════════════════════════════════ -->
     <div id="tab-buchhaltung" class="page">
       <div id="buchhaltungContent">
-        <div class="empty"><div class="ico">🦩</div><p>Lade Daten…</p></div>
+        <div class="empty" id="emptyLoadActivities"><div class="ico">🦩</div><p>Lade Daten…</p></div>
       </div>
     </div>
 
@@ -2040,7 +2040,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
          ═══════════════════════════════════ -->
     <div id="tab-einstellungen" class="page">
       <div id="einstellungenContent">
-        <div class="empty"><div class="ico">🦤</div><p>Lade Einstellungen…</p></div>
+        <div class="empty" id="emptyLoadSettings"><div class="ico">🦤</div><p>Lade Einstellungen…</p></div>
       </div>
     </div>
 
@@ -2125,17 +2125,17 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
           <button style="flex:1;padding:18px 16px;background:var(--paper);border:none;cursor:pointer;text-align:left;font-family:inherit"
             onclick="erfSetMode('buchung')">
             <div style="font-size:20px;margin-bottom:4px">📝</div>
-            <div style="font-size:14px;font-weight:600;color:var(--ink)">Buchung erfassen</div>
-            <div style="font-size:11px;color:var(--muted)">Einnahme, Ausgabe oder Transfer</div>
+            <div id="erfModeBuchungTitle" style="font-size:14px;font-weight:600;color:var(--ink)">Buchung erfassen</div>
+            <div id="erfModeBuchungSub" style="font-size:11px;color:var(--muted)">Einnahme, Ausgabe oder Transfer</div>
           </button>
-          <button style="width:60px;background:var(--bg2);border:none;border-left:1.5px solid var(--border);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center"
+          <button id="erfModeScanBtn" style="width:60px;background:var(--bg2);border:none;border-left:1.5px solid var(--border);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center"
             onclick="openErfassenScan()" title="Beleg scannen">
             📷
           </button>
         </div>
         <button class="erf-card" onclick="erfSetMode('rechnung')" style="padding:14px 16px;text-align:left">
           <span class="erf-card-icon" style="font-size:18px;margin-right:8px">📬</span>
-          <span class="erf-card-label" style="font-size:14px">Rechnung erstellen</span>
+          <span class="erf-card-label" id="erfModeRechnungLabel" style="font-size:14px">Rechnung erstellen</span>
         </button>
       </div>
     </div>
@@ -2198,18 +2198,18 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
             oninput="erfCheckDuplicate();erfCalcMwstPreview()">
         </div>
         <div class="form-group">
-          <label class="form-label">Datum</label>
+          <label class="form-label" id="erfDateLabel">Datum</label>
           <input type="date" id="erfDate" class="form-input" onchange="erfCheckDuplicate()">
         </div>
       </div>
       <!-- Description + Counterpart -->
       <div class="form-group">
-        <label class="form-label">Beschreibung</label>
+        <label class="form-label" id="erfDescLabel">Beschreibung</label>
         <input type="text" id="erfDesc" class="form-input" placeholder="Was war das?"
           oninput="erfCheckDuplicate()" onblur="erfSuggestFromMerchant()" maxlength="300">
       </div>
       <div class="form-group">
-        <label class="form-label">Gegenpartei / Kunde</label>
+        <label class="form-label" id="erfCounterpartLabel">Gegenpartei / Kunde</label>
         <input type="text" id="erfCounterpart" class="form-input"
           placeholder="Person oder Organisation"
           oninput="erfCheckDuplicate()" onblur="erfSuggestFromMerchant()" list="erfCounterpartList">
@@ -2217,7 +2217,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       </div>
       <!-- Invoice ref (income only) -->
       <div id="erfInvRefWrap" class="form-group" style="display:none">
-        <label class="form-label">Rechnungs-Nr</label>
+        <label class="form-label" id="erfInvRefLabel">Rechnungs-Nr</label>
         <input type="text" id="erfInvRef" class="form-input" placeholder="R-2026-001">
       </div>
       <!-- Category / Source chips -->
@@ -2230,13 +2230,13 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <!-- Account + Projekt -->
       <div class="grid-2">
         <div class="form-group">
-          <label class="form-label">Konto</label>
+          <label class="form-label" id="erfAccountLabel">Konto</label>
           <select id="erfAccount" class="form-input">
             <option value="">— wählen —</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Projekt <span style="color:var(--muted);font-weight:400">(opt.)</span></label>
+          <label class="form-label" id="erfProjektLabel">Projekt <span style="color:var(--muted);font-weight:400">(opt.)</span></label>
           <select id="erfProjekt" class="form-input">
             <option value="">— kein Projekt —</option>
           </select>
@@ -2246,31 +2246,31 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       <div id="erfTransferAccountsWrap" style="display:none">
         <div class="grid-2">
           <div class="form-group">
-            <label class="form-label">Von Konto</label>
+            <label class="form-label" id="erfTransferFromLabel">Von Konto</label>
             <select id="erfTransferFrom" class="form-input"><option value="">— wählen —</option></select>
           </div>
           <div class="form-group">
-            <label class="form-label">Nach Konto</label>
+            <label class="form-label" id="erfTransferToLabel">Nach Konto</label>
             <select id="erfTransferTo" class="form-input"><option value="">— wählen —</option></select>
           </div>
         </div>
       </div>
       <!-- Paid toggle -->
       <div class="form-group">
-        <label class="form-label">Status</label>
+        <label class="form-label" id="erfStatusLabel">Status</label>
         <select id="erfPaid" class="form-input">
-          <option value="yes">✅ Bezahlt / Eingegangen</option>
-          <option value="no">⏳ Ausstehend / Geplant</option>
+          <option value="yes" id="erfPaidOptYes">✅ Bezahlt / Eingegangen</option>
+          <option value="no" id="erfPaidOptNo">⏳ Ausstehend / Geplant</option>
         </select>
       </div>
       <!-- Note -->
       <div class="form-group">
-        <label class="form-label">Notiz</label>
+        <label class="form-label" id="erfNoteLabel">Notiz</label>
         <input type="text" id="erfNote" class="form-input" placeholder="Optional">
       </div>
       <!-- MWST (Session 3 — hidden if not MWST-pflichtig) -->
       <div class="form-group" id="erfMwstWrap" style="display:none">
-        <label class="form-label">MWST-Satz (%)</label>
+        <label class="form-label" id="erfMwstLabel">MWST-Satz (%)</label>
         <div style="display:flex;gap:8px;align-items:center">
           <input type="number" id="erfMwstSatz" class="form-input" placeholder="8.1" step="0.1" style="width:100px"
             oninput="erfCalcMwstPreview()">
@@ -2279,19 +2279,19 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
       </div>
       <!-- Beleg (scan zone stub — AI in D1) -->
       <div class="form-group">
-        <label class="form-label">Beleg</label>
+        <label class="form-label" id="erfBelegLabel">Beleg</label>
         <div id="erfScanZone" class="erf-scan-zone" onclick="erfTriggerUpload()"
           ondragover="erfDragOver(event)" ondragleave="erfDragLeave()" ondrop="erfDrop(event)">
           <div style="font-size:28px;margin-bottom:6px">📎</div>
-          <div style="font-size:13px;color:var(--muted)">Foto, PDF oder Datei</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">JPG · PNG · PDF · Drag & Drop</div>
+          <div id="erfScanZoneTypes" style="font-size:13px;color:var(--muted)">Foto, PDF oder Datei</div>
+          <div id="erfScanZoneFormats" style="font-size:11px;color:var(--muted);margin-top:2px">JPG · PNG · PDF · Drag & Drop</div>
         </div>
         <div id="erfReceiptPreview"></div>
         <input type="file" id="erfFileInput" accept="image/*,.pdf" style="display:none" onchange="erfFilePicked(event)">
       </div>
       <!-- Duplicate warning -->
       <div id="erfDupWarn" style="display:none;background:#fffbeb;border:1px solid #fbbf24;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#92400e">
-        <div style="font-weight:600;margin-bottom:3px">⚠️ Mögliche Doppelbuchung</div>
+        <div id="erfDupWarnTitle" style="font-weight:600;margin-bottom:3px">⚠️ Mögliche Doppelbuchung</div>
         <div id="erfDupWarnText" style="color:#78350f"></div>
       </div>
       <!-- Save button -->
@@ -2303,7 +2303,7 @@ tr.unconfirmed td:first-child::before { content: '◷ '; font-style: normal; col
 
     <!-- SCREEN 2: Beleg scan (stub — full AI in D1) -->
     <div id="erfScreen2" style="display:none;padding:12px 20px 28px">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+      <p id="erfScanIntro" style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
         Lade einen Beleg hoch — die KI liest Betrag, Datum und Kategorie automatisch.
       </p>
       <div class="erf-scan-zone" style="height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px"
@@ -3186,6 +3186,326 @@ const I18N = {
     'abs.csv.col_exp':                'Ausgabe',
     'abs.csv.col_text':               'Text',
     'abs.csv.fallback_taxcat':        'Alle übrigen Geschäftsaufwände',
+
+    /* ── Sprint 6.5b · BL-109b · Cold-Zone Teil B ── */
+    /* Gruppe 7: Cockpit-Widget-System */
+    'widget.cat.buchhaltung.label':   'Buchhaltung',
+    'widget.cat.buchhaltung.desc':    'Was ist passiert?',
+    'widget.cat.geschaeft.label':     'Geschäftsanalyse',
+    'widget.cat.geschaeft.desc':      'Wie gesund ist mein Geschäft?',
+    'widget.cat.kompass.label':       'Kompass',
+    'widget.cat.kompass.desc':        'Bin ich auf dem richtigen Weg?',
+
+    'widget.canrender.coming_soon':       'Coming Soon',
+    'widget.canrender.connect_clockify':  'Clockify verbinden → Einstellungen',
+    'widget.canrender.setup_account':     'Konto einrichten → Einstellungen',
+    'widget.canrender.first_buchung':     'Erste Buchung erfassen',
+    'widget.canrender.first_invoice':     'Erste Rechnung erstellen',
+    'widget.canrender.setup_recurrings':  'Recurrings einrichten',
+
+    'widget.datastatus.coming_soon':         'Coming Soon',
+    'widget.datastatus.needs_clockify_up':   'Braucht Clockify-Upgrade',
+    'widget.datastatus.needs_checkin':       'Braucht Check-in',
+    'widget.datastatus.data_available':      'Daten vorhanden',
+    'widget.datastatus.requires_clockify':   'Benötigt Clockify',
+
+    'widget.detail.formula':         'Berechnung',
+    'widget.detail.interpretation':  'Interpretation',
+    'widget.detail.data':            'Daten',
+    'widget.detail.further_reading': 'Zum Nachlesen',
+
+    'widget.library.title':       'Widget-Bibliothek',
+    'widget.library.missing':     'Dir fehlt ein Widget?',
+    'widget.library.send_idea':   'Sende uns deine Idee',
+
+    'widget.error':                  'Fehler',
+
+    /* Widget Names + Descriptions (24 Widgets) */
+    'widget.einnahmen.name':         'Einnahmen',
+    'widget.einnahmen.desc':         'Jahreseinnahmen mit Trend',
+    'widget.ausgaben.name':          'Ausgaben',
+    'widget.ausgaben.desc':          'Jahresausgaben mit Trend',
+    'widget.profit.name':            'Profit',
+    'widget.profit.desc':            'Einnahmen minus Ausgaben',
+    'widget.vermoegen.name':         'Vermögen',
+    'widget.vermoegen.desc':         'Geschätztes Gesamtvermögen',
+    'widget.cashflow.name':          'Cashflow',
+    'widget.cashflow.desc':          'Monatlicher Ein-/Ausgang als Chart',
+    'widget.offene_rechnungen.name': 'Offene Rechnungen',
+    'widget.offene_rechnungen.desc': 'Unbezahlte Rechnungen',
+    'widget.steuer_score.name':      'Steuerbereit',
+    'widget.steuer_score.desc':      'Wie gut bist du für die Steuer vorbereitet?',
+    'widget.liquiditaet.name':       'Liquidität',
+    'widget.liquiditaet.desc':       'Liquiditätsvorschau auf 60 Tage',
+    'widget.puffer.name':            'Puffer',
+    'widget.puffer.desc':            'Wie voll ist dein Puffer?',
+    'widget.stundensatz.name':       'Stundensatz',
+    'widget.stundensatz.desc':       'Effektiver Stundensatz aus Zeit × Geld',
+    'widget.auslastung.name':        'Auslastung',
+    'widget.auslastung.desc':        'Anteil verrechenbarer Stunden',
+    'widget.deckungsbeitrag.name':   'Deckungsbeitrag',
+    'widget.deckungsbeitrag.desc':   'Minimum-Stunden für Fixkosten',
+    'widget.runway.name':            'Runway',
+    'widget.runway.desc':            'Wie lange reicht dein Geld noch?',
+    'widget.abo_kosten.name':        'Abo-Kosten',
+    'widget.abo_kosten.desc':        'Monatliche wiederkehrende Kosten',
+    'widget.kundenkonzentration.name': 'Kundenkonzentration',
+    'widget.kundenkonzentration.desc': 'Wie abhängig bist du von einzelnen Kunden?',
+    'widget.steuerreserve.name':     'Steuerreserve',
+    'widget.steuerreserve.desc':     'Empfohlene Steuerrücklage',
+    'widget.freiheit.name':          'Freiheits-Monate',
+    'widget.freiheit.desc':          'Wie viele Monate könntest du ohne Einkommen leben?',
+    'widget.lebensenergie.name':     'Lebensenergie-Satz',
+    'widget.lebensenergie.desc':     'Was verdienst du wirklich pro Lebensstunde?',
+    'widget.kosten_lebensstunde.name': 'Kosten/Lebensstunde',
+    'widget.kosten_lebensstunde.desc': 'Was kostet eine Stunde deines Lebens?',
+    'widget.portfolio_life.name':    'Portfolio Life',
+    'widget.portfolio_life.desc':    'Wie teilt sich deine Zeit auf Projekte auf?',
+    'widget.sabbatical.name':        'Sabbatical',
+    'widget.sabbatical.desc':        'Wie nah bist du an einem Sabbatical?',
+    'widget.burnout.name':           'Burnout-Risiko',
+    'widget.burnout.desc':           'Arbeitsmuster-Analyse',
+    'widget.enough.name':            'Enough-Punkt',
+    'widget.enough.desc':            'Wo liegt "genug" für dich?',
+    'widget.doughnut.name':          'Personal Doughnut',
+    'widget.doughnut.desc':          'Dein persönlicher Doughnut — zwischen zu wenig und zu viel',
+
+    /* Widget Detail-Strings: formula + interpretation + data labels */
+    'widget.einnahmen.formula':      'Σ Buchungen (Typ=Einnahme, laufendes Jahr)',
+    'widget.einnahmen.interp_pos':   'Deine Einnahmen im laufenden Jahr.',
+    'widget.einnahmen.interp_zero':  'Noch keine Einnahmen erfasst.',
+    'widget.einnahmen.confirmed_sub':'✓ {amt} bestätigt',
+    'widget.ausgaben.formula':       'Σ Buchungen (Typ=Ausgabe, laufendes Jahr)',
+    'widget.ausgaben.interp':        'Deine Ausgaben im laufenden Jahr.',
+    'widget.profit.formula':         'Einnahmen − Ausgaben (laufendes Jahr)',
+    'widget.profit.interp_pos':      'Du bist im Plus.',
+    'widget.profit.interp_neg':      'Deine Ausgaben übersteigen die Einnahmen.',
+    'widget.vermoegen.formula':      'Σ estimatedBalance(Konto) × FX-Kurs → Hauptwährung',
+    'widget.vermoegen.interp':       'Geschätzt aus Startsaldi + Buchungsbewegungen.',
+    'widget.vermoegen.sub_n_konten': '{n} Konten',
+    'widget.cashflow.formula':       'Einnahmen vs. Ausgaben pro Monat (Balkenchart)',
+    'widget.cashflow.interp':        'Zeigt deinen monatlichen Geldfluss über das laufende Jahr.',
+    'widget.cashflow.legend_inc':    'Einnahmen',
+    'widget.cashflow.legend_exp':    'Ausgaben',
+    'widget.cashflow.no_data':       'Keine Daten',
+    'widget.offene_rechnungen.formula': 'Rechnungen mit Status ≠ Bezahlt/Entwurf',
+    'widget.offene_rechnungen.interp_zero': 'Keine offenen Rechnungen.',
+    'widget.offene_rechnungen.interp_n':    '{n} Rechnungen warten auf Zahlung.',
+    'widget.offene_rechnungen.sub_open':    '{amt} offen',
+    'widget.offene_rechnungen.sub_overdue': '⚠ {n} überfällig',
+    'widget.steuer_score.formula':   'Kategorisiert 40% + Dokumentiert 30% + MWST 10% + Flags 20%',
+    'widget.steuer_score.interp_good': 'Du bist gut vorbereitet.',
+    'widget.steuer_score.interp_bad':  'Es gibt noch Lücken — prüfe deine Buchungen.',
+    'widget.steuer_score.sub_review':  '{n} zu prüfen',
+    'widget.steuer_score.row_categorized': 'Kategorisiert',
+    'widget.steuer_score.row_documented':  'Dokumentiert',
+    'widget.steuer_score.row_mwst_ok':     'MWST-OK',
+    'widget.steuer_score.row_flags_ok':    'Flags-OK',
+    'widget.liquiditaet.formula':    'Aktuelles Saldo + erwartete Ein-/Ausgänge über Zeitraum',
+    'widget.liquiditaet.interp':     'Zeigt ob du in den nächsten Wochen liquide bleibst.',
+    'widget.liquiditaet.no_account': 'Konto mit Saldo nötig',
+    'widget.liquiditaet.sub_in_days':'in {n} Tagen',
+    'widget.puffer.formula':         'Buffer-Konto Saldo ÷ Puffer-Ziel × 100',
+    'widget.puffer.no_buffer':       'Buffer-Konto einrichten',
+    'widget.puffer.no_buffer_long':  'Kein Buffer-Konto gefunden. Erstelle ein Konto mit "Buffer" im Namen oder Typ "Pocket".',
+    'widget.puffer.full':            'Puffer voll!',
+    'widget.puffer.remaining':       'Noch {amt} bis zum Ziel.',
+    'widget.puffer.row_current':     'Aktuell',
+    'widget.puffer.row_goal':        'Ziel',
+    'widget.puffer.row_account':     'Konto',
+    'widget.stundensatz.formula':    'Geschäfts-Einnahmen / getrackte Stunden',
+    'widget.stundensatz.no_clockify_long': 'Verbinde Clockify um deinen Stundensatz zu berechnen.',
+    'widget.stundensatz.no_income':  'Stundensatz kann erst berechnet werden wenn Einnahmen erfasst sind.',
+    'widget.stundensatz.normal':     'Dein effektiver Stundensatz basierend auf allen getrackten Stunden.',
+    'widget.stundensatz.connect':    'Clockify verbinden',
+    'widget.stundensatz.no_income_short': 'Noch keine Einnahmen',
+    'widget.auslastung.formula':     'Billable Hours / Total Tracked Hours',
+    'widget.auslastung.interp':      'Wie viel deiner getrackten Zeit direkt verrechenbar ist.',
+    'widget.deckungsbeitrag.no_data':'Daten fehlen',
+    'widget.deckungsbeitrag.no_clockify':  'Clockify verbinden',
+    'widget.deckungsbeitrag.no_hours':     'Keine Stunden erfasst',
+    'widget.deckungsbeitrag.no_income':    'Noch keine Einnahmen erfasst',
+    'widget.deckungsbeitrag.no_clockify_long': 'Clockify verbinden → Einstellungen',
+    'widget.deckungsbeitrag.no_hours_long':    'Keine Stunden in Clockify erfasst',
+    'widget.deckungsbeitrag.no_rate_long':     'Stundensatz kann erst berechnet werden wenn Einnahmen vorhanden sind (Einnahmen ÷ Stunden)',
+    'widget.deckungsbeitrag.formula':'Monatliche Fixkosten (geschäftl. Recurrings) ÷ Effektiver Stundensatz',
+    'widget.deckungsbeitrag.over_min':  'Du arbeitest {n}h über dem Minimum.',
+    'widget.deckungsbeitrag.under_min': 'Dir fehlen {n}h um Fixkosten zu decken.',
+    'widget.deckungsbeitrag.sub_min':   'Minimum/Monat bei {amt} Fixkosten',
+    'widget.deckungsbeitrag.sub_surplus_pos': '+{n}h Surplus',
+    'widget.deckungsbeitrag.sub_surplus_neg': '{n}h Surplus',
+    'widget.deckungsbeitrag.value_unit':      '{n}h/Monat',
+    'widget.deckungsbeitrag.row_fixcosts':    'Fixkosten/Mt.',
+    'widget.deckungsbeitrag.row_rate':        'Stundensatz',
+    'widget.deckungsbeitrag.row_min_hours':   'Min. Stunden',
+    'widget.deckungsbeitrag.row_surplus':     'Surplus',
+    'widget.runway.no_data':         'Saldo + Geschäftsausgaben nötig',
+    'widget.runway.no_data_long':    'Braucht ein Konto mit Saldo und Geschäftsausgaben der letzten 3 Monate.',
+    'widget.runway.formula':         'Gesamtvermögen / Ø monatliche Gesamtausgaben',
+    'widget.runway.interp_good':     'Komfortable Runway.',
+    'widget.runway.interp_warn':     'Weniger als 6 Monate — plane voraus.',
+    'widget.runway.value_months':    '{n} Monate',
+    'widget.runway.value_months_short': '{n} Mt.',
+    'widget.abo_kosten.formula':     'Σ aktive Recurrings (monatlich normiert)',
+    'widget.abo_kosten.interp':      'Deine fixen monatlichen Kosten aus wiederkehrenden Zahlungen.',
+    'widget.abo_kosten.value_per_month': '{amt}/Mt.',
+    'widget.kundenkonzentration.no_invoices': 'Keine Rechnungen',
+    'widget.kundenkonzentration.formula': 'Herfindahl-Hirschman Index: Σ(Umsatzanteil²) × 10000',
+    'widget.kundenkonzentration.interp_high': 'Hohe Konzentration — Klumpenrisiko.',
+    'widget.kundenkonzentration.interp_mod':  'Moderate Konzentration.',
+    'widget.kundenkonzentration.interp_low':  'Gut diversifiziert.',
+    'widget.steuerreserve.formula':  'Profit × {pct}% ({country} Pauschale)',
+    'widget.steuerreserve.interp':   'Lege diesen Betrag für Steuern und Sozialabgaben zurück.',
+    'widget.steuerreserve.sub_pct':  '{pct}% vom Profit',
+    'widget.freiheit.formula':       'Gesamtvermögen / Ø monatl. Gesamtausgaben (inkl. privat)',
+    'widget.freiheit.interp_good':   'Gute Freiheitsreserve.',
+    'widget.freiheit.interp_warn':   'Weniger als 6 Monate finanzieller Spielraum.',
+    'widget.freiheit.row_wealth':    'Vermögen',
+    'widget.freiheit.row_avg_exp':   'Ø Ausgaben/Mt.',
+    'widget.lebensenergie.no_data':  'Clockify nötig',
+    'widget.lebensenergie.formula':  '(Netto-Einnahmen − Arbeitskosten) / (Stunden × 1.25)',
+    'widget.lebensenergie.interp':   'Der wahre Stundensatz nach Abzug aller versteckten Kosten und Zeit.',
+    'widget.lebensenergie.sub_nominal': 'Nominal: {rate}',
+    'widget.lebensenergie.sub_nominal_empty': 'Nominal: —',
+    'widget.lebensenergie.link_label':  'Vicki Robin: Your Money or Your Life',
+    'widget.kosten_lebensstunde.formula': 'Monatsausgaben / 480 (≈ 16 wache Stunden × 30 Tage)',
+    'widget.kosten_lebensstunde.interp':  'So viel kostet eine Stunde deines wachen Lebens an Fixkosten.',
+    'widget.kosten_lebensstunde.sub':     'pro wache Stunde',
+    'widget.portfolio_life.formula':  'Clockify Projekte aggregiert',
+    'widget.portfolio_life.no_clockify': 'Clockify verbinden',
+    'widget.portfolio_life.value_total': '{n}h total',
+    'widget.portfolio_life.more_n':      '+{n} weitere',
+    'widget.sabbatical.formula':     'Freiheits-Monate / Ziel-Monate × 100',
+    'widget.sabbatical.interp_ready':'Du könntest dir jetzt ein Sabbatical leisten!',
+    'widget.sabbatical.interp_short':'Dir fehlen noch {amt}.',
+    'widget.sabbatical.sub_progress':'{cur} / {target} Mt.',
+    'widget.burnout.coming_soon':    'Coming Soon',
+    'widget.burnout.coming_soon_sub':'Braucht Clockify-Upgrade',
+    'widget.burnout.coming_soon_long': 'Wird nach dem Clockify Timestamps-Upgrade verfügbar.',
+    'widget.enough.coming_soon':     'Coming Soon',
+    'widget.enough.coming_soon_sub': 'Braucht Check-in System',
+    'widget.enough.coming_soon_long':'Wird nach dem Check-in System (DS4) verfügbar.',
+    'widget.doughnut.coming_soon':   'Coming Soon',
+    'widget.doughnut.coming_soon_sub':'Design in DS4',
+    'widget.doughnut.coming_soon_long':'Wird nach der Doughnut Design-Session verfügbar.',
+
+    /* Cockpit recent transactions empty */
+    'cockpit.recent.empty':          'Noch keine Buchungen',
+
+    /* Gruppe 8: Erfassen-Overlay */
+    'erf.title':                     'Erfassen',
+    'erf.mode.buchung':              'Buchung erfassen',
+    'erf.mode.buchung_sub':          'Einnahme, Ausgabe oder Transfer',
+    'erf.mode.rechnung':             'Rechnung erstellen',
+    'erf.mode.scan':                 'Beleg scannen',
+    'erf.fx.toggle':                 '🌐 Fremdwährung umrechnen',
+    'erf.fx.apply':                  '↓ Übernehmen',
+    'erf.type.expense':              'Ausgabe',
+    'erf.type.income':               'Einnahme',
+    'erf.type.transfer':             'Transfer',
+    'erf.scan.inline':                '📷 Beleg scannen',
+    'erf.scan.disabled_hint_pre':     'Aktiviere die KI-Beleganalyse in ',
+    'erf.scan.disabled_hint_link':    'Einstellungen → Verknüpfungen',
+    'erf.bereich.business':          '💼 Geschäftlich',
+    'erf.bereich.private':           '🏠 Privat',
+    'erf.label.amount':              'Betrag',
+    'erf.label.date':                'Datum',
+    'erf.label.description':         'Beschreibung',
+    'erf.label.counterpart':         'Gegenpartei / Kunde',
+    'erf.label.invoice_ref':         'Rechnungs-Nr',
+    'erf.label.category':            'Kategorie',
+    'erf.label.account':             'Konto',
+    'erf.label.projekt':             'Projekt',
+    'erf.label.projekt_opt':         '(opt.)',
+    'erf.label.transfer_from':       'Von Konto',
+    'erf.label.transfer_to':         'Nach Konto',
+    'erf.label.status':              'Status',
+    'erf.label.note':                'Notiz',
+    'erf.label.mwst_pct':            'MWST-Satz (%)',
+    'erf.label.beleg':               'Beleg',
+    'erf.placeholder.amount':        '0.00',
+    'erf.placeholder.description':   'Was war das?',
+    'erf.placeholder.counterpart':   'Person oder Organisation',
+    'erf.placeholder.invoice_ref':   'R-2026-001',
+    'erf.placeholder.note':          'Optional',
+    'erf.placeholder.mwst':          '8.1',
+    'erf.select.choose':             '— wählen —',
+    'erf.select.no_projekt':         '— kein Projekt —',
+    'erf.status.paid':               '✅ Bezahlt / Eingegangen',
+    'erf.status.pending':            '⏳ Ausstehend / Geplant',
+    'erf.scan.types':                'Foto, PDF oder Datei',
+    'erf.scan.formats':              'JPG · PNG · PDF · Drag & Drop',
+    'erf.btn.save':                  '✓ Speichern',
+    'erf.dup.title':                 '⚠️ Mögliche Doppelbuchung',
+    'erf.scan.intro':                'Lade einen Beleg hoch — die KI liest Betrag, Datum und Kategorie automatisch.',
+    /* Rechnungs-Form spezifisch */
+    'erf.inv.label.description':     'Beschreibung / Leistung',
+    'erf.inv.label.taxcat':          'Steuerkategorie',
+    'erf.inv.label.due':             'Fällig am',
+    'erf.inv.label.client':          'Kunde',
+    'erf.inv.status.paid':           'Bezahlt',
+    'erf.inv.status.open':           'Offen',
+    'erf.inv.status.draft':          'Entwurf',
+    'erf.inv.status.partial':        'Teilzahlung',
+
+    /* Gruppe 9: Inbox */
+    'inbox.btn_title':               'Zahlungs-Inbox',
+    'inbox.section.income':          'Einnahmen — Zahlungseingang bestätigen',
+    'inbox.section.expense':         'Ausgaben — Ausführung bestätigen',
+    'inbox.section.unconfirmed':     'Unbestätigte Buchungen — bitte prüfen',
+    'inbox.subtitle.away_singular':  'Du warst {days} Tage weg — {n} Eintrag wartet.',
+    'inbox.subtitle.away_plural':    'Du warst {days} Tage weg — {n} Einträge warten.',
+    'inbox.subtitle.due_singular':   '{n} fälliger Eintrag',
+    'inbox.subtitle.due_plural':     '{n} fällige Einträge',
+    'inbox.due.today':               'Heute fällig',
+    'inbox.due.yesterday':           'Gestern fällig',
+    'inbox.due.overdue':             '{n} Tage überfällig (seit {date})',
+    'inbox.due.overdue_recur':       '{n} Tage überfällig ({date})',
+    'inbox.btn.invoice_paid':        '✓ Zahlung eingegangen',
+    'inbox.btn.shift_due':           'Fälligkeit verschieben',
+    'inbox.btn.later':               'Später',
+    'inbox.btn.recur_book':          '✓ Bezahlt / ausgeführt',
+    'inbox.btn.recur_skip':          'Überspringen',
+    'inbox.btn.recur_snooze':        'Nicht bezahlt',
+    'inbox.btn.confirm':             '✓ Bestätigen',
+    'inbox.btn.confirm_short':       'Bestätigen',
+    'inbox.btn.cancel':              'Abbrechen',
+    'inbox.btn.done':                'Fertig',
+
+    /* Gruppe 10: Confirms + Banner/Modals */
+    'confirm.gdrive_disconnect':     'Google Drive trennen? Deine Belege bleiben in Google Drive — FinanceBird verliert nur die Verbindung.',
+    'confirm.notion_reset':          'Verbindung zurücksetzen? Du musst dich neu mit Notion verbinden. Deine Daten in Notion bleiben erhalten.',
+    'confirm.invoice_delete':        'Rechnung "{nr}" löschen?',
+    'confirm.buchung_delete':        'Buchung "{label}" löschen?\n\nSie wird 30 Tage im Papierkorb behalten.',
+    'confirm.local_data_delete':     'Wirklich ALLE lokalen Daten löschen? Notion-Daten bleiben erhalten.',
+    'confirm.logout':                'Wirklich abmelden? Lokale Daten bleiben erhalten, du kannst dich jederzeit wieder verbinden.',
+    'confirm.person_remove':         'Person entfernen?',
+
+    'collab.modal.title':            'Accountant hinzufügen',
+    'collab.modal.body':             'Nach dem Hinzufügen erhältst du eine Einladungsnachricht, die du direkt per E-Mail oder Messenger weiterschicken kannst.',
+    'collab.modal.label_name':       'Name',
+    'collab.modal.placeholder_name': 'z.B. Maria Muster',
+    'collab.modal.label_email':      'E-Mail (optional)',
+    'collab.modal.placeholder_email':'maria@muster.ch',
+    'collab.modal.cancel':           'Abbrechen',
+    'collab.modal.create':           'Einladung erstellen →',
+    'collab.invite.title':           'Einladung bereit',
+    'collab.invite.body':            'Schicke diese Nachricht an deinen Accountant — per E-Mail, WhatsApp oder wie es einfacher ist.',
+    'collab.invite.copy':            '📋 Kopieren',
+    'collab.invite.mail':            '✉️ E-Mail öffnen',
+    'collab.invite.done':            'Fertig',
+
+    'app.status.connected':          'Verbunden',
+
+    /* Gruppe 11: Empty/Loading */
+    'loading.data':                  'Lade Daten…',
+    'loading.einstellungen':         'Lade Einstellungen…',
+    'empty.zeit_sync_hint':          'Klicke Sync um Zeiterfassungsdaten zu laden',
+    'empty.projekte_cache':          'Keine Projekte im Cache',
+    'health.warn.cache_empty':       'Buchungen-Cache leer',
+    'health.warn.cache_empty_action':'Sync starten',
+    'health.warn.no_konten':         'Keine Konten',
+    'health.warn.no_konten_action':  'In Notion konfigurieren',
   },
   en: {
     'nav.cockpit':       'Cockpit',
@@ -3688,6 +4008,326 @@ const I18N = {
     'abs.csv.col_exp':                'Expense',
     'abs.csv.col_text':               'Text',
     'abs.csv.fallback_taxcat':        'Other business expenses',
+
+    /* ── Sprint 6.5b · BL-109b · Cold-Zone Teil B ── */
+    /* Gruppe 7: Cockpit-Widget-System */
+    'widget.cat.buchhaltung.label':   'Bookkeeping',
+    'widget.cat.buchhaltung.desc':    'What happened?',
+    'widget.cat.geschaeft.label':     'Business Analysis',
+    'widget.cat.geschaeft.desc':      'How healthy is my business?',
+    'widget.cat.kompass.label':       'Compass',
+    'widget.cat.kompass.desc':        'Am I on the right track?',
+
+    'widget.canrender.coming_soon':       'Coming Soon',
+    'widget.canrender.connect_clockify':  'Connect Clockify → Settings',
+    'widget.canrender.setup_account':     'Set up account → Settings',
+    'widget.canrender.first_buchung':     'Add your first transaction',
+    'widget.canrender.first_invoice':     'Create your first invoice',
+    'widget.canrender.setup_recurrings':  'Set up recurrings',
+
+    'widget.datastatus.coming_soon':         'Coming Soon',
+    'widget.datastatus.needs_clockify_up':   'Requires Clockify upgrade',
+    'widget.datastatus.needs_checkin':       'Requires check-in',
+    'widget.datastatus.data_available':      'Data available',
+    'widget.datastatus.requires_clockify':   'Requires Clockify',
+
+    'widget.detail.formula':         'Formula',
+    'widget.detail.interpretation':  'Interpretation',
+    'widget.detail.data':            'Data',
+    'widget.detail.further_reading': 'Further Reading',
+
+    'widget.library.title':       'Widget Library',
+    'widget.library.missing':     'Missing a widget?',
+    'widget.library.send_idea':   'Send us your idea',
+
+    'widget.error':                  'Error',
+
+    /* Widget Names + Descriptions (24 Widgets) */
+    'widget.einnahmen.name':         'Income',
+    'widget.einnahmen.desc':         'Annual income with trend',
+    'widget.ausgaben.name':          'Expenses',
+    'widget.ausgaben.desc':          'Annual expenses with trend',
+    'widget.profit.name':            'Profit',
+    'widget.profit.desc':            'Income minus expenses',
+    'widget.vermoegen.name':         'Assets',
+    'widget.vermoegen.desc':         'Estimated total assets',
+    'widget.cashflow.name':          'Cashflow',
+    'widget.cashflow.desc':          'Monthly in/outflow as chart',
+    'widget.offene_rechnungen.name': 'Open Invoices',
+    'widget.offene_rechnungen.desc': 'Unpaid invoices',
+    'widget.steuer_score.name':      'Tax-Ready',
+    'widget.steuer_score.desc':      'How prepared are you for taxes?',
+    'widget.liquiditaet.name':       'Liquidity',
+    'widget.liquiditaet.desc':       'Liquidity forecast over 60 days',
+    'widget.puffer.name':            'Buffer',
+    'widget.puffer.desc':            'How full is your buffer?',
+    'widget.stundensatz.name':       'Hourly Rate',
+    'widget.stundensatz.desc':       'Effective hourly rate from time × money',
+    'widget.auslastung.name':        'Utilization',
+    'widget.auslastung.desc':        'Share of billable hours',
+    'widget.deckungsbeitrag.name':   'Contribution Margin',
+    'widget.deckungsbeitrag.desc':   'Minimum hours for fixed costs',
+    'widget.runway.name':            'Runway',
+    'widget.runway.desc':            'How long does your money last?',
+    'widget.abo_kosten.name':        'Subscription Costs',
+    'widget.abo_kosten.desc':        'Monthly recurring costs',
+    'widget.kundenkonzentration.name': 'Client Concentration',
+    'widget.kundenkonzentration.desc': 'How dependent are you on individual clients?',
+    'widget.steuerreserve.name':     'Tax Reserve',
+    'widget.steuerreserve.desc':     'Recommended tax reserve',
+    'widget.freiheit.name':          'Freedom Months',
+    'widget.freiheit.desc':          'How many months could you live without income?',
+    'widget.lebensenergie.name':     'Life Energy Rate',
+    'widget.lebensenergie.desc':     'What do you really earn per life hour?',
+    'widget.kosten_lebensstunde.name': 'Cost per Life Hour',
+    'widget.kosten_lebensstunde.desc': 'What does an hour of your life cost?',
+    'widget.portfolio_life.name':    'Portfolio Life',
+    'widget.portfolio_life.desc':    'How does your time split across projects?',
+    'widget.sabbatical.name':        'Sabbatical',
+    'widget.sabbatical.desc':        'How close are you to a sabbatical?',
+    'widget.burnout.name':           'Burnout Risk',
+    'widget.burnout.desc':           'Work pattern analysis',
+    'widget.enough.name':            'Enough Point',
+    'widget.enough.desc':            'Where is "enough" for you?',
+    'widget.doughnut.name':          'Personal Doughnut',
+    'widget.doughnut.desc':          'Your personal doughnut — between too little and too much',
+
+    /* Widget Detail-Strings: formula + interpretation + data labels */
+    'widget.einnahmen.formula':      'Σ transactions (type=Income, current year)',
+    'widget.einnahmen.interp_pos':   'Your income for the current year.',
+    'widget.einnahmen.interp_zero':  'No income recorded yet.',
+    'widget.einnahmen.confirmed_sub':'✓ {amt} confirmed',
+    'widget.ausgaben.formula':       'Σ transactions (type=Expense, current year)',
+    'widget.ausgaben.interp':        'Your expenses for the current year.',
+    'widget.profit.formula':         'Income − Expenses (current year)',
+    'widget.profit.interp_pos':      'You are in the black.',
+    'widget.profit.interp_neg':      'Your expenses exceed your income.',
+    'widget.vermoegen.formula':      'Σ estimatedBalance(account) × FX rate → main currency',
+    'widget.vermoegen.interp':       'Estimated from opening balances + transaction movements.',
+    'widget.vermoegen.sub_n_konten': '{n} accounts',
+    'widget.cashflow.formula':       'Income vs. expenses per month (bar chart)',
+    'widget.cashflow.interp':        'Shows your monthly cash flow over the current year.',
+    'widget.cashflow.legend_inc':    'Income',
+    'widget.cashflow.legend_exp':    'Expenses',
+    'widget.cashflow.no_data':       'No data',
+    'widget.offene_rechnungen.formula': 'Invoices with status ≠ Paid/Draft',
+    'widget.offene_rechnungen.interp_zero': 'No open invoices.',
+    'widget.offene_rechnungen.interp_n':    '{n} invoices awaiting payment.',
+    'widget.offene_rechnungen.sub_open':    '{amt} open',
+    'widget.offene_rechnungen.sub_overdue': '⚠ {n} overdue',
+    'widget.steuer_score.formula':   'Categorized 40% + Documented 30% + VAT 10% + Flags 20%',
+    'widget.steuer_score.interp_good': 'You are well prepared.',
+    'widget.steuer_score.interp_bad':  'There are still gaps — review your transactions.',
+    'widget.steuer_score.sub_review':  '{n} to review',
+    'widget.steuer_score.row_categorized': 'Categorized',
+    'widget.steuer_score.row_documented':  'Documented',
+    'widget.steuer_score.row_mwst_ok':     'VAT-OK',
+    'widget.steuer_score.row_flags_ok':    'Flags-OK',
+    'widget.liquiditaet.formula':    'Current balance + expected in/outflows over the period',
+    'widget.liquiditaet.interp':     'Shows whether you stay liquid in the coming weeks.',
+    'widget.liquiditaet.no_account': 'Account with balance required',
+    'widget.liquiditaet.sub_in_days':'in {n} days',
+    'widget.puffer.formula':         'Buffer account balance ÷ buffer goal × 100',
+    'widget.puffer.no_buffer':       'Set up buffer account',
+    'widget.puffer.no_buffer_long':  'No buffer account found. Create an account with "Buffer" in the name or type "Pocket".',
+    'widget.puffer.full':            'Buffer full!',
+    'widget.puffer.remaining':       '{amt} to go.',
+    'widget.puffer.row_current':     'Current',
+    'widget.puffer.row_goal':        'Goal',
+    'widget.puffer.row_account':     'Account',
+    'widget.stundensatz.formula':    'Business income / tracked hours',
+    'widget.stundensatz.no_clockify_long': 'Connect Clockify to calculate your hourly rate.',
+    'widget.stundensatz.no_income':  'Hourly rate can only be calculated once income is recorded.',
+    'widget.stundensatz.normal':     'Your effective hourly rate based on all tracked hours.',
+    'widget.stundensatz.connect':    'Connect Clockify',
+    'widget.stundensatz.no_income_short': 'No income yet',
+    'widget.auslastung.formula':     'Billable hours / total tracked hours',
+    'widget.auslastung.interp':      'How much of your tracked time is directly billable.',
+    'widget.deckungsbeitrag.no_data':'Data missing',
+    'widget.deckungsbeitrag.no_clockify':  'Connect Clockify',
+    'widget.deckungsbeitrag.no_hours':     'No hours tracked',
+    'widget.deckungsbeitrag.no_income':    'No income recorded yet',
+    'widget.deckungsbeitrag.no_clockify_long': 'Connect Clockify → Settings',
+    'widget.deckungsbeitrag.no_hours_long':    'No hours tracked in Clockify',
+    'widget.deckungsbeitrag.no_rate_long':     'Hourly rate can only be calculated once income exists (income ÷ hours)',
+    'widget.deckungsbeitrag.formula':'Monthly fixed costs (business recurrings) ÷ effective hourly rate',
+    'widget.deckungsbeitrag.over_min':  'You are working {n}h over the minimum.',
+    'widget.deckungsbeitrag.under_min': 'You are short {n}h to cover fixed costs.',
+    'widget.deckungsbeitrag.sub_min':   'Min/month at {amt} fixed costs',
+    'widget.deckungsbeitrag.sub_surplus_pos': '+{n}h surplus',
+    'widget.deckungsbeitrag.sub_surplus_neg': '{n}h surplus',
+    'widget.deckungsbeitrag.value_unit':      '{n}h/month',
+    'widget.deckungsbeitrag.row_fixcosts':    'Fixed costs/mo.',
+    'widget.deckungsbeitrag.row_rate':        'Hourly rate',
+    'widget.deckungsbeitrag.row_min_hours':   'Min. hours',
+    'widget.deckungsbeitrag.row_surplus':     'Surplus',
+    'widget.runway.no_data':         'Balance + business expenses required',
+    'widget.runway.no_data_long':    'Requires an account with balance and business expenses from the last 3 months.',
+    'widget.runway.formula':         'Total assets / avg. monthly total expenses',
+    'widget.runway.interp_good':     'Comfortable runway.',
+    'widget.runway.interp_warn':     'Less than 6 months — plan ahead.',
+    'widget.runway.value_months':    '{n} months',
+    'widget.runway.value_months_short': '{n} mo.',
+    'widget.abo_kosten.formula':     'Σ active recurrings (normalized monthly)',
+    'widget.abo_kosten.interp':      'Your fixed monthly costs from recurring payments.',
+    'widget.abo_kosten.value_per_month': '{amt}/mo.',
+    'widget.kundenkonzentration.no_invoices': 'No invoices',
+    'widget.kundenkonzentration.formula': 'Herfindahl-Hirschman Index: Σ(revenue share²) × 10000',
+    'widget.kundenkonzentration.interp_high': 'High concentration — cluster risk.',
+    'widget.kundenkonzentration.interp_mod':  'Moderate concentration.',
+    'widget.kundenkonzentration.interp_low':  'Well diversified.',
+    'widget.steuerreserve.formula':  'Profit × {pct}% ({country} flat rate)',
+    'widget.steuerreserve.interp':   'Set this amount aside for taxes and social security.',
+    'widget.steuerreserve.sub_pct':  '{pct}% of profit',
+    'widget.freiheit.formula':       'Total assets / avg. monthly total expenses (incl. private)',
+    'widget.freiheit.interp_good':   'Solid freedom reserve.',
+    'widget.freiheit.interp_warn':   'Less than 6 months of financial runway.',
+    'widget.freiheit.row_wealth':    'Assets',
+    'widget.freiheit.row_avg_exp':   'Avg. expenses/mo.',
+    'widget.lebensenergie.no_data':  'Clockify required',
+    'widget.lebensenergie.formula':  '(Net income − work costs) / (hours × 1.25)',
+    'widget.lebensenergie.interp':   'The true hourly rate after deducting all hidden costs and time.',
+    'widget.lebensenergie.sub_nominal': 'Nominal: {rate}',
+    'widget.lebensenergie.sub_nominal_empty': 'Nominal: —',
+    'widget.lebensenergie.link_label':  'Vicki Robin: Your Money or Your Life',
+    'widget.kosten_lebensstunde.formula': 'Monthly expenses / 480 (≈ 16 waking hours × 30 days)',
+    'widget.kosten_lebensstunde.interp':  'This is what an hour of your waking life costs in fixed expenses.',
+    'widget.kosten_lebensstunde.sub':     'per waking hour',
+    'widget.portfolio_life.formula':  'Clockify projects aggregated',
+    'widget.portfolio_life.no_clockify': 'Connect Clockify',
+    'widget.portfolio_life.value_total': '{n}h total',
+    'widget.portfolio_life.more_n':      '+{n} more',
+    'widget.sabbatical.formula':     'Freedom months / target months × 100',
+    'widget.sabbatical.interp_ready':'You could afford a sabbatical now!',
+    'widget.sabbatical.interp_short':'You need {amt} more.',
+    'widget.sabbatical.sub_progress':'{cur} / {target} mo.',
+    'widget.burnout.coming_soon':    'Coming Soon',
+    'widget.burnout.coming_soon_sub':'Requires Clockify upgrade',
+    'widget.burnout.coming_soon_long': 'Will be available after the Clockify Timestamps upgrade.',
+    'widget.enough.coming_soon':     'Coming Soon',
+    'widget.enough.coming_soon_sub': 'Requires check-in system',
+    'widget.enough.coming_soon_long':'Will be available after the check-in system (DS4).',
+    'widget.doughnut.coming_soon':   'Coming Soon',
+    'widget.doughnut.coming_soon_sub':'Design in DS4',
+    'widget.doughnut.coming_soon_long':'Will be available after the doughnut design session.',
+
+    /* Cockpit recent transactions empty */
+    'cockpit.recent.empty':          'No transactions yet',
+
+    /* Gruppe 8: Erfassen-Overlay */
+    'erf.title':                     'Add Entry',
+    'erf.mode.buchung':              'Add transaction',
+    'erf.mode.buchung_sub':          'Income, expense or transfer',
+    'erf.mode.rechnung':             'Create invoice',
+    'erf.mode.scan':                 'Scan receipt',
+    'erf.fx.toggle':                 '🌐 Convert foreign currency',
+    'erf.fx.apply':                  '↓ Apply',
+    'erf.type.expense':              'Expense',
+    'erf.type.income':               'Income',
+    'erf.type.transfer':             'Transfer',
+    'erf.scan.inline':                '📷 Scan receipt',
+    'erf.scan.disabled_hint_pre':     'Activate AI receipt analysis in ',
+    'erf.scan.disabled_hint_link':    'Settings → Connections',
+    'erf.bereich.business':          '💼 Business',
+    'erf.bereich.private':           '🏠 Private',
+    'erf.label.amount':              'Amount',
+    'erf.label.date':                'Date',
+    'erf.label.description':         'Description',
+    'erf.label.counterpart':         'Counterpart / Client',
+    'erf.label.invoice_ref':         'Invoice no.',
+    'erf.label.category':            'Category',
+    'erf.label.account':             'Account',
+    'erf.label.projekt':             'Project',
+    'erf.label.projekt_opt':         '(opt.)',
+    'erf.label.transfer_from':       'From account',
+    'erf.label.transfer_to':         'To account',
+    'erf.label.status':              'Status',
+    'erf.label.note':                'Note',
+    'erf.label.mwst_pct':            'VAT rate (%)',
+    'erf.label.beleg':               'Receipt',
+    'erf.placeholder.amount':        '0.00',
+    'erf.placeholder.description':   'What was it?',
+    'erf.placeholder.counterpart':   'Person or organization',
+    'erf.placeholder.invoice_ref':   'R-2026-001',
+    'erf.placeholder.note':          'Optional',
+    'erf.placeholder.mwst':          '8.1',
+    'erf.select.choose':             '— choose —',
+    'erf.select.no_projekt':         '— no project —',
+    'erf.status.paid':               '✅ Paid / Received',
+    'erf.status.pending':            '⏳ Pending / Planned',
+    'erf.scan.types':                'Photo, PDF or file',
+    'erf.scan.formats':              'JPG · PNG · PDF · Drag & Drop',
+    'erf.btn.save':                  '✓ Save',
+    'erf.dup.title':                 '⚠️ Possible duplicate',
+    'erf.scan.intro':                'Upload a receipt — the AI reads amount, date and category automatically.',
+    /* Rechnungs-Form spezifisch */
+    'erf.inv.label.description':     'Description / service',
+    'erf.inv.label.taxcat':          'Tax category',
+    'erf.inv.label.due':             'Due on',
+    'erf.inv.label.client':          'Client',
+    'erf.inv.status.paid':           'Paid',
+    'erf.inv.status.open':           'Open',
+    'erf.inv.status.draft':          'Draft',
+    'erf.inv.status.partial':        'Partial',
+
+    /* Gruppe 9: Inbox */
+    'inbox.btn_title':               'Payments inbox',
+    'inbox.section.income':          'Income — confirm payment received',
+    'inbox.section.expense':         'Expenses — confirm execution',
+    'inbox.section.unconfirmed':     'Unconfirmed transactions — please review',
+    'inbox.subtitle.away_singular':  'You were away {days} days — {n} entry waiting.',
+    'inbox.subtitle.away_plural':    'You were away {days} days — {n} entries waiting.',
+    'inbox.subtitle.due_singular':   '{n} due entry',
+    'inbox.subtitle.due_plural':     '{n} due entries',
+    'inbox.due.today':               'Due today',
+    'inbox.due.yesterday':           'Due yesterday',
+    'inbox.due.overdue':             '{n} days overdue (since {date})',
+    'inbox.due.overdue_recur':       '{n} days overdue ({date})',
+    'inbox.btn.invoice_paid':        '✓ Payment received',
+    'inbox.btn.shift_due':           'Shift due date',
+    'inbox.btn.later':               'Later',
+    'inbox.btn.recur_book':          '✓ Paid / executed',
+    'inbox.btn.recur_skip':          'Skip',
+    'inbox.btn.recur_snooze':        'Not paid',
+    'inbox.btn.confirm':             '✓ Confirm',
+    'inbox.btn.confirm_short':       'Confirm',
+    'inbox.btn.cancel':              'Cancel',
+    'inbox.btn.done':                'Done',
+
+    /* Gruppe 10: Confirms + Banner/Modals */
+    'confirm.gdrive_disconnect':     'Disconnect Google Drive? Your receipts stay in Google Drive — FinanceBird only loses the connection.',
+    'confirm.notion_reset':          'Reset connection? You will need to reconnect to Notion. Your data in Notion stays intact.',
+    'confirm.invoice_delete':        'Delete invoice "{nr}"?',
+    'confirm.buchung_delete':        'Delete transaction "{label}"?\n\nIt will be kept in trash for 30 days.',
+    'confirm.local_data_delete':     'Really delete ALL local data? Notion data stays intact.',
+    'confirm.logout':                'Really sign out? Local data stays intact, you can reconnect anytime.',
+    'confirm.person_remove':         'Remove person?',
+
+    'collab.modal.title':            'Add accountant',
+    'collab.modal.body':             'After adding, you receive an invitation message you can forward by email or messenger.',
+    'collab.modal.label_name':       'Name',
+    'collab.modal.placeholder_name': 'e.g. Maria Muster',
+    'collab.modal.label_email':      'Email (optional)',
+    'collab.modal.placeholder_email':'maria@muster.ch',
+    'collab.modal.cancel':           'Cancel',
+    'collab.modal.create':           'Create invitation →',
+    'collab.invite.title':           'Invitation ready',
+    'collab.invite.body':            'Send this message to your accountant — by email, WhatsApp or whatever is easiest.',
+    'collab.invite.copy':            '📋 Copy',
+    'collab.invite.mail':            '✉️ Open email',
+    'collab.invite.done':            'Done',
+
+    'app.status.connected':          'Connected',
+
+    /* Gruppe 11: Empty/Loading */
+    'loading.data':                  'Loading data…',
+    'loading.einstellungen':         'Loading settings…',
+    'empty.zeit_sync_hint':          'Click sync to load time tracking data',
+    'empty.projekte_cache':          'No projects in cache',
+    'health.warn.cache_empty':       'Transaction cache empty',
+    'health.warn.cache_empty_action':'Start sync',
+    'health.warn.no_konten':         'No accounts',
+    'health.warn.no_konten_action':  'Configure in Notion',
   }
 };
 
@@ -4655,7 +5295,7 @@ async function flushReceiptQueueAfterReauth() {
 
 /** Sprint 5 BUG-041: Disconnect GDrive vom Einstellungen-Flow */
 function settingsDisconnectGDrive() {
-  if (!confirm('Google Drive trennen? Deine Belege bleiben in Google Drive — FinanceBird verliert nur die Verbindung.')) return;
+  if (!confirm(t('confirm.gdrive_disconnect'))) return;
   saveLocal('fb_gdrive_parent', null);
   saveLocal('fb_gdrive_tier_business_tier', null);
   saveLocal('fb_gdrive_tier_private_tier', null);
@@ -6181,7 +6821,7 @@ async function deltaSync() {
 /* ── Offline Write Queue ── */
 
 const QUEUE_KEY = 'fb_write_queue';
-const APP_VERSION = '2.28a.2026-04-26';
+const APP_VERSION = '2.29a.2026-04-26';
 
 function queueAdd(entry) {
   entry.id      = entry.id || uid();
@@ -7632,7 +8272,7 @@ async function submitLicenseKey() {
   }
 }
 function triggerReset() {
-  if (!confirm('Verbindung zurücksetzen? Du musst dich neu mit Notion verbinden. Deine Daten in Notion bleiben erhalten.')) return;
+  if (!confirm(t('confirm.notion_reset'))) return;
   Auth.logout();
   // Cache leeren
   try {
@@ -9283,9 +9923,13 @@ function inboxRender(invoices, recurrings, staleUnconfirmed = []) {
   const sub   = document.getElementById('inboxSubtitle');
 
   if (InboxState.daysSince > 1) {
-    sub.textContent = `Du warst ${InboxState.daysSince} Tage weg — ${total} ${total === 1 ? 'Eintrag wartet' : 'Einträge warten'}.`;
+    sub.textContent = total === 1
+      ? t('inbox.subtitle.away_singular', { days: InboxState.daysSince, n: total })
+      : t('inbox.subtitle.away_plural',   { days: InboxState.daysSince, n: total });
   } else {
-    sub.textContent = `${total} ${total === 1 ? 'fälliger Eintrag' : 'fällige Einträge'}`;
+    sub.textContent = total === 1
+      ? t('inbox.subtitle.due_singular', { n: total })
+      : t('inbox.subtitle.due_plural',   { n: total });
   }
 
   document.getElementById('inboxProgress').style.display = 'none';
@@ -9293,7 +9937,7 @@ function inboxRender(invoices, recurrings, staleUnconfirmed = []) {
   let html = '';
 
   if (invoices.length > 0) {
-    html += `<div class="inbox-section-label">Einnahmen — Zahlungseingang bestätigen</div>`;
+    html += `<div class="inbox-section-label">${t('inbox.section.income')}</div>`;
     html += invoices.map(inv => inboxInvCard(inv)).join('');
   }
 
@@ -9301,14 +9945,14 @@ function inboxRender(invoices, recurrings, staleUnconfirmed = []) {
     html += `<div style="border-top:1px solid var(--border);margin:12px 0"></div>`;
 
   if (recurrings.length > 0) {
-    html += `<div class="inbox-section-label">Ausgaben — Ausführung bestätigen</div>`;
+    html += `<div class="inbox-section-label">${t('inbox.section.expense')}</div>`;
     html += recurrings.map(r => inboxRecurCard(r)).join('');
   }
 
   // Soft reminders: stale unconfirmed bookings
   if (staleUnconfirmed.length > 0) {
     html += `<div style="border-top:1px solid var(--border);margin:12px 0"></div>`;
-    html += `<div class="inbox-section-label" style="color:var(--amber)">Unbestätigte Buchungen — bitte prüfen</div>`;
+    html += `<div class="inbox-section-label" style="color:var(--amber)">${t('inbox.section.unconfirmed')}</div>`;
     html += staleUnconfirmed.map(b => `
       <div class="inbox-card" style="border-color:var(--border);opacity:.8">
         <div class="inbox-card-header">
@@ -9321,8 +9965,8 @@ function inboxRender(invoices, recurrings, staleUnconfirmed = []) {
           </div>
         </div>
         <div class="inbox-actions">
-          <button class="inbox-btn-confirm" onclick="confirmBuchung('${b._id}')">✓ Bestätigen</button>
-          <button class="inbox-btn-later"   onclick="inboxDoneByCardId('inboxStale_${b._id}')">Später</button>
+          <button class="inbox-btn-confirm" onclick="confirmBuchung('${b._id}')">${t('inbox.btn.confirm')}</button>
+          <button class="inbox-btn-later"   onclick="inboxDoneByCardId('inboxStale_${b._id}')">${t('inbox.btn.later')}</button>
         </div>
       </div>`).join('');
   }
@@ -9333,9 +9977,9 @@ function inboxRender(invoices, recurrings, staleUnconfirmed = []) {
 function inboxInvCard(inv) {
   const today    = toDay();
   const daysDue  = Math.round((new Date(today) - new Date(inv.due)) / 86400000);
-  const dueLabel = daysDue === 0 ? 'Heute fällig'
-                 : daysDue === 1 ? 'Gestern fällig'
-                 : `${daysDue} Tage überfällig (seit ${fmtDate(inv.due)})`;
+  const dueLabel = daysDue === 0 ? t('inbox.due.today')
+                 : daysDue === 1 ? t('inbox.due.yesterday')
+                 : t('inbox.due.overdue', { n: daysDue, date: fmtDate(inv.due) });
   return `
     <div class="inbox-card" id="inboxInv_${inv._id}">
       <div class="inbox-card-header">
@@ -9348,21 +9992,21 @@ function inboxInvCard(inv) {
       </div>
       <div class="inbox-actions">
         <button class="inbox-btn-confirm" onclick="inboxInvPaid('${inv._id}')">
-          ✓ Zahlung eingegangen
+          ${t('inbox.btn.invoice_paid')}
         </button>
         <button class="inbox-btn-shift" onclick="inboxInvShowShift('${inv._id}')">
-          Fälligkeit verschieben
+          ${t('inbox.btn.shift_due')}
         </button>
         <button class="inbox-btn-later" onclick="inboxDone('inv_${inv._id}')">
-          Später
+          ${t('inbox.btn.later')}
         </button>
       </div>
       <div id="inboxInvShift_${inv._id}" style="display:none;margin-top:10px;display:none;gap:8px;align-items:center;flex-wrap:wrap">
         <input type="date" id="inboxInvNewDue_${inv._id}"
           style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;color:var(--ink);background:var(--paper)"
           value="${inv.due || today}">
-        <button class="btn btn-sm btn-primary" onclick="inboxInvConfirmShift('${inv._id}')">Bestätigen</button>
-        <button class="btn btn-sm btn-outline" onclick="document.getElementById('inboxInvShift_${inv._id}').style.display='none'">Abbrechen</button>
+        <button class="btn btn-sm btn-primary" onclick="inboxInvConfirmShift('${inv._id}')">${t('inbox.btn.confirm_short')}</button>
+        <button class="btn btn-sm btn-outline" onclick="document.getElementById('inboxInvShift_${inv._id}').style.display='none'">${t('inbox.btn.cancel')}</button>
       </div>
     </div>`;
 }
@@ -9371,10 +10015,10 @@ function inboxRecurCard(r) {
   const today    = toDay();
   const periodDate = r._periodDate || r.nextDate;
   const daysDue  = r._daysOverdue || Math.round((new Date(today) - new Date(periodDate)) / 86400000);
-  const dueLabel = daysDue === 0 ? 'Heute fällig'
-                 : daysDue === 1 ? 'Gestern fällig'
-                 : `${daysDue} Tage überfällig (${fmtDate(periodDate)})`;
-  const freqLabel = { weekly:'Wöchentlich', monthly:'Monatlich', yearly:'Jährlich' }[r.freq] || r.freq;
+  const dueLabel = daysDue === 0 ? t('inbox.due.today')
+                 : daysDue === 1 ? t('inbox.due.yesterday')
+                 : t('inbox.due.overdue_recur', { n: daysDue, date: fmtDate(periodDate) });
+  const freqLabel = recFreqLabel(r.freq);
   const isIncome = r.typ === 'Einnahme';
   // BL-069: unique card ID per period
   const cardId = 'inboxRecur_' + r._id + (r._periodDate ? '_' + r._periodDate : '');
@@ -9389,9 +10033,9 @@ function inboxRecurCard(r) {
         <div class="inbox-card-amt ${isIncome ? 'pos' : 'neg'}">${isIncome ? '+' : '−'}${fmtS(r.amt)}</div>
       </div>
       <div class="inbox-actions">
-        <button class="inbox-btn-confirm" onclick="inboxRecurBook('${r._id}')">✓ Bezahlt / ausgeführt</button>
-        <button class="inbox-btn-shift"   onclick="inboxRecurSkip('${r._id}')">Überspringen</button>
-        <button class="inbox-btn-later"   onclick="inboxRecurSnooze('${r._id}')">Nicht bezahlt</button>
+        <button class="inbox-btn-confirm" onclick="inboxRecurBook('${r._id}')">${t('inbox.btn.recur_book')}</button>
+        <button class="inbox-btn-shift"   onclick="inboxRecurSkip('${r._id}')">${t('inbox.btn.recur_skip')}</button>
+        <button class="inbox-btn-later"   onclick="inboxRecurSnooze('${r._id}')">${t('inbox.btn.recur_snooze')}</button>
       </div>
     </div>`;
 }
@@ -9859,10 +10503,113 @@ function applyStaticI18n() {
     const el = document.getElementById(id);
     if (el) el.textContent = t(key);
   };
+  const _setHTML = (id, html) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  };
+  const _setAttr = (id, attr, key) => {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute(attr, t(key));
+  };
   _setText('saldoModalAmtLabel',  'saldo.modal.balance_label');
   _setText('saldoModalDateLabel', 'saldo.modal.date_label');
   _setText('saldoModalCancelBtn', 'saldo.modal.cancel');
   _setText('saldoModalSaveBtn',   'saldo.modal.save');
+
+  // ── S34 Sprint 6.5b · BL-109b ──
+  // App-Header Status + Inbox-Btn Title
+  _setText('appStatusLabel', 'app.status.connected');
+  _setAttr('inboxBtn', 'title', 'inbox.btn_title');
+
+  // Erfassen-Modal Statics
+  _setText('erfassenTitle',          'erf.title');
+  _setText('erfModeBuchungTitle',    'erf.mode.buchung');
+  _setText('erfModeBuchungSub',      'erf.mode.buchung_sub');
+  _setText('erfModeRechnungLabel',   'erf.mode.rechnung');
+  _setAttr('erfModeScanBtn', 'title','erf.mode.scan');
+  _setText('erfFXToggle',            'erf.fx.toggle');
+  _setText('erfFXApply',             'erf.fx.apply');
+  _setText('erfBtnExpense',          'erf.type.expense');
+  _setText('erfBtnIncome',           'erf.type.income');
+  _setText('erfBtnTransfer',         'erf.type.transfer');
+  _setText('erfInlineScanBtn',       'erf.scan.inline');
+  // erfScanDisabledHint contains a link — innerHTML
+  _setHTML('erfScanDisabledHint',
+    t('erf.scan.disabled_hint_pre') +
+    '<a href="#" onclick="nav(\'einstellungen\');closeErfassen();return false" style="color:var(--accent)">' +
+    t('erf.scan.disabled_hint_link') + '</a>');
+  _setText('erfBtnBiz',              'erf.bereich.business');
+  _setText('erfBtnPriv',             'erf.bereich.private');
+  _setText('erfAmtLabel',            'erf.label.amount');
+  _setText('erfDateLabel',           'erf.label.date');
+  _setText('erfDescLabel',           'erf.label.description');
+  _setText('erfCounterpartLabel',    'erf.label.counterpart');
+  _setText('erfInvRefLabel',         'erf.label.invoice_ref');
+  _setText('erfCatLabel',            'erf.label.category');
+  _setText('erfAccountLabel',        'erf.label.account');
+  // erfProjektLabel has nested span "(opt.)" — innerHTML
+  _setHTML('erfProjektLabel',
+    t('erf.label.projekt') + ' <span style="color:var(--muted);font-weight:400">' + t('erf.label.projekt_opt') + '</span>');
+  _setText('erfTransferFromLabel',   'erf.label.transfer_from');
+  _setText('erfTransferToLabel',     'erf.label.transfer_to');
+  _setText('erfStatusLabel',         'erf.label.status');
+  _setText('erfPaidOptYes',          'erf.status.paid');
+  _setText('erfPaidOptNo',           'erf.status.pending');
+  _setText('erfNoteLabel',           'erf.label.note');
+  _setText('erfMwstLabel',           'erf.label.mwst_pct');
+  _setText('erfBelegLabel',          'erf.label.beleg');
+  _setText('erfScanZoneTypes',       'erf.scan.types');
+  _setText('erfScanZoneFormats',     'erf.scan.formats');
+  _setText('erfDupWarnTitle',        'erf.dup.title');
+  _setText('erfSaveBtn',             'erf.btn.save');
+  _setText('erfScanIntro',           'erf.scan.intro');
+  // Erfassen Placeholders + Select-Options (— wählen — / — kein Projekt —)
+  _setAttr('erfAmt',         'placeholder', 'erf.placeholder.amount');
+  _setAttr('erfDesc',        'placeholder', 'erf.placeholder.description');
+  _setAttr('erfCounterpart', 'placeholder', 'erf.placeholder.counterpart');
+  _setAttr('erfInvRef',      'placeholder', 'erf.placeholder.invoice_ref');
+  _setAttr('erfNote',        'placeholder', 'erf.placeholder.note');
+  _setAttr('erfMwstSatz',    'placeholder', 'erf.placeholder.mwst');
+  // Update first <option> of erfAccount, erfProjekt, erfTransferFrom, erfTransferTo
+  const _setFirstOption = (selectId, key) => {
+    const sel = document.getElementById(selectId);
+    if (sel && sel.options.length > 0 && sel.options[0].value === '') {
+      sel.options[0].textContent = t(key);
+    }
+  };
+  _setFirstOption('erfAccount',      'erf.select.choose');
+  _setFirstOption('erfProjekt',      'erf.select.no_projekt');
+  _setFirstOption('erfTransferFrom', 'erf.select.choose');
+  _setFirstOption('erfTransferTo',   'erf.select.choose');
+
+  // Collab Modal + Invite Sheet (L11-Pattern)
+  _setText('collabModalTitle',       'collab.modal.title');
+  _setText('collabModalBody',        'collab.modal.body');
+  _setText('collabModalLabelName',   'collab.modal.label_name');
+  _setText('collabModalLabelEmail',  'collab.modal.label_email');
+  _setText('collabModalCancelBtn',   'collab.modal.cancel');
+  _setText('collabModalCreateBtn',   'collab.modal.create');
+  _setAttr('collabNameInput',  'placeholder', 'collab.modal.placeholder_name');
+  _setAttr('collabEmailInput', 'placeholder', 'collab.modal.placeholder_email');
+  _setText('collabInviteTitle',      'collab.invite.title');
+  _setText('collabInviteBody',       'collab.invite.body');
+  _setText('collabInviteCopyBtn',    'collab.invite.copy');
+  _setText('collabInviteMailBtn',    'collab.invite.mail');
+  _setText('collabInviteDoneBtn',    'collab.invite.done');
+
+  // Inbox btn (Done button text)
+  _setText('inboxDoneBtn', 'inbox.btn.done');
+
+  // Loading-Empty-States (cockpit/activities/einstellungen)
+  const _setLoading = (id, key) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const p = el.querySelector('p');
+    if (p) p.textContent = t(key);
+  };
+  _setLoading('emptyLoadCockpit',    'loading.data');
+  _setLoading('emptyLoadActivities', 'loading.data');
+  _setLoading('emptyLoadSettings',   'loading.einstellungen');
 }
 
 function renderAll() {
@@ -9938,42 +10685,42 @@ function calculateTaxReadiness() {
 /* ── BL-085: Widget-Bibliothek-System (S17/DS1) ── */
 
 const WIDGET_CATS = {
-  buchhaltung: { label: 'Buchhaltung', desc: 'Was ist passiert?', color: 'var(--green)' },
-  geschaeft:   { label: 'Geschäftsanalyse', desc: 'Wie gesund ist mein Geschäft?', color: 'var(--accent)' },
-  kompass:     { label: 'Kompass', desc: 'Bin ich auf dem richtigen Weg?', color: 'var(--amber)' },
+  buchhaltung: { label: 'widget.cat.buchhaltung.label', desc: 'widget.cat.buchhaltung.desc', color: 'var(--green)' },
+  geschaeft:   { label: 'widget.cat.geschaeft.label',   desc: 'widget.cat.geschaeft.desc',   color: 'var(--accent)' },
+  kompass:     { label: 'widget.cat.kompass.label',     desc: 'widget.cat.kompass.desc',     color: 'var(--amber)' },
 };
 
 const WIDGETS = [
   // ── Buchhaltung ──
-  { id: 'einnahmen', cat: 'buchhaltung', name: 'Einnahmen', icon: '💰', size: 'small',
-    requires: ['buchungen'], desc: 'Jahreseinnahmen mit Trend',
+  { id: 'einnahmen', cat: 'buchhaltung', name: 'widget.einnahmen.name', icon: '💰', size: 'small',
+    requires: ['buchungen'], desc: 'widget.einnahmen.desc',
     render() {
       const v = Computed.totalIncome();
       const conf = Computed.totalIncomeConfirmed();
       const hasUnconf = conf < v;
       return `<div class="w-val pos">${fmtS(v)}</div>
-        ${hasUnconf ? `<div class="w-sub">✓ ${fmtS(conf)} bestätigt</div>` : ''}`;
+        ${hasUnconf ? `<div class="w-sub">${t('widget.einnahmen.confirmed_sub', { amt: fmtS(conf) })}</div>` : ''}`;
     },
     detail() {
       const v = Computed.totalIncome();
-      return { value: fmtS(v), valueClass: 'pos', formula: 'Σ Buchungen (Typ=Einnahme, laufendes Jahr)',
-        interpretation: v > 0 ? 'Deine Einnahmen im laufenden Jahr.' : 'Noch keine Einnahmen erfasst.' };
+      return { value: fmtS(v), valueClass: 'pos', formula: t('widget.einnahmen.formula'),
+        interpretation: v > 0 ? t('widget.einnahmen.interp_pos') : t('widget.einnahmen.interp_zero') };
     }
   },
-  { id: 'ausgaben', cat: 'buchhaltung', name: 'Ausgaben', icon: '💸', size: 'small',
-    requires: ['buchungen'], desc: 'Jahresausgaben mit Trend',
+  { id: 'ausgaben', cat: 'buchhaltung', name: 'widget.ausgaben.name', icon: '💸', size: 'small',
+    requires: ['buchungen'], desc: 'widget.ausgaben.desc',
     render() {
       const v = Computed.totalExpense();
       return `<div class="w-val neg">${fmtS(v)}</div>`;
     },
     detail() {
       const v = Computed.totalExpense();
-      return { value: fmtS(v), valueClass: 'neg', formula: 'Σ Buchungen (Typ=Ausgabe, laufendes Jahr)',
-        interpretation: 'Deine Ausgaben im laufenden Jahr.' };
+      return { value: fmtS(v), valueClass: 'neg', formula: t('widget.ausgaben.formula'),
+        interpretation: t('widget.ausgaben.interp') };
     }
   },
-  { id: 'profit', cat: 'buchhaltung', name: 'Profit', icon: '📊', size: 'small',
-    requires: ['buchungen'], desc: 'Einnahmen minus Ausgaben',
+  { id: 'profit', cat: 'buchhaltung', name: 'widget.profit.name', icon: '📊', size: 'small',
+    requires: ['buchungen'], desc: 'widget.profit.desc',
     render() {
       const v = Computed.totalIncome() - Computed.totalExpense();
       return `<div class="w-val ${v >= 0 ? 'pos' : 'neg'}">${fmtS(v)}</div>`;
@@ -9981,22 +10728,22 @@ const WIDGETS = [
     detail() {
       const v = Computed.totalIncome() - Computed.totalExpense();
       return { value: fmtS(v), valueClass: v >= 0 ? 'pos' : 'neg',
-        formula: 'Einnahmen − Ausgaben (laufendes Jahr)',
-        interpretation: v >= 0 ? 'Du bist im Plus.' : 'Deine Ausgaben übersteigen die Einnahmen.' };
+        formula: t('widget.profit.formula'),
+        interpretation: v >= 0 ? t('widget.profit.interp_pos') : t('widget.profit.interp_neg') };
     }
   },
-  { id: 'vermoegen', cat: 'buchhaltung', name: 'Vermögen', icon: '🏦', size: 'small',
-    requires: ['konten'], desc: 'Geschätztes Gesamtvermögen',
+  { id: 'vermoegen', cat: 'buchhaltung', name: 'widget.vermoegen.name', icon: '🏦', size: 'small',
+    requires: ['konten'], desc: 'widget.vermoegen.desc',
     render() {
       const v = Computed.totalWealth();
       return `<div class="w-val ${v >= 0 ? '' : 'neg'}">${fmtS(v)}</div>
-        <div class="w-sub">${Store.konten.filter(k=>k.active!==false).length} Konten</div>`;
+        <div class="w-sub">${t('widget.vermoegen.sub_n_konten', { n: Store.konten.filter(k=>k.active!==false).length })}</div>`;
     },
     detail() {
       const v = Computed.totalWealth();
       return { value: fmtS(v), valueClass: v >= 0 ? '' : 'neg',
-        formula: 'Σ estimatedBalance(Konto) × FX-Kurs → Hauptwährung',
-        interpretation: 'Geschätzt aus Startsaldi + Buchungsbewegungen.',
+        formula: t('widget.vermoegen.formula'),
+        interpretation: t('widget.vermoegen.interp'),
         data: Store.konten.filter(k=>k.active!==false).map(k => {
           const est = Computed.estimatedBalance(k.name, k.stand, k.saldoDatum);
           return [k.icon + ' ' + k.name, est !== null ? fmtK(est, k.currency) : '—'];
@@ -10004,95 +10751,95 @@ const WIDGETS = [
       };
     }
   },
-  { id: 'cashflow-chart', cat: 'buchhaltung', name: 'Cashflow', icon: '📈', size: 'large',
-    requires: ['buchungen'], desc: 'Monatlicher Ein-/Ausgang als Chart',
+  { id: 'cashflow-chart', cat: 'buchhaltung', name: 'widget.cashflow.name', icon: '📈', size: 'large',
+    requires: ['buchungen'], desc: 'widget.cashflow.desc',
     render() { return cockpitCashflowInner(); },
     detail() {
-      return { value: '', formula: 'Einnahmen vs. Ausgaben pro Monat (Balkenchart)',
-        interpretation: 'Zeigt deinen monatlichen Geldfluss über das laufende Jahr.' };
+      return { value: '', formula: t('widget.cashflow.formula'),
+        interpretation: t('widget.cashflow.interp') };
     }
   },
-  { id: 'offene-rechnungen', cat: 'buchhaltung', name: 'Offene Rechnungen', icon: '📬', size: 'small',
-    requires: ['rechnungen'], desc: 'Unbezahlte Rechnungen',
+  { id: 'offene-rechnungen', cat: 'buchhaltung', name: 'widget.offene_rechnungen.name', icon: '📬', size: 'small',
+    requires: ['rechnungen'], desc: 'widget.offene_rechnungen.desc',
     render() {
       const invoices = Computed.openInvoices();
       const n = invoices.length;
       const amt = Computed.openInvoiceAmount();
       const overdue = Computed.overdueInvoices().length;
       return `<div class="w-val">${n}</div>
-        <div class="w-sub">${fmtS(amt)} offen</div>
-        ${overdue > 0 ? `<div class="w-sub neg">⚠ ${overdue} überfällig</div>` : ''}`;
+        <div class="w-sub">${t('widget.offene_rechnungen.sub_open', { amt: fmtS(amt) })}</div>
+        ${overdue > 0 ? `<div class="w-sub neg">${t('widget.offene_rechnungen.sub_overdue', { n: overdue })}</div>` : ''}`;
     },
     detail() {
       const n = Computed.openInvoices().length;
-      return { value: String(n), formula: 'Rechnungen mit Status ≠ Bezahlt/Entwurf',
-        interpretation: n === 0 ? 'Keine offenen Rechnungen.' : `${n} Rechnungen warten auf Zahlung.` };
+      return { value: String(n), formula: t('widget.offene_rechnungen.formula'),
+        interpretation: n === 0 ? t('widget.offene_rechnungen.interp_zero') : t('widget.offene_rechnungen.interp_n', { n }) };
     }
   },
-  { id: 'steuer-score', cat: 'buchhaltung', name: 'Steuerbereit', icon: '📋', size: 'small',
-    requires: ['buchungen'], desc: 'Wie gut bist du für die Steuer vorbereitet?',
+  { id: 'steuer-score', cat: 'buchhaltung', name: 'widget.steuer_score.name', icon: '📋', size: 'small',
+    requires: ['buchungen'], desc: 'widget.steuer_score.desc',
     render() {
       const tr = calculateTaxReadiness();
       const color = tr.score < 50 ? 'neg' : tr.score < 80 ? 'warn' : 'pos';
       return `<div class="w-val ${color}">${tr.score}%</div>
-        ${tr.reviewCount > 0 ? `<div class="w-sub">${tr.reviewCount} zu prüfen</div>` : ''}`;
+        ${tr.reviewCount > 0 ? `<div class="w-sub">${t('widget.steuer_score.sub_review', { n: tr.reviewCount })}</div>` : ''}`;
     },
     detail() {
       const tr = calculateTaxReadiness();
       return { value: tr.score + '%', valueClass: tr.score < 50 ? 'neg' : tr.score < 80 ? 'warn' : 'pos',
-        formula: 'Kategorisiert 40% + Dokumentiert 30% + MWST 10% + Flags 20%',
-        interpretation: tr.score >= 80 ? 'Du bist gut vorbereitet.' : 'Es gibt noch Lücken — prüfe deine Buchungen.',
-        data: [['Kategorisiert', Math.round(tr.categorized*100)+'%'],['Dokumentiert', Math.round(tr.documented*100)+'%'],
-               ['MWST-OK', Math.round(tr.mwstOk*100)+'%'],['Flags-OK', Math.round(tr.flagsOk*100)+'%']] };
+        formula: t('widget.steuer_score.formula'),
+        interpretation: tr.score >= 80 ? t('widget.steuer_score.interp_good') : t('widget.steuer_score.interp_bad'),
+        data: [[t('widget.steuer_score.row_categorized'), Math.round(tr.categorized*100)+'%'],[t('widget.steuer_score.row_documented'), Math.round(tr.documented*100)+'%'],
+               [t('widget.steuer_score.row_mwst_ok'), Math.round(tr.mwstOk*100)+'%'],[t('widget.steuer_score.row_flags_ok'), Math.round(tr.flagsOk*100)+'%']] };
     }
   },
-  { id: 'liquiditaet', cat: 'buchhaltung', name: 'Liquidität', icon: '💧', size: 'medium',
-    requires: ['konten','buchungen','rechnungen'], desc: 'Liquiditätsvorschau auf 60 Tage',
+  { id: 'liquiditaet', cat: 'buchhaltung', name: 'widget.liquiditaet.name', icon: '💧', size: 'medium',
+    requires: ['konten','buchungen','rechnungen'], desc: 'widget.liquiditaet.desc',
     render() { return cockpitLiquiditaetInner(); },
     detail() {
-      return { value: '', formula: 'Aktuelles Saldo + erwartete Ein-/Ausgänge über Zeitraum',
-        interpretation: 'Zeigt ob du in den nächsten Wochen liquide bleibst.' };
+      return { value: '', formula: t('widget.liquiditaet.formula'),
+        interpretation: t('widget.liquiditaet.interp') };
     }
   },
-  { id: 'puffer', cat: 'buchhaltung', name: 'Puffer', icon: '🛟', size: 'small',
-    requires: ['konten','buchungen'], desc: 'Wie voll ist dein Puffer?',
+  { id: 'puffer', cat: 'buchhaltung', name: 'widget.puffer.name', icon: '🛟', size: 'small',
+    requires: ['konten','buchungen'], desc: 'widget.puffer.desc',
     render() {
       const p = Computed.puffer();
-      if (!p) return '<div class="w-val muted">—</div><div class="w-sub">Buffer-Konto einrichten</div>';
+      if (!p) return '<div class="w-val muted">—</div><div class="w-sub">' + t('widget.puffer.no_buffer') + '</div>';
       const color = p.pct < 30 ? 'neg' : p.pct < 70 ? 'warn' : 'pos';
       return `<div class="w-val ${color}">${p.pct}%</div>
         <div class="w-sub">${fmtS(p.balance)} / ${fmtS(p.goal)}</div>`;
     },
     detail() {
       const p = Computed.puffer();
-      if (!p) return { value: '—', interpretation: 'Kein Buffer-Konto gefunden. Erstelle ein Konto mit "Buffer" im Namen oder Typ "Pocket".' };
-      return { value: p.pct + '%', formula: 'Buffer-Konto Saldo ÷ Puffer-Ziel × 100',
-        interpretation: p.pct >= 100 ? 'Puffer voll!' : `Noch ${fmtS(p.goal - p.balance)} bis zum Ziel.`,
-        data: [['Aktuell', fmtS(p.balance)], ['Ziel', fmtS(p.goal)], ['Konto', p.konto]] };
+      if (!p) return { value: '—', interpretation: t('widget.puffer.no_buffer_long') };
+      return { value: p.pct + '%', formula: t('widget.puffer.formula'),
+        interpretation: p.pct >= 100 ? t('widget.puffer.full') : t('widget.puffer.remaining', { amt: fmtS(p.goal - p.balance) }),
+        data: [[t('widget.puffer.row_current'), fmtS(p.balance)], [t('widget.puffer.row_goal'), fmtS(p.goal)], [t('widget.puffer.row_account'), p.konto]] };
     }
   },
 
   // ── Geschäftsanalyse ──
-  { id: 'stundensatz', cat: 'geschaeft', name: 'Stundensatz', icon: '⏱️', size: 'small',
-    requires: ['clockify'], desc: 'Effektiver Stundensatz aus Zeit × Geld',
+  { id: 'stundensatz', cat: 'geschaeft', name: 'widget.stundensatz.name', icon: '⏱️', size: 'small',
+    requires: ['clockify'], desc: 'widget.stundensatz.desc',
     render() {
       const z = Computed.zeitKPIs();
-      if (!z.hasClockify) return '<div class="w-val muted">—</div><div class="w-sub">Clockify verbinden</div>';
-      if (!z.effectiveRate) return '<div class="w-val muted">—</div><div class="w-sub">Noch keine Einnahmen</div>';
+      if (!z.hasClockify) return '<div class="w-val muted">—</div><div class="w-sub">' + t('widget.stundensatz.connect') + '</div>';
+      if (!z.effectiveRate) return '<div class="w-val muted">—</div><div class="w-sub">' + t('widget.stundensatz.no_income_short') + '</div>';
       return `<div class="w-val">${fmtS(z.effectiveRate)}/h</div>`;
     },
     detail() {
       const z = Computed.zeitKPIs();
       const noRate = z.hasClockify && !z.effectiveRate;
       return { value: z.hasClockify && z.effectiveRate ? fmtS(z.effectiveRate)+'/h' : '—',
-        formula: 'Geschäfts-Einnahmen / getrackte Stunden',
-        interpretation: !z.hasClockify ? 'Verbinde Clockify um deinen Stundensatz zu berechnen.'
-          : noRate ? 'Stundensatz kann erst berechnet werden wenn Einnahmen erfasst sind.'
-          : 'Dein effektiver Stundensatz basierend auf allen getrackten Stunden.' };
+        formula: t('widget.stundensatz.formula'),
+        interpretation: !z.hasClockify ? t('widget.stundensatz.no_clockify_long')
+          : noRate ? t('widget.stundensatz.no_income')
+          : t('widget.stundensatz.normal') };
     }
   },
-  { id: 'auslastung', cat: 'geschaeft', name: 'Auslastung', icon: '📅', size: 'small',
-    requires: ['clockify'], desc: 'Anteil verrechenbarer Stunden',
+  { id: 'auslastung', cat: 'geschaeft', name: 'widget.auslastung.name', icon: '📅', size: 'small',
+    requires: ['clockify'], desc: 'widget.auslastung.desc',
     render() {
       const z = Computed.zeitKPIs();
       if (!z.hasClockify) return '<div class="w-val muted">—</div>';
@@ -10102,70 +10849,70 @@ const WIDGETS = [
     detail() {
       const z = Computed.zeitKPIs();
       return { value: z.hasClockify ? Math.round((z.billableHours/z.totalHours)*100)+'%' : '—',
-        formula: 'Billable Hours / Total Tracked Hours',
-        interpretation: 'Wie viel deiner getrackten Zeit direkt verrechenbar ist.' };
+        formula: t('widget.auslastung.formula'),
+        interpretation: t('widget.auslastung.interp') };
     }
   },
-  { id: 'deckungsbeitrag', cat: 'geschaeft', name: 'Deckungsbeitrag', icon: '🎯', size: 'medium',
-    requires: ['buchungen','clockify'], desc: 'Minimum-Stunden für Fixkosten',
+  { id: 'deckungsbeitrag', cat: 'geschaeft', name: 'widget.deckungsbeitrag.name', icon: '🎯', size: 'medium',
+    requires: ['buchungen','clockify'], desc: 'widget.deckungsbeitrag.desc',
     render() {
       const d = Computed.deckungsbeitrag();
-      if (!d) return '<div class="w-val muted">—</div><div class="w-sub">Daten fehlen</div>';
+      if (!d) return '<div class="w-val muted">—</div><div class="w-sub">' + t('widget.deckungsbeitrag.no_data') + '</div>';
       if (!d.hourlyRate) {
         const z = Computed.zeitKPIs();
-        const hint = !z.hasClockify ? 'Clockify verbinden' : z.totalH === 0 ? 'Keine Stunden erfasst' : 'Noch keine Einnahmen erfasst';
+        const hint = !z.hasClockify ? t('widget.deckungsbeitrag.no_clockify') : z.totalH === 0 ? t('widget.deckungsbeitrag.no_hours') : t('widget.deckungsbeitrag.no_income');
         return `<div class="w-val muted">—</div><div class="w-sub">${hint}</div>`;
       }
       return `<div class="w-val">${d.minBillableHours}h</div>
-        <div class="w-sub">Minimum/Monat bei ${fmtS(d.fixCosts)} Fixkosten</div>
-        ${d.surplusHours !== null ? `<div class="w-sub ${d.surplusHours >= 0 ? 'pos' : 'neg'}">${d.surplusHours >= 0 ? '+' : ''}${d.surplusHours}h Surplus</div>` : ''}`;
+        <div class="w-sub">${t('widget.deckungsbeitrag.sub_min', { amt: fmtS(d.fixCosts) })}</div>
+        ${d.surplusHours !== null ? `<div class="w-sub ${d.surplusHours >= 0 ? 'pos' : 'neg'}">${d.surplusHours >= 0 ? t('widget.deckungsbeitrag.sub_surplus_pos', { n: d.surplusHours }) : t('widget.deckungsbeitrag.sub_surplus_neg', { n: d.surplusHours })}</div>` : ''}`;
     },
     detail() {
       const d = Computed.deckungsbeitrag();
       if (!d || !d.hourlyRate) {
         const z = Computed.zeitKPIs();
-        const hint = !z.hasClockify ? 'Clockify verbinden → Einstellungen' : z.totalH === 0 ? 'Keine Stunden in Clockify erfasst' : 'Stundensatz kann erst berechnet werden wenn Einnahmen vorhanden sind (Einnahmen ÷ Stunden)';
+        const hint = !z.hasClockify ? t('widget.deckungsbeitrag.no_clockify_long') : z.totalH === 0 ? t('widget.deckungsbeitrag.no_hours_long') : t('widget.deckungsbeitrag.no_rate_long');
         return { value: '—', interpretation: hint };
       }
-      return { value: d.minBillableHours + 'h/Monat',
-        formula: 'Monatliche Fixkosten (geschäftl. Recurrings) ÷ Effektiver Stundensatz',
-        interpretation: d.surplusHours >= 0 ? `Du arbeitest ${d.surplusHours}h über dem Minimum.` : `Dir fehlen ${Math.abs(d.surplusHours)}h um Fixkosten zu decken.`,
-        data: [['Fixkosten/Mt.', fmtS(d.fixCosts)], ['Stundensatz', fmtS(d.hourlyRate)+'/h'], ['Min. Stunden', d.minBillableHours+'h'], ['Surplus', d.surplusHours !== null ? d.surplusHours+'h' : '—']] };
+      return { value: t('widget.deckungsbeitrag.value_unit', { n: d.minBillableHours }),
+        formula: t('widget.deckungsbeitrag.formula'),
+        interpretation: d.surplusHours >= 0 ? t('widget.deckungsbeitrag.over_min', { n: d.surplusHours }) : t('widget.deckungsbeitrag.under_min', { n: Math.abs(d.surplusHours) }),
+        data: [[t('widget.deckungsbeitrag.row_fixcosts'), fmtS(d.fixCosts)], [t('widget.deckungsbeitrag.row_rate'), fmtS(d.hourlyRate)+'/h'], [t('widget.deckungsbeitrag.row_min_hours'), d.minBillableHours+'h'], [t('widget.deckungsbeitrag.row_surplus'), d.surplusHours !== null ? d.surplusHours+'h' : '—']] };
     }
   },
-  { id: 'runway', cat: 'geschaeft', name: 'Runway', icon: '🛫', size: 'small',
-    requires: ['konten','buchungen'], desc: 'Wie lange reicht dein Geld noch?',
+  { id: 'runway', cat: 'geschaeft', name: 'widget.runway.name', icon: '🛫', size: 'small',
+    requires: ['konten','buchungen'], desc: 'widget.runway.desc',
     render() {
       const r = Computed.runway();
-      if (!r) return '<div class="w-val muted">—</div><div class="w-sub">Saldo + Geschäftsausgaben nötig</div>';
+      if (!r) return '<div class="w-val muted">—</div><div class="w-sub">' + t('widget.runway.no_data') + '</div>';
       const color = r.months < 3 ? 'neg' : r.months < 6 ? 'warn' : 'pos';
-      return `<div class="w-val ${color}">${r.months < 99 ? r.months.toFixed(1) + ' Mt.' : '∞'}</div>`;
+      return `<div class="w-val ${color}">${r.months < 99 ? t('widget.runway.value_months_short', { n: r.months.toFixed(1) }) : '∞'}</div>`;
     },
     detail() {
       const r = Computed.runway();
-      if (!r) return { value: '—', interpretation: 'Braucht ein Konto mit Saldo und Geschäftsausgaben der letzten 3 Monate.' };
-      return { value: r.months < 99 ? r.months.toFixed(1)+' Monate' : '∞',
-        formula: 'Gesamtvermögen / Ø monatliche Gesamtausgaben',
-        interpretation: r.months >= 6 ? 'Komfortable Runway.' : 'Weniger als 6 Monate — plane voraus.' };
+      if (!r) return { value: '—', interpretation: t('widget.runway.no_data_long') };
+      return { value: r.months < 99 ? t('widget.runway.value_months', { n: r.months.toFixed(1) }) : '∞',
+        formula: t('widget.runway.formula'),
+        interpretation: r.months >= 6 ? t('widget.runway.interp_good') : t('widget.runway.interp_warn') };
     }
   },
-  { id: 'abo-kosten', cat: 'geschaeft', name: 'Abo-Kosten', icon: '🔄', size: 'small',
-    requires: ['recurrings'], desc: 'Monatliche wiederkehrende Kosten',
+  { id: 'abo-kosten', cat: 'geschaeft', name: 'widget.abo_kosten.name', icon: '🔄', size: 'small',
+    requires: ['recurrings'], desc: 'widget.abo_kosten.desc',
     render() {
       const v = Computed.subscriptionMonthly();
-      return `<div class="w-val">${fmtS(v)}/Mt.</div>`;
+      return `<div class="w-val">${t('widget.abo_kosten.value_per_month', { amt: fmtS(v) })}</div>`;
     },
     detail() {
       const v = Computed.subscriptionMonthly();
-      return { value: fmtS(v)+'/Mt.', formula: 'Σ aktive Recurrings (monatlich normiert)',
-        interpretation: 'Deine fixen monatlichen Kosten aus wiederkehrenden Zahlungen.' };
+      return { value: t('widget.abo_kosten.value_per_month', { amt: fmtS(v) }), formula: t('widget.abo_kosten.formula'),
+        interpretation: t('widget.abo_kosten.interp') };
     }
   },
-  { id: 'kundenkonzentration', cat: 'geschaeft', name: 'Kundenkonzentration', icon: '🎲', size: 'medium',
-    requires: ['rechnungen'], desc: 'Wie abhängig bist du von einzelnen Kunden?',
+  { id: 'kundenkonzentration', cat: 'geschaeft', name: 'widget.kundenkonzentration.name', icon: '🎲', size: 'medium',
+    requires: ['rechnungen'], desc: 'widget.kundenkonzentration.desc',
     render() {
       const c = Computed.clientConcentration();
-      if (!c || c.clients.length === 0) return '<div class="w-val muted">—</div><div class="w-sub">Keine Rechnungen</div>';
+      if (!c || c.clients.length === 0) return '<div class="w-val muted">—</div><div class="w-sub">' + t('widget.kundenkonzentration.no_invoices') + '</div>';
       const risk = c.hhi > 5000 ? 'neg' : c.hhi > 2500 ? 'warn' : 'pos';
       return `<div class="w-val ${risk}">HHI ${c.hhi}</div>
         <div class="w-sub">${c.topClient}: ${c.topClientPct}%</div>`;
@@ -10173,119 +10920,119 @@ const WIDGETS = [
     detail() {
       const c = Computed.clientConcentration();
       return { value: c ? 'HHI '+c.hhi : '—',
-        formula: 'Herfindahl-Hirschman Index: Σ(Umsatzanteil²) × 10000',
-        interpretation: c && c.hhi > 5000 ? 'Hohe Konzentration — Klumpenrisiko.' : c && c.hhi > 2500 ? 'Moderate Konzentration.' : 'Gut diversifiziert.',
+        formula: t('widget.kundenkonzentration.formula'),
+        interpretation: c && c.hhi > 5000 ? t('widget.kundenkonzentration.interp_high') : c && c.hhi > 2500 ? t('widget.kundenkonzentration.interp_mod') : t('widget.kundenkonzentration.interp_low'),
         data: c ? c.clients.map(cl => [cl.name, cl.pct+'%']) : [] };
     }
   },
-  { id: 'steuerreserve', cat: 'geschaeft', name: 'Steuerreserve', icon: '🏛️', size: 'small',
-    requires: ['buchungen'], desc: 'Empfohlene Steuerrücklage',
+  { id: 'steuerreserve', cat: 'geschaeft', name: 'widget.steuerreserve.name', icon: '🏛️', size: 'small',
+    requires: ['buchungen'], desc: 'widget.steuerreserve.desc',
     render() {
       const tr = Computed.taxReserve();
       return `<div class="w-val">${fmtS(tr.amount)}</div>
-        <div class="w-sub">${tr.rate}% vom Profit</div>`;
+        <div class="w-sub">${t('widget.steuerreserve.sub_pct', { pct: tr.rate })}</div>`;
     },
     detail() {
       const tr = Computed.taxReserve();
-      return { value: fmtS(tr.amount), formula: `Profit × ${tr.rate}% (${AppState.country || 'CH'} Pauschale)`,
-        interpretation: 'Lege diesen Betrag für Steuern und Sozialabgaben zurück.',
+      return { value: fmtS(tr.amount), formula: t('widget.steuerreserve.formula', { pct: tr.rate, country: AppState.country || 'CH' }),
+        interpretation: t('widget.steuerreserve.interp'),
         data: Object.entries(tr.breakdown).map(([k,v]) => [k, fmtS(v)]) };
     }
   },
 
   // ── Kompass ──
-  { id: 'freiheit', cat: 'kompass', name: 'Freiheits-Monate', icon: '🕊️', size: 'small',
-    requires: ['konten','buchungen'], desc: 'Wie viele Monate könntest du ohne Einkommen leben?',
+  { id: 'freiheit', cat: 'kompass', name: 'widget.freiheit.name', icon: '🕊️', size: 'small',
+    requires: ['konten','buchungen'], desc: 'widget.freiheit.desc',
     render() {
       const f = Computed.freedomMonths();
       const color = f.months < 3 ? 'neg' : f.months < 6 ? 'warn' : 'pos';
-      return `<div class="w-val ${color}">${f.months.toFixed(1)} Mt.</div>`;
+      return `<div class="w-val ${color}">${t('widget.runway.value_months_short', { n: f.months.toFixed(1) })}</div>`;
     },
     detail() {
       const f = Computed.freedomMonths();
-      return { value: f.months.toFixed(1)+' Monate', formula: 'Gesamtvermögen / Ø monatl. Gesamtausgaben (inkl. privat)',
-        interpretation: f.months >= 6 ? 'Gute Freiheitsreserve.' : 'Weniger als 6 Monate finanzieller Spielraum.',
-        data: [['Vermögen', fmtS(f.wealth)],['Ø Ausgaben/Mt.', fmtS(f.avgMonthlyExpense)]] };
+      return { value: t('widget.runway.value_months', { n: f.months.toFixed(1) }), formula: t('widget.freiheit.formula'),
+        interpretation: f.months >= 6 ? t('widget.freiheit.interp_good') : t('widget.freiheit.interp_warn'),
+        data: [[t('widget.freiheit.row_wealth'), fmtS(f.wealth)],[t('widget.freiheit.row_avg_exp'), fmtS(f.avgMonthlyExpense)]] };
     }
   },
-  { id: 'lebensenergie', cat: 'kompass', name: 'Lebensenergie-Satz', icon: '⚡', size: 'medium',
-    requires: ['buchungen','clockify'], desc: 'Was verdienst du wirklich pro Lebensstunde?',
+  { id: 'lebensenergie', cat: 'kompass', name: 'widget.lebensenergie.name', icon: '⚡', size: 'medium',
+    requires: ['buchungen','clockify'], desc: 'widget.lebensenergie.desc',
     render() {
       const le = Computed.lifeEnergyRate();
-      if (!le.hasData) return '<div class="w-val muted">—</div><div class="w-sub">Clockify nötig</div>';
+      if (!le.hasData) return '<div class="w-val muted">—</div><div class="w-sub">' + t('widget.lebensenergie.no_data') + '</div>';
       return `<div class="w-val">${fmtS(le.trueRate)}/h</div>
-        <div class="w-sub">Nominal: ${le.nominal ? fmtS(le.nominal) + '/h' : '—'}</div>`;
+        <div class="w-sub">${le.nominal ? t('widget.lebensenergie.sub_nominal', { rate: fmtS(le.nominal) + '/h' }) : t('widget.lebensenergie.sub_nominal_empty')}</div>`;
     },
     detail() {
       const le = Computed.lifeEnergyRate();
       return { value: le.hasData ? fmtS(le.trueRate)+'/h' : '—',
-        formula: '(Netto-Einnahmen − Arbeitskosten) / (Stunden × 1.25)',
-        interpretation: 'Der wahre Stundensatz nach Abzug aller versteckten Kosten und Zeit.',
-        links: [{ label: 'Vicki Robin: Your Money or Your Life', url: 'https://yourmoneyoryourlife.com' }] };
+        formula: t('widget.lebensenergie.formula'),
+        interpretation: t('widget.lebensenergie.interp'),
+        links: [{ label: t('widget.lebensenergie.link_label'), url: 'https://yourmoneyoryourlife.com' }] };
     }
   },
-  { id: 'kosten-lebensstunde', cat: 'kompass', name: 'Kosten/Lebensstunde', icon: '⏳', size: 'small',
-    requires: ['buchungen'], desc: 'Was kostet eine Stunde deines Lebens?',
+  { id: 'kosten-lebensstunde', cat: 'kompass', name: 'widget.kosten_lebensstunde.name', icon: '⏳', size: 'small',
+    requires: ['buchungen'], desc: 'widget.kosten_lebensstunde.desc',
     render() {
       const monthExp = Computed.totalExpense() / Math.max(1, new Date().getMonth() + 1);
       const costPerH = monthExp / 480; // ~16h wach × 30 Tage
       return `<div class="w-val">${fmtS(costPerH)}</div>
-        <div class="w-sub">pro wache Stunde</div>`;
+        <div class="w-sub">${t('widget.kosten_lebensstunde.sub')}</div>`;
     },
     detail() {
-      return { value: '', formula: 'Monatsausgaben / 480 (≈ 16 wache Stunden × 30 Tage)',
-        interpretation: 'So viel kostet eine Stunde deines wachen Lebens an Fixkosten.' };
+      return { value: '', formula: t('widget.kosten_lebensstunde.formula'),
+        interpretation: t('widget.kosten_lebensstunde.interp') };
     }
   },
-  { id: 'portfolio-life', cat: 'kompass', name: 'Portfolio Life', icon: '🧩', size: 'medium',
-    requires: ['clockify'], desc: 'Wie teilt sich deine Zeit auf Projekte auf?',
+  { id: 'portfolio-life', cat: 'kompass', name: 'widget.portfolio_life.name', icon: '🧩', size: 'medium',
+    requires: ['clockify'], desc: 'widget.portfolio_life.desc',
     render() {
       const z = Computed.zeitKPIs();
-      if (!z.hasClockify) return '<div class="w-val muted">—</div><div class="w-sub">Clockify verbinden</div>';
+      if (!z.hasClockify) return '<div class="w-val muted">—</div><div class="w-sub">' + t('widget.portfolio_life.no_clockify') + '</div>';
       const projects = z.projects || [];
       return projects.slice(0, 4).map(p =>
         `<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
           <span>${esc(p.name)}</span><span style="font-weight:600">${p.hours.toFixed(0)}h</span></div>`
-      ).join('') + (projects.length > 4 ? `<div class="w-sub">+${projects.length - 4} weitere</div>` : '');
+      ).join('') + (projects.length > 4 ? `<div class="w-sub">${t('widget.portfolio_life.more_n', { n: projects.length - 4 })}</div>` : '');
     },
     detail() {
       const z = Computed.zeitKPIs();
-      return { value: z.hasClockify ? z.totalHours.toFixed(0)+'h total' : '—',
-        formula: 'Clockify Projekte aggregiert',
+      return { value: z.hasClockify ? t('widget.portfolio_life.value_total', { n: z.totalHours.toFixed(0) }) : '—',
+        formula: t('widget.portfolio_life.formula'),
         data: (z.projects||[]).map(p => [p.name, p.hours.toFixed(1)+'h']) };
     }
   },
-  { id: 'sabbatical', cat: 'kompass', name: 'Sabbatical', icon: '🏖️', size: 'small',
-    requires: ['konten','buchungen'], desc: 'Wie nah bist du an einem Sabbatical?',
+  { id: 'sabbatical', cat: 'kompass', name: 'widget.sabbatical.name', icon: '🏖️', size: 'small',
+    requires: ['konten','buchungen'], desc: 'widget.sabbatical.desc',
     render() {
       const s = Computed.sabbaticalReadiness();
       const color = s.pct >= 100 ? 'pos' : s.pct >= 50 ? 'warn' : '';
       return `<div class="w-val ${color}">${Math.min(100, Math.round(s.pct))}%</div>
-        <div class="w-sub">${s.currentMonths.toFixed(1)} / ${s.targetMonths} Mt.</div>`;
+        <div class="w-sub">${t('widget.sabbatical.sub_progress', { cur: s.currentMonths.toFixed(1), target: s.targetMonths })}</div>`;
     },
     detail() {
       const s = Computed.sabbaticalReadiness();
-      return { value: Math.round(s.pct)+'%', formula: 'Freiheits-Monate / Ziel-Monate × 100',
-        interpretation: s.pct >= 100 ? 'Du könntest dir jetzt ein Sabbatical leisten!' : `Dir fehlen noch ${fmtS(s.amountNeeded)}.` };
+      return { value: Math.round(s.pct)+'%', formula: t('widget.sabbatical.formula'),
+        interpretation: s.pct >= 100 ? t('widget.sabbatical.interp_ready') : t('widget.sabbatical.interp_short', { amt: fmtS(s.amountNeeded) }) };
     }
   },
-  { id: 'burnout-risk', cat: 'kompass', name: 'Burnout-Risiko', icon: '🔥', size: 'medium',
-    requires: ['clockify-timestamps'], desc: 'Arbeitsmuster-Analyse',
+  { id: 'burnout-risk', cat: 'kompass', name: 'widget.burnout.name', icon: '🔥', size: 'medium',
+    requires: ['clockify-timestamps'], desc: 'widget.burnout.desc',
     comingSoon: true,
-    render() { return '<div class="w-val muted">Coming Soon</div><div class="w-sub">Braucht Clockify-Upgrade</div>'; },
-    detail() { return { value: 'Coming Soon', interpretation: 'Wird nach dem Clockify Timestamps-Upgrade verfügbar.' }; }
+    render() { return '<div class="w-val muted">' + t('widget.burnout.coming_soon') + '</div><div class="w-sub">' + t('widget.burnout.coming_soon_sub') + '</div>'; },
+    detail() { return { value: t('widget.burnout.coming_soon'), interpretation: t('widget.burnout.coming_soon_long') }; }
   },
-  { id: 'enough-point', cat: 'kompass', name: 'Enough-Punkt', icon: '🪷', size: 'small',
-    requires: ['checkin'], desc: 'Wo liegt "genug" für dich?',
+  { id: 'enough-point', cat: 'kompass', name: 'widget.enough.name', icon: '🪷', size: 'small',
+    requires: ['checkin'], desc: 'widget.enough.desc',
     comingSoon: true,
-    render() { return '<div class="w-val muted">Coming Soon</div><div class="w-sub">Braucht Check-in System</div>'; },
-    detail() { return { value: 'Coming Soon', interpretation: 'Wird nach dem Check-in System (DS4) verfügbar.' }; }
+    render() { return '<div class="w-val muted">' + t('widget.enough.coming_soon') + '</div><div class="w-sub">' + t('widget.enough.coming_soon_sub') + '</div>'; },
+    detail() { return { value: t('widget.enough.coming_soon'), interpretation: t('widget.enough.coming_soon_long') }; }
   },
-  { id: 'doughnut', cat: 'kompass', name: 'Personal Doughnut', icon: '🍩', size: 'large',
-    requires: ['checkin'], desc: 'Dein persönlicher Doughnut — zwischen zu wenig und zu viel',
+  { id: 'doughnut', cat: 'kompass', name: 'widget.doughnut.name', icon: '🍩', size: 'large',
+    requires: ['checkin'], desc: 'widget.doughnut.desc',
     comingSoon: true,
-    render() { return '<div class="w-val muted">Coming Soon</div><div class="w-sub">Design in DS4</div>'; },
-    detail() { return { value: 'Coming Soon', interpretation: 'Wird nach der Doughnut Design-Session verfügbar.' }; }
+    render() { return '<div class="w-val muted">' + t('widget.doughnut.coming_soon') + '</div><div class="w-sub">' + t('widget.doughnut.coming_soon_sub') + '</div>'; },
+    detail() { return { value: t('widget.doughnut.coming_soon'), interpretation: t('widget.doughnut.coming_soon_long') }; }
   },
 ];
 
@@ -10424,19 +11171,19 @@ function renderCockpit() {
 }
 
 function canRenderWidget(w) {
-  if (w.comingSoon) return { ok: false, msg: 'Coming Soon' };
+  if (w.comingSoon) return { ok: false, msg: t('widget.canrender.coming_soon') };
   if (w.requires.includes('clockify') || w.requires.includes('clockify-timestamps')) {
     const z = Computed.zeitKPIs();
-    if (!z || !z.hasClockify) return { ok: false, msg: 'Clockify verbinden → Einstellungen' };
+    if (!z || !z.hasClockify) return { ok: false, msg: t('widget.canrender.connect_clockify') };
   }
   if (w.requires.includes('konten') && Store.konten.length === 0)
-    return { ok: false, msg: 'Konto einrichten → Einstellungen' };
+    return { ok: false, msg: t('widget.canrender.setup_account') };
   if (w.requires.includes('buchungen') && Store.buchungen.length === 0)
-    return { ok: false, msg: 'Erste Buchung erfassen' };
+    return { ok: false, msg: t('widget.canrender.first_buchung') };
   if (w.requires.includes('rechnungen') && Store.rechnungen.length === 0)
-    return { ok: false, msg: 'Erste Rechnung erstellen' };
+    return { ok: false, msg: t('widget.canrender.first_invoice') };
   if (w.requires.includes('recurrings') && Store.recurrings.length === 0)
-    return { ok: false, msg: 'Recurrings einrichten' };
+    return { ok: false, msg: t('widget.canrender.setup_recurrings') };
   return { ok: true };
 }
 
@@ -10448,7 +11195,7 @@ function widgetCardHTML(w, overrides) {
     content = `<div class="w-val muted">—</div><div class="w-sub">${check.msg}</div>`;
   } else {
     try { content = w.render(overrides || {}); }
-    catch (e) { content = `<div class="w-val muted">Fehler</div>`; console.warn('Widget render error:', w.id, e); }
+    catch (e) { content = `<div class="w-val muted">${t('widget.error')}</div>`; console.warn('Widget render error:', w.id, e); }
   }
   return `
     <div class="widget ${sizeClass}" data-widget-id="${w.id}" onclick="openWidgetDetail('${w.id}')">
@@ -10458,7 +11205,7 @@ function widgetCardHTML(w, overrides) {
       </div>
       <div class="widget-header">
         <span class="widget-icon">${w.icon}</span>
-        <span class="widget-name">${w.name}</span>
+        <span class="widget-name">${t(w.name)}</span>
       </div>
       <div class="widget-body">${content}</div>
     </div>`;
@@ -10468,7 +11215,7 @@ function widgetCardHTML(w, overrides) {
 
 function cockpitCashflowInner() {
   const data = Computed.cashflowByMonth();
-  if (!data || data.length === 0) return '<div class="w-val muted">Keine Daten</div>';
+  if (!data || data.length === 0) return '<div class="w-val muted">' + t('widget.cashflow.no_data') + '</div>';
   const maxVal = Math.max(...data.map(d => Math.max(d.income, d.expense)), 1);
   const maxH = 100; // px
   return `<div style="display:flex;gap:2px;align-items:flex-end;height:120px;margin-top:8px">
@@ -10485,8 +11232,8 @@ function cockpitCashflowInner() {
     }).join('')}
   </div>
   <div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:11px">
-    <span><span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:2px"></span> Einnahmen</span>
-    <span><span style="display:inline-block;width:8px;height:8px;background:var(--red);border-radius:2px;opacity:0.7"></span> Ausgaben</span>
+    <span><span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:2px"></span> ${t('widget.cashflow.legend_inc')}</span>
+    <span><span style="display:inline-block;width:8px;height:8px;background:var(--red);border-radius:2px;opacity:0.7"></span> ${t('widget.cashflow.legend_exp')}</span>
   </div>`;
 }
 
@@ -10494,11 +11241,11 @@ function cockpitLiquiditaetInner() {
   const proj = Computed.liquidityProjection(_liqHorizon);
   const mainK = Store.konten.find(k => k.active !== false && k.stand != null);
   const baseEst = mainK ? Computed.estimatedBalance(mainK.name, mainK.stand, mainK.saldoDatum) : null;
-  if (baseEst === null) return '<div class="w-val muted">—</div><div class="w-sub">Konto mit Saldo nötig</div>';
+  if (baseEst === null) return '<div class="w-val muted">—</div><div class="w-sub">' + t('widget.liquiditaet.no_account') + '</div>';
   const projected = baseEst + proj.totalInflow - proj.totalOutflow;
   const color = projected < 0 ? 'neg' : '';
   return `<div class="w-val ${color}">${fmtS(projected)}</div>
-    <div class="w-sub">in ${_liqHorizon} Tagen</div>
+    <div class="w-sub">${t('widget.liquiditaet.sub_in_days', { n: _liqHorizon })}</div>
     <div style="display:flex;gap:8px;margin-top:8px;font-size:12px">
       <span style="color:var(--green)">+${fmtS(proj.totalInflow)}</span>
       <span style="color:var(--red)">−${fmtS(proj.totalOutflow)}</span>
@@ -10521,18 +11268,18 @@ function openWidgetDetail(widgetId) {
         <div class="overlay-sheet-header">
           <span style="font-size:24px">${w.icon}</span>
           <div>
-            <div style="font-weight:700;font-size:17px">${w.name}</div>
-            <div style="font-size:12px;color:${cat?.color || 'var(--muted)'}">${cat?.label || ''}</div>
+            <div style="font-weight:700;font-size:17px">${t(w.name)}</div>
+            <div style="font-size:12px;color:${cat?.color || 'var(--muted)'}">${cat?.label ? t(cat.label) : ''}</div>
           </div>
           <button class="overlay-close-btn" onclick="document.getElementById('widgetDetailOverlay').remove()">✕</button>
         </div>
         ${d.value ? `<div class="detail-hero ${d.valueClass || ''}">${d.value}</div>` : ''}
-        ${d.formula ? `<div class="detail-section"><div class="detail-label">Berechnung</div><div class="detail-text">${d.formula}</div></div>` : ''}
-        ${d.interpretation ? `<div class="detail-section"><div class="detail-label">Interpretation</div><div class="detail-text">${d.interpretation}</div></div>` : ''}
-        ${d.data && d.data.length ? `<div class="detail-section"><div class="detail-label">Daten</div>
+        ${d.formula ? `<div class="detail-section"><div class="detail-label">${t('widget.detail.formula')}</div><div class="detail-text">${d.formula}</div></div>` : ''}
+        ${d.interpretation ? `<div class="detail-section"><div class="detail-label">${t('widget.detail.interpretation')}</div><div class="detail-text">${d.interpretation}</div></div>` : ''}
+        ${d.data && d.data.length ? `<div class="detail-section"><div class="detail-label">${t('widget.detail.data')}</div>
           <table class="detail-table">${d.data.map(row => `<tr><td>${row[0]}</td><td style="text-align:right;font-weight:600">${row[1]}</td></tr>`).join('')}</table>
         </div>` : ''}
-        ${d.links && d.links.length ? `<div class="detail-section"><div class="detail-label">Zum Nachlesen</div>
+        ${d.links && d.links.length ? `<div class="detail-section"><div class="detail-label">${t('widget.detail.further_reading')}</div>
           ${d.links.map(l => `<a href="${l.url}" target="_blank" style="display:block;color:var(--accent);font-size:13px;margin-bottom:4px">${l.label} ↗</a>`).join('')}
         </div>` : ''}
       </div>
@@ -10552,7 +11299,7 @@ function openWidgetLibrary() {
     <div id="widgetLibraryOverlay" class="overlay-sheet" onclick="if(event.target===this)this.remove()">
       <div class="overlay-sheet-content" style="max-height:85vh">
         <div class="overlay-sheet-header">
-          <div style="font-weight:700;font-size:17px">Widget-Bibliothek</div>
+          <div style="font-weight:700;font-size:17px">${t('widget.library.title')}</div>
           <button class="overlay-close-btn" onclick="document.getElementById('widgetLibraryOverlay').remove()">✕</button>
         </div>
         <div class="library-tabs" id="libraryTabs">
@@ -10560,7 +11307,7 @@ function openWidgetLibrary() {
             <button class="library-tab ${i === 0 ? 'active' : ''}" data-cat="${key}"
               onclick="switchLibraryTab('${key}')"
               style="--tab-color:${c.color}">
-              <span class="tab-dot" style="background:${c.color}"></span> ${c.label}
+              <span class="tab-dot" style="background:${c.color}"></span> ${t(c.label)}
             </button>`).join('')}
         </div>
         <div id="libraryContent">${renderLibraryTab(cats[0][0], active)}</div>
@@ -10586,8 +11333,8 @@ function renderLibraryTab(cat, active) {
         <div style="display:flex;align-items:center;gap:10px;flex:1">
           <span style="font-size:22px">${w.icon}</span>
           <div>
-            <div style="font-weight:600;font-size:14px">${w.name}</div>
-            <div style="font-size:12px;color:var(--muted)">${w.desc}</div>
+            <div style="font-weight:600;font-size:14px">${t(w.name)}</div>
+            <div style="font-size:12px;color:var(--muted)">${t(w.desc)}</div>
             <span class="data-badge ${dataStatus.cls}">${dataStatus.label}</span>
           </div>
         </div>
@@ -10602,8 +11349,8 @@ function renderLibraryTab(cat, active) {
       <div style="display:flex;align-items:center;gap:10px;flex:1">
         <span style="font-size:22px">💡</span>
         <div>
-          <div style="font-weight:600;font-size:14px">Dir fehlt ein Widget?</div>
-          <div style="font-size:12px;color:var(--muted)">Sende uns deine Idee</div>
+          <div style="font-weight:600;font-size:14px">${t('widget.library.missing')}</div>
+          <div style="font-size:12px;color:var(--muted)">${t('widget.library.send_idea')}</div>
         </div>
       </div>
       <span style="color:var(--accent)">→</span>
@@ -10611,14 +11358,14 @@ function renderLibraryTab(cat, active) {
 }
 
 function widgetDataStatus(w) {
-  if (w.comingSoon) return { label: 'Coming Soon', cls: 'badge-gray' };
-  if (w.requires.includes('clockify-timestamps')) return { label: 'Braucht Clockify-Upgrade', cls: 'badge-amber' };
-  if (w.requires.includes('checkin')) return { label: 'Braucht Check-in', cls: 'badge-amber' };
+  if (w.comingSoon) return { label: t('widget.datastatus.coming_soon'), cls: 'badge-gray' };
+  if (w.requires.includes('clockify-timestamps')) return { label: t('widget.datastatus.needs_clockify_up'), cls: 'badge-amber' };
+  if (w.requires.includes('checkin')) return { label: t('widget.datastatus.needs_checkin'), cls: 'badge-amber' };
   if (w.requires.includes('clockify')) {
     const z = Computed.zeitKPIs();
-    return z.hasClockify ? { label: 'Daten vorhanden', cls: 'badge-green' } : { label: 'Benötigt Clockify', cls: 'badge-amber' };
+    return z.hasClockify ? { label: t('widget.datastatus.data_available'), cls: 'badge-green' } : { label: t('widget.datastatus.requires_clockify'), cls: 'badge-amber' };
   }
-  return { label: 'Daten vorhanden', cls: 'badge-green' };
+  return { label: t('widget.datastatus.data_available'), cls: 'badge-green' };
 }
 
 function addWidget(widgetId) {
@@ -10734,7 +11481,7 @@ document.addEventListener('click', e => {
 
 function renderRecentBookingsHTML() {
   const recent = Store.buchungen.slice(0, 8);
-  if (!recent.length) return '<div class="empty"><div class="ico">📭</div><p>Noch keine Buchungen</p></div>';
+  if (!recent.length) return '<div class="empty"><div class="ico">📭</div><p>' + t('cockpit.recent.empty') + '</p></div>';
   return `<table class="data-table">
     <thead><tr>
       <th>Datum</th><th>Beschreibung</th><th>Gegenpartei</th><th>Typ</th><th>Betrag</th>
@@ -11308,7 +12055,7 @@ async function submitPartialPayment(invId) {
 
 async function deleteRechnung(id) {
   const r = Store.rechnungen.find(x => x._id === id);
-  if (!confirm(`Rechnung "${r?.nr||''}" löschen?`)) return;
+  if (!confirm(t('confirm.invoice_delete', { nr: r?.nr || '' }))) return;
   try {
     const db = getActiveDataAdapter();
     await db.deleteInvoice(id);
@@ -12151,7 +12898,7 @@ function renderAktivitaeten() {
           <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600">Aktivitäten</h2>
           <button class="btn btn-primary btn-sm" onclick="syncTimeTracker()">🔄 Sync starten</button>
         </div>
-        <div class="empty"><div class="ico">🦚</div><p>Klicke Sync um Zeiterfassungsdaten zu laden</p></div>
+        <div class="empty"><div class="ico">🦚</div><p>${t('empty.zeit_sync_hint')}</p></div>
       </div>`;
     return;
   }
@@ -12699,14 +13446,14 @@ function buildDiagReport() {
   // Cache sizes
   const buchCount = Store.buchungen.length;
   checks.push(buchCount === 0
-    ? warn('Buchungen-Cache leer', 'Sync starten')
+    ? warn(t('health.warn.cache_empty'), t('health.warn.cache_empty_action'))
     : buchCount > 3000
       ? warn(`${buchCount} Buchungen`, 'Archivierung empfohlen')
       : ok(`${buchCount} Buchungen gecacht`));
 
   checks.push(Store.konten.length
     ? ok(`${Store.konten.length} Konten gecacht`)
-    : warn('Keine Konten', 'In Notion konfigurieren'));
+    : warn(t('health.warn.no_konten'), t('health.warn.no_konten_action')));
 
   // Queue
   const qPending = loadLocal(QUEUE_KEY, []).filter(e => e.status === 'pending' || e.status === 'error').length;
@@ -12932,7 +13679,7 @@ async function archiveDriveReceipt(receiptLink) {
 
 async function deleteBuchung(id) {
   const b = Store.buchungen.find(x => x._id === id);
-  if (!confirm(`Buchung "${b?.desc || fmt(b?.amount)+' CHF'}" löschen?\n\nSie wird 30 Tage im Papierkorb behalten.`)) return;
+  if (!confirm(t('confirm.buchung_delete', { label: b?.desc || fmt(b?.amount)+' CHF' }))) return;
   try {
     const db = getActiveDataAdapter();
     await db.deleteBooking(id);
@@ -14926,7 +15673,7 @@ function renderZieleWithTiers() {
             <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600">Ziele</h2>
             <button class="btn btn-primary btn-sm" onclick="openZielForm()">+ Ziel</button>
           </div>
-          ${allP.map(p => zielCardHTML(p)).join('') || '<div class="empty"><div class="ico">🐣</div><p>Keine Projekte im Cache</p></div>'}
+          ${allP.map(p => zielCardHTML(p)).join('') || '<div class="empty"><div class="ico">🐣</div><p>'+t('empty.projekte_cache')+'</p></div>'}
           <details style="margin-top:16px;border:1px solid var(--border);border-radius:12px;padding:14px 16px">
             <summary style="cursor:pointer;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);list-style:none;display:flex;justify-content:space-between">
               Weitere Ziel-Typen (kommen mit Kompass) <span style="font-size:14px">▾</span>
@@ -15124,7 +15871,7 @@ function healIssue(action) {
 }
 
 function clearAllLocal() {
-  if (!confirm('Wirklich ALLE lokalen Daten löschen? Notion-Daten bleiben erhalten.')) return;
+  if (!confirm(t('confirm.local_data_delete'))) return;
   const keep = ['fb_appstate'];
   Object.keys(localStorage).filter(k => !keep.includes(k)).forEach(k => localStorage.removeItem(k));
   alert('Lokale Daten gelöscht. Seite wird neu geladen…');
@@ -15144,7 +15891,7 @@ function setCountry(country) {
 
 /** Session 3: Logout with confirmation */
 function logoutWithConfirm() {
-  if (!confirm('Wirklich abmelden? Lokale Daten bleiben erhalten, du kannst dich jederzeit wieder verbinden.')) return;
+  if (!confirm(t('confirm.logout'))) return;
   logout();
 }
 
@@ -15229,7 +15976,7 @@ function toggleCollaborator(id) {
 }
 
 function removeCollaborator(id) {
-  if (!confirm('Person entfernen?')) return;
+  if (!confirm(t('confirm.person_remove'))) return;
   collaborators = collaborators.filter(x => x.id !== id);
   saveCollaborators();
   renderEinstellungen();
